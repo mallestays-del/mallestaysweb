@@ -44,7 +44,7 @@ export default function ChatBot() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full p-4 shadow-2xl hover:shadow-3xl transition-all transform hover:scale-110 z-50 animate-bounce"
+          className="fixed bottom-6 right-6 bg-yellow-600 hover:bg-yellow-700 text-white rounded-full p-4 elegant-shadow transition-all duration-300 hover:scale-110 z-50"
           data-testid="chat-button"
         >
           <MessageCircle className="h-6 w-6" />
@@ -53,14 +53,14 @@ export default function ChatBot() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col z-50 border-2 border-purple-200" data-testid="chat-window">
+        <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-white rounded-lg elegant-shadow flex flex-col z-50 border border-slate-200" data-testid="chat-window">
           {/* Header */}
-          <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 rounded-t-2xl flex justify-between items-center">
+          <div className="bg-slate-900 text-white p-4 rounded-t-lg flex justify-between items-center border-b border-slate-800">
             <div className="flex items-center space-x-2">
-              <MessageCircle className="h-5 w-5" />
-              <span className="font-semibold">Malle Stays Assistant</span>
+              <MessageCircle className="h-5 w-5 text-yellow-600" />
+              <span className="font-semibold">Concierge Service</span>
             </div>
-            <button onClick={() => setIsOpen(false)} data-testid="chat-close-button" className="hover:bg-white/20 rounded-full p-1 transition-colors">
+            <button onClick={() => setIsOpen(false)} data-testid="chat-close-button" className="hover:text-yellow-600 transition-colors">
               <X className="h-5 w-5" />
             </button>
           </div>
