@@ -18,13 +18,13 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="fixed top-0 w-full bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 backdrop-blur-sm z-50 shadow-lg" data-testid="navbar">
+    <nav className="fixed top-0 w-full bg-slate-900 backdrop-blur-md z-50 border-b border-slate-800" data-testid="navbar">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2" data-testid="logo-link">
-            <Building2 className="h-8 w-8 text-white" />
-            <span className="text-2xl font-bold text-white drop-shadow-lg">Malle Stays</span>
+          <Link href="/" className="flex items-center space-x-3" data-testid="logo-link">
+            <Building2 className="h-8 w-8 text-yellow-600" />
+            <span className="text-2xl font-bold text-white" style={{ fontFamily: "'Playfair Display', serif" }}>Malle Stays</span>
           </Link>
 
           {/* Desktop Navigation */}
