@@ -45,7 +45,7 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden"
+            className="md:hidden text-white"
             data-testid="mobile-menu-button"
           >
             {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -57,14 +57,14 @@ export default function Navbar() {
           <div className="md:hidden py-4 space-y-2" data-testid="mobile-menu">
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href} onClick={() => setIsOpen(false)}>
-                <Button variant="ghost" className="w-full justify-start" data-testid={`mobile-nav-${link.label.toLowerCase().replace(/\s/g, '-')}`}>
+                <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/20" data-testid={`mobile-nav-${link.label.toLowerCase().replace(/\s/g, '-')}`}>
                   <link.icon className="h-4 w-4 mr-2" />
                   {link.label}
                 </Button>
               </Link>
             ))}
             <Link href="/admin/login" onClick={() => setIsOpen(false)}>
-              <Button variant="outline" className="w-full" data-testid="mobile-admin-login-btn">Admin Login</Button>
+              <Button className="w-full bg-white text-purple-600 hover:bg-gray-100" data-testid="mobile-admin-login-btn">Admin Login</Button>
             </Link>
           </div>
         )}
