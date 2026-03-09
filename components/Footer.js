@@ -5,26 +5,26 @@ import { Building2, Facebook, Instagram, Twitter, Mail, Phone, MapPin } from 'lu
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-900 text-white" data-testid="footer">
+    <footer className="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white" data-testid="footer">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <Building2 className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">Malle Stays</span>
+              <Building2 className="h-8 w-8 text-pink-400" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Malle Stays</span>
             </div>
-            <p className="text-slate-400 mb-4">
+            <p className="text-slate-300 mb-4">
               Curated luxury villas and bungalows for your perfect staycation.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-slate-400 hover:text-white" data-testid="social-facebook">
+              <a href="#" className="text-slate-300 hover:text-pink-400 transition-colors" data-testid="social-facebook">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="text-slate-400 hover:text-white" data-testid="social-instagram">
+              <a href="#" className="text-slate-300 hover:text-pink-400 transition-colors" data-testid="social-instagram">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="text-slate-400 hover:text-white" data-testid="social-twitter">
+              <a href="#" className="text-slate-300 hover:text-pink-400 transition-colors" data-testid="social-twitter">
                 <Twitter className="h-5 w-5" />
               </a>
             </div>
