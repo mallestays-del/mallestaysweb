@@ -54,17 +54,17 @@ export default function Navbar() {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden py-4 space-y-2" data-testid="mobile-menu">
+          <div className="md:hidden py-4 space-y-2 border-t border-slate-800" data-testid="mobile-menu">
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href} onClick={() => setIsOpen(false)}>
-                <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/20" data-testid={`mobile-nav-${link.label.toLowerCase().replace(/\s/g, '-')}`}>
+                <Button variant="ghost" className="w-full justify-start text-slate-300 hover:text-white hover:bg-slate-800" data-testid={`mobile-nav-${link.label.toLowerCase().replace(/\s/g, '-')}`}>
                   <link.icon className="h-4 w-4 mr-2" />
                   {link.label}
                 </Button>
               </Link>
             ))}
             <Link href="/admin/login" onClick={() => setIsOpen(false)}>
-              <Button className="w-full bg-white text-purple-600 hover:bg-gray-100" data-testid="mobile-admin-login-btn">Admin Login</Button>
+              <Button className="w-full bg-yellow-600 hover:bg-yellow-700 text-white" data-testid="mobile-admin-login-btn">Admin Login</Button>
             </Link>
           </div>
         )}
