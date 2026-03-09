@@ -31,14 +31,14 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-1">
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href}>
-                <Button variant="ghost" className="flex items-center space-x-2 text-white hover:bg-white/20" data-testid={`nav-${link.label.toLowerCase().replace(/\s/g, '-')}`}>
+                <Button variant="ghost" className="flex items-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-800 font-medium" data-testid={`nav-${link.label.toLowerCase().replace(/\s/g, '-')}`}>
                   <link.icon className="h-4 w-4" />
                   <span>{link.label}</span>
                 </Button>
               </Link>
             ))}
             <Link href="/admin/login">
-              <Button className="ml-4 bg-white text-purple-600 hover:bg-gray-100 shadow-lg" data-testid="admin-login-btn">Admin Login</Button>
+              <Button className="ml-4 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold" data-testid="admin-login-btn">Admin Login</Button>
             </Link>
           </div>
 
