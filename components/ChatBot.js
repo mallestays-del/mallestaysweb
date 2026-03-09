@@ -44,7 +44,7 @@ export default function ChatBot() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 bg-primary text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-shadow z-50"
+          className="fixed bottom-6 right-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full p-4 shadow-2xl hover:shadow-3xl transition-all transform hover:scale-110 z-50 animate-bounce"
           data-testid="chat-button"
         >
           <MessageCircle className="h-6 w-6" />
@@ -53,14 +53,14 @@ export default function ChatBot() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-white rounded-lg shadow-2xl flex flex-col z-50" data-testid="chat-window">
+        <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col z-50 border-2 border-purple-200" data-testid="chat-window">
           {/* Header */}
-          <div className="bg-primary text-white p-4 rounded-t-lg flex justify-between items-center">
+          <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 rounded-t-2xl flex justify-between items-center">
             <div className="flex items-center space-x-2">
               <MessageCircle className="h-5 w-5" />
               <span className="font-semibold">Malle Stays Assistant</span>
             </div>
-            <button onClick={() => setIsOpen(false)} data-testid="chat-close-button">
+            <button onClick={() => setIsOpen(false)} data-testid="chat-close-button" className="hover:bg-white/20 rounded-full p-1 transition-colors">
               <X className="h-5 w-5" />
             </button>
           </div>
