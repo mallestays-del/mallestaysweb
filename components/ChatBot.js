@@ -75,10 +75,10 @@ export default function ChatBot() {
                   data-testid={`chat-message-${msg.type}`}
                 >
                   <div
-                    className={`max-w-[80%] p-3 rounded-lg ${
+                    className={`max-w-[80%] p-3 rounded-lg shadow-md ${
                       msg.type === 'user'
-                        ? 'bg-primary text-white'
-                        : 'bg-slate-100 text-slate-900'
+                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                        : 'bg-gradient-to-r from-blue-50 to-purple-50 text-slate-900 border border-purple-200'
                     }`}
                   >
                     {msg.text}
