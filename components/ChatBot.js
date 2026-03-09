@@ -109,7 +109,7 @@ export default function ChatBot() {
                 placeholder="Type your message..."
                 data-testid="chat-input"
               />
-              <Button onClick={sendMessage} size="icon" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg" data-testid="chat-send-button">
+              <Button onClick={sendMessage} size="icon" className="bg-yellow-600 hover:bg-yellow-700" data-testid="chat-send-button">
                 <Send className="h-4 w-4" />
               </Button>
             </div>
