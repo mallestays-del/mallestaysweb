@@ -32,47 +32,47 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-semibold mb-4">Quick Links</h3>
+            <h3 className="font-semibold mb-4 text-pink-400">Quick Links</h3>
             <ul className="space-y-2">
-              <li><Link href="/villas" className="text-slate-400 hover:text-white" data-testid="footer-villas">Browse Villas</Link></li>
-              <li><Link href="/gallery" className="text-slate-400 hover:text-white" data-testid="footer-gallery">Gallery</Link></li>
-              <li><Link href="/reviews" className="text-slate-400 hover:text-white" data-testid="footer-reviews">Reviews</Link></li>
-              <li><Link href="/partner" className="text-slate-400 hover:text-white" data-testid="footer-partner">Partner With Us</Link></li>
+              <li><Link href="/villas" className="text-slate-300 hover:text-pink-400 transition-colors" data-testid="footer-villas">Browse Villas</Link></li>
+              <li><Link href="/gallery" className="text-slate-300 hover:text-pink-400 transition-colors" data-testid="footer-gallery">Gallery</Link></li>
+              <li><Link href="/reviews" className="text-slate-300 hover:text-pink-400 transition-colors" data-testid="footer-reviews">Reviews</Link></li>
+              <li><Link href="/partner" className="text-slate-300 hover:text-pink-400 transition-colors" data-testid="footer-partner">Partner With Us</Link></li>
             </ul>
           </div>
 
           {/* Locations */}
           <div>
-            <h3 className="font-semibold mb-4">Popular Locations</h3>
+            <h3 className="font-semibold mb-4 text-purple-400">Popular Locations</h3>
             <ul className="space-y-2">
-              <li><Link href="/villas?location=Lonavala" className="text-slate-400 hover:text-white">Lonavala</Link></li>
-              <li><Link href="/villas?location=Alibaug" className="text-slate-400 hover:text-white">Alibaug</Link></li>
-              <li><Link href="/villas?location=Karjat" className="text-slate-400 hover:text-white">Karjat</Link></li>
-              <li><Link href="/villas?location=Igatpuri" className="text-slate-400 hover:text-white">Igatpuri</Link></li>
+              <li><Link href="/villas?location=Lonavala" className="text-slate-300 hover:text-purple-400 transition-colors">Lonavala</Link></li>
+              <li><Link href="/villas?location=Alibaug" className="text-slate-300 hover:text-purple-400 transition-colors">Alibaug</Link></li>
+              <li><Link href="/villas?location=Karjat" className="text-slate-300 hover:text-purple-400 transition-colors">Karjat</Link></li>
+              <li><Link href="/villas?location=Igatpuri" className="text-slate-300 hover:text-purple-400 transition-colors">Igatpuri</Link></li>
             </ul>
           </div>
 
           {/* Contact */}
           <div>
-            <h3 className="font-semibold mb-4">Contact Us</h3>
+            <h3 className="font-semibold mb-4 text-cyan-400">Contact Us</h3>
             <ul className="space-y-2">
-              <li className="flex items-center space-x-2 text-slate-400">
-                <Phone className="h-4 w-4" />
+              <li className="flex items-center space-x-2 text-slate-300">
+                <Phone className="h-4 w-4 text-cyan-400" />
                 <span>+91 98765 43210</span>
               </li>
-              <li className="flex items-center space-x-2 text-slate-400">
-                <Mail className="h-4 w-4" />
+              <li className="flex items-center space-x-2 text-slate-300">
+                <Mail className="h-4 w-4 text-cyan-400" />
                 <span>info@mallestays.com</span>
               </li>
-              <li className="flex items-start space-x-2 text-slate-400">
-                <MapPin className="h-4 w-4 mt-1" />
+              <li className="flex items-start space-x-2 text-slate-300">
+                <MapPin className="h-4 w-4 mt-1 text-cyan-400" />
                 <span>Mumbai, Maharashtra, India</span>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400">
+        <div className="border-t border-slate-700 mt-8 pt-8 text-center text-slate-400">
           <p>&copy; {new Date().getFullYear()} Malle Stays. All rights reserved.</p>
         </div>
       </div>
