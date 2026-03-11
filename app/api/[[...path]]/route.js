@@ -49,7 +49,7 @@ export async function GET(request) {
       if (guests) query.maxGuests = { $gte: parseInt(guests) };
       if (bedrooms) query.bedrooms = parseInt(bedrooms);
 
-      const villas = await db.collection('villas').find(query).sort({ createdAt: -1 }).toArray();
+      const villas = await db.collection('villas').find(query).sort({ createdAt: -1 }).limit(100).toArray();
       return NextResponse.json({ villas });
     }
 
