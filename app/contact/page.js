@@ -184,7 +184,7 @@ export default function ContactPage() {
           <Card>
             <CardContent className="p-0">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d241317.11609823277!2d72.74109995709657!3d19.082177513865436!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c6306644edc1%3A0x5da4ed8f8d648c69!2sMumbai%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1234567890123"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3769.8987654321!2d73.2520000!3d19.1560000!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7945d1db38f15%3A0x489f41a06016e9bb!2sPanvelkar%20Estate%2C%20Badlapur%20East%2C%20Mumbai%2C%20Maharashtra%20421503!5e0!3m2!1sen!2sin!4v1234567890123"
                 width="100%"
                 height="400"
                 style={{ border: 0 }}
