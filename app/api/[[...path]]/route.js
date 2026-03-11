@@ -96,7 +96,7 @@ export async function GET(request) {
       const confirmedBookings = await db.collection('bookings').countDocuments({ status: 'confirmed' });
       const totalReviews = await db.collection('reviews').countDocuments();
       
-      const bookings = await db.collection('bookings').find({ status: 'confirmed' }).toArray();
+      const bookings = await db.collection('bookings').find({ status: 'confirmed' }, { projection: { totalPrice: 1 } }).toArray();
       const totalRevenue = bookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0);
 
       return NextResponse.json({
