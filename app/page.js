@@ -351,26 +351,32 @@ export default function HomePage() {
       )}
 
       {/* Amenities */}
-      <section className="py-20 bg-slate-900 text-white" data-testid="amenities-section">
+      <section className="py-20 bg-slate-50" data-testid="amenities-section">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <p className="text-yellow-600 font-semibold tracking-wider uppercase text-sm mb-3">Excellence</p>
-            <h2 className="text-5xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <p className="text-yellow-600 font-semibold tracking-wider uppercase text-sm mb-3">Features</p>
+            <h2 className="text-5xl font-bold mb-4 text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>
               Premium Amenities
             </h2>
-            <p className="text-slate-300 text-lg max-w-2xl mx-auto">
+            <p className="text-slate-600 text-lg max-w-2xl mx-auto">
               Every detail crafted for your ultimate comfort and luxury
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {amenitiesHighlight.map((amenity, idx) => (
-              <div key={idx} className="text-center group" data-testid={`amenity-${idx}`}>
-                <div className="inline-flex items-center justify-center w-20 h-20 border-2 border-yellow-600 rounded-full mb-6 group-hover:bg-yellow-600 transition-colors duration-300">
-                  <amenity.icon className="h-10 w-10 text-yellow-600 group-hover:text-white transition-colors duration-300" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3">{amenity.title}</h3>
-                <p className="text-slate-400">{amenity.description}</p>
-              </div>
+              <Card key={idx} className="border-0 elegant-shadow-hover overflow-hidden group" data-testid={`amenity-${idx}`}>
+                <CardContent className="p-6">
+                  <div className="flex items-start space-x-4">
+                    <div className="flex-shrink-0 w-14 h-14 bg-yellow-600/10 rounded-xl flex items-center justify-center group-hover:bg-yellow-600 transition-colors duration-300">
+                      <amenity.icon className="h-7 w-7 text-yellow-600 group-hover:text-white transition-colors duration-300" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-semibold mb-2 text-slate-900">{amenity.title}</h3>
+                      <p className="text-slate-600 text-sm leading-relaxed">{amenity.description}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
