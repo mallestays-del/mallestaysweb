@@ -1,1 +1,7 @@
-'use client';\n\nimport { SessionProvider } from 'next-auth/react';\n\nexport default function AdminLayout({ children }) {\n  return <SessionProvider>{children}</SessionProvider>;\n}\n
+'use client';
+
+import { SessionProvider } from 'next-auth/react';
+
+export default function AdminLayout({ children }) {
+  return <SessionProvider>{children}</SessionProvider>;
+}
