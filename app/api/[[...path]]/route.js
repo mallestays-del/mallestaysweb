@@ -81,7 +81,12 @@ export async function GET(request) {
     if (pathname === '/api/reviews') {
       const villaId = searchParams.get('villaId');
       let query = villaId ? { villaId } : {};
-      const reviews = await db.collection('reviews').find(query).sort({ createdAt: -1 }).limit(50).toArray();
+      const reviews = await db.collection('reviews').find(query, { 
+        projection: { 
+          villaId: 1, villaName: 1, name: 1, rating: 1, comment: 1, 
+          approved: 1, createdAt: 1, id: 1 
+        } 
+      }).sort({ createdAt: -1 }).limit(50).toArray();
       return NextResponse.json({ reviews });
     }
 
