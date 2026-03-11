@@ -63,35 +63,33 @@ export default function ContactPage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-start space-x-4">
-                  <div className="p-3 bg-primary/10 rounded-full">
-                    <Phone className="h-6 w-6 text-primary" />
+                  <div className="p-3 bg-yellow-600/10 rounded-full">
+                    <Phone className="h-6 w-6 text-yellow-600" />
                   </div>
                   <div>
                     <h3 className="font-semibold mb-1">Phone</h3>
-                    <p className="text-slate-600">+91 98765 43210</p>
-                    <p className="text-slate-600">+91 98765 43211</p>
+                    <p className="text-slate-600"><a href="tel:+918446620191" className="hover:text-yellow-600 transition-colors">+91 8446620191</a></p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-4">
-                  <div className="p-3 bg-primary/10 rounded-full">
-                    <Mail className="h-6 w-6 text-primary" />
+                  <div className="p-3 bg-yellow-600/10 rounded-full">
+                    <Mail className="h-6 w-6 text-yellow-600" />
                   </div>
                   <div>
                     <h3 className="font-semibold mb-1">Email</h3>
-                    <p className="text-slate-600">info@mallestays.com</p>
-                    <p className="text-slate-600">support@mallestays.com</p>
+                    <p className="text-slate-600"><a href="mailto:connect@mallestays.com" className="hover:text-yellow-600 transition-colors">connect@mallestays.com</a></p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-4">
-                  <div className="p-3 bg-primary/10 rounded-full">
-                    <MapPin className="h-6 w-6 text-primary" />
+                  <div className="p-3 bg-yellow-600/10 rounded-full">
+                    <MapPin className="h-6 w-6 text-yellow-600" />
                   </div>
                   <div>
                     <h3 className="font-semibold mb-1">Office Address</h3>
                     <p className="text-slate-600">
-                      Malle Stays Pvt Ltd<br />
-                      123, Luxury Tower<br />
-                      Mumbai, Maharashtra 400001<br />
+                      01 Panvelkar Estate<br />
+                      Badlapur East<br />
+                      Mumbai, Maharashtra 421503<br />
                       India
                     </p>
                   </div>
