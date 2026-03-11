@@ -201,19 +201,15 @@ export default function VillaDetailsPage() {
             {villa.amenities && villa.amenities.length > 0 && (
               <Card data-testid="villa-amenities">
                 <CardHeader>
-                  <CardTitle>Amenities</CardTitle>
+                  <CardTitle>Amenities & Features</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {villa.amenities.map((amenity, index) => {
-                      const Icon = amenityIcons[amenity] || Waves;
-                      return (
-                        <div key={index} className="flex items-center space-x-2">
-                          <Icon className="h-5 w-5 text-primary" />
-                          <span>{amenity}</span>
-                        </div>
-                      );
-                    })}
+                  <div className="flex flex-wrap gap-2">
+                    {villa.amenities.map((amenity, index) => (
+                      <span key={index} className="inline-flex items-center px-4 py-2 bg-slate-100 text-slate-700 rounded-full text-sm font-medium hover:bg-yellow-600 hover:text-white transition-colors duration-300">
+                        {amenity}
+                      </span>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
