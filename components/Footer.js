@@ -58,15 +58,15 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center space-x-3 text-slate-400">
                 <Phone className="h-4 w-4 text-yellow-600 flex-shrink-0" />
-                <span>+91 98765 43210</span>
+                <a href="tel:+918446620191" className="hover:text-yellow-600 transition-colors">+91 8446620191</a>
               </li>
               <li className="flex items-center space-x-3 text-slate-400">
                 <Mail className="h-4 w-4 text-yellow-600 flex-shrink-0" />
-                <span>info@mallestays.com</span>
+                <a href="mailto:connect@mallestays.com" className="hover:text-yellow-600 transition-colors">connect@mallestays.com</a>
               </li>
               <li className="flex items-start space-x-3 text-slate-400">
                 <MapPin className="h-4 w-4 mt-1 text-yellow-600 flex-shrink-0" />
-                <span>Mumbai, Maharashtra, India</span>
+                <span>01 Panvelkar Estate, Badlapur East, Mumbai, Maharashtra 421503</span>
               </li>
             </ul>
           </div>
