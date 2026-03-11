@@ -19,6 +19,7 @@ export default function AddVillaPage() {
   const [formData, setFormData] = useState({
     name: '',
     location: '',
+    category: '',
     description: '',
     pricePerNight: '',
     bedrooms: '2',
