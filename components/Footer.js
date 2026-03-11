@@ -18,13 +18,13 @@ export default function Footer() {
               Curated luxury villas and estates for discerning travelers seeking exceptional experiences.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-slate-400 hover:text-yellow-600 transition-colors duration-300" data-testid="social-facebook">
+              <a href="https://www.facebook.com/profile.php?id=61580271326579" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-yellow-600 transition-colors duration-300" data-testid="social-facebook">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="text-slate-400 hover:text-yellow-600 transition-colors duration-300" data-testid="social-instagram">
+              <a href="https://www.instagram.com/mallestays?igsh=MTJ0Zm4xeHRicDV3Zg==&utm_source=ig_contact_invite" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-yellow-600 transition-colors duration-300" data-testid="social-instagram">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="text-slate-400 hover:text-yellow-600 transition-colors duration-300" data-testid="social-twitter">
+              <a href="https://x.com/MalleStays" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-yellow-600 transition-colors duration-300" data-testid="social-twitter">
                 <Twitter className="h-5 w-5" />
               </a>
             </div>
