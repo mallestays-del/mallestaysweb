@@ -22,21 +22,40 @@ export default function ContactPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
+      // Format the message for WhatsApp
+      const whatsappMessage = `*New Contact Form Submission*
 
-      const data = await response.json();
-      if (response.ok) {
-        toast.success('Message sent successfully! We will get back to you soon.');
+📝 *Name:* ${formData.name}
+📧 *Email:* ${formData.email}
+${formData.phone ? `📱 *Phone:* ${formData.phone}\n` : ''}
+💬 *Message:*
+${formData.message}
+
+---
+Sent via Malle Stays Contact Form`;
+
+      // Encode the message for URL
+      const encodedMessage = encodeURIComponent(whatsappMessage);
+      
+      // Your WhatsApp number (country code + number without + or spaces)
+      const whatsappNumber = '918446620191';
+      
+      // Construct WhatsApp URL
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+      
+      // Open WhatsApp in a new tab
+      window.open(whatsappUrl, '_blank');
+      
+      // Show success message
+      toast.success('Redirecting to WhatsApp... Please send the message from there.');
+      
+      // Reset form after a short delay
+      setTimeout(() => {
         setFormData({ name: '', email: '', phone: '', message: '' });
-      } else {
-        toast.error(data.error || 'Failed to send message');
-      }
+      }, 1000);
+      
     } catch (error) {
-      toast.error('An error occurred');
+      toast.error('Failed to open WhatsApp. Please try again.');
     } finally {
       setLoading(false);
     }
