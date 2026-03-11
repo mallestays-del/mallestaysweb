@@ -35,8 +35,8 @@ export default function VillasPage() {
       if (filters.category && filters.category !== 'all') params.append('category', filters.category);
       if (filters.minPrice) params.append('minPrice', filters.minPrice);
       if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
-      if (filters.guests) params.append('guests', filters.guests);
-      if (filters.bedrooms) params.append('bedrooms', filters.bedrooms);
+      if (filters.guests && filters.guests !== 'any') params.append('guests', filters.guests);
+      if (filters.bedrooms && filters.bedrooms !== 'any') params.append('bedrooms', filters.bedrooms);
 
       const response = await fetch(`/api/villas?${params.toString()}`);
       const data = await response.json();
