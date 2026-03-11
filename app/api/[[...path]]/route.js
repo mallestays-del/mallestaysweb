@@ -65,7 +65,7 @@ export async function GET(request) {
 
     // Get locations
     if (pathname === '/api/locations') {
-      const locations = await db.collection('locations').find().sort({ name: 1 }).toArray();
+      const locations = await db.collection('locations').find().sort({ name: 1 }).limit(100).toArray();
       return NextResponse.json({ locations });
     }
 
@@ -73,7 +73,7 @@ export async function GET(request) {
     if (pathname === '/api/reviews') {
       const villaId = searchParams.get('villaId');
       let query = villaId ? { villaId } : {};
-      const reviews = await db.collection('reviews').find(query).sort({ createdAt: -1 }).toArray();
+      const reviews = await db.collection('reviews').find(query).sort({ createdAt: -1 }).limit(50).toArray();
       return NextResponse.json({ reviews });
     }
 
