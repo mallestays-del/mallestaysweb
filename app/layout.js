@@ -3,6 +3,7 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ChatBot from '@/components/ChatBot';
+import WhatsAppButton from '@/components/WhatsAppButton';
 import { Toaster } from '@/components/ui/sonner';
 import { seoConfig, generateStructuredData } from '@/lib/seo';
 
