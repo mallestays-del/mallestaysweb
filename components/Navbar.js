@@ -12,7 +12,7 @@ export default function Navbar() {
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
     { href: '/villas', label: 'Villas', icon: Building2 },
-    { href: '/gallery', label: 'Gallery', icon: Image },
+    { href: '/gallery', label: 'Gallery', icon: ImageIcon },
     { href: '/reviews', label: 'Reviews', icon: Star },
     { href: '/contact', label: 'Contact', icon: Phone },
     { href: '/partner', label: 'Partner With Us', icon: Handshake },
