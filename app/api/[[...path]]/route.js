@@ -352,6 +352,75 @@ export async function POST(request) {
       return NextResponse.json({ reply });
     }
 
+    // Admin: Change Email
+    if (pathname === '/api/admin/settings/email') {
+      const session = await checkAuth(request);
+      if (session.error) return session;
+
+      const { currentEmail, newEmail } = body;
+
+      if (!currentEmail || !newEmail) {
+        return NextResponse.json({ error: 'Both current and new email are required' }, { status: 400 });
+      }
+
+      // Check if new email already exists
+      const existingAdmin = await db.collection('admins').findOne({ email: newEmail });
+      if (existingAdmin) {
+        return NextResponse.json({ error: 'Email already in use' }, { status: 400 });
+      }
+
+      // Update email
+      const result = await db.collection('admins').updateOne(
+        { email: currentEmail },
+        { $set: { email: newEmail, updatedAt: new Date().toISOString() } }
+      );
+
+      if (result.modifiedCount === 0) {
+        return NextResponse.json({ error: 'Failed to update email' }, { status: 500 });
+      }
+
+      return NextResponse.json({ message: 'Email updated successfully' });
+    }
+
+    // Admin: Change Password
+    if (pathname === '/api/admin/settings/password') {
+      const session = await checkAuth(request);
+      if (session.error) return session;
+
+      const { email, currentPassword, newPassword } = body;
+
+      if (!email || !currentPassword || !newPassword) {
+        return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
+      }
+
+      // Find admin
+      const admin = await db.collection('admins').findOne({ email });
+      if (!admin) {
+        return NextResponse.json({ error: 'Admin not found' }, { status: 404 });
+      }
+
+      // Verify current password
+      const isValid = await bcrypt.compare(currentPassword, admin.password);
+      if (!isValid) {
+        return NextResponse.json({ error: 'Current password is incorrect' }, { status: 401 });
+      }
+
+      // Hash new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      // Update password
+      const result = await db.collection('admins').updateOne(
+        { email },
+        { $set: { password: hashedPassword, updatedAt: new Date().toISOString() } }
+      );
+
+      if (result.modifiedCount === 0) {
+        return NextResponse.json({ error: 'Failed to update password' }, { status: 500 });
+      }
+
+      return NextResponse.json({ message: 'Password updated successfully' });
+    }
+
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   } catch (error) {
     console.error('POST Error:', error);
