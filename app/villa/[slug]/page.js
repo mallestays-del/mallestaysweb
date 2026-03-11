@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { MapPin, Users, Bed, Wifi, Car, UtensilsCrossed, Waves, ArrowLeft, Calendar, Phone, Mail, User } from 'lucide-react';
+import { MapPin, Users, Bed, ArrowLeft, Calendar, Phone, Mail, User } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { toast } from 'sonner';
+import { generateStructuredData } from '@/lib/seo';
 
 export default function VillaDetailsPage() {
   const params = useParams();
