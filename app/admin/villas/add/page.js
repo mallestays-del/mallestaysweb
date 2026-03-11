@@ -154,6 +154,20 @@ export default function AddVillaPage() {
                   </Select>
                 </div>
                 <div>
+                  <label className="text-sm font-medium mb-2 block">Category *</label>
+                  <Select value={formData.category} onValueChange={(val) => setFormData({ ...formData, category: val })} required>
+                    <SelectTrigger data-testid="villa-category-select">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Poolside Villa">Poolside Villa</SelectItem>
+                      <SelectItem value="Beach Villa">Beach Villa</SelectItem>
+                      <SelectItem value="Mountain Villa">Mountain Villa</SelectItem>
+                      <SelectItem value="Farmhouse Villa">Farmhouse Villa</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
                   <label className="text-sm font-medium mb-2 block">Description *</label>
                   <Textarea
                     value={formData.description}
