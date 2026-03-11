@@ -1,0 +1,15 @@
+# Malle Stays - Robots.txt
+# Allow all search engines to crawl the site
+
+User-agent: *
+Allow: /
+
+# Disallow admin pages
+Disallow: /admin/
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://villa-retreat-app.preview.emergentagent.com/sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1
