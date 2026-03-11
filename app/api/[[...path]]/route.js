@@ -117,7 +117,7 @@ export async function GET(request) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-      const admins = await db.collection('admins').find({}, { projection: { password: 0 } }).toArray();
+      const admins = await db.collection('admins').find({}, { projection: { password: 0 } }).limit(100).toArray();
       return NextResponse.json({ admins });
     }
 
