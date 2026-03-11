@@ -54,6 +54,20 @@ export default function VillasPage() {
   const FilterContent = () => (
     <div className="space-y-4">
       <div>
+        <label className="text-sm font-medium mb-2 block">Category</label>
+        <Select value={filters.category} onValueChange={(val) => setFilters({ ...filters, category: val })}>
+          <SelectTrigger data-testid="filter-category">
+            <SelectValue placeholder="All Categories" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Categories</SelectItem>
+            {categories.map(cat => (
+              <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div>
         <label className="text-sm font-medium mb-2 block">Location</label>
         <Select value={filters.location} onValueChange={(val) => setFilters({ ...filters, location: val })}>
           <SelectTrigger data-testid="filter-location">
