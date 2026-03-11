@@ -24,10 +24,13 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3" data-testid="logo-link">
-            <img 
+            <Image 
               src="https://customer-assets.emergentagent.com/job_villa-retreat-app/artifacts/5po3y6s4_image.png" 
               alt="Malle Stays Logo" 
+              width={120}
+              height={40}
               className="h-10 w-auto"
+              priority
             />
           </Link>
 
