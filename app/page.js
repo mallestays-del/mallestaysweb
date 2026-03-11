@@ -243,6 +243,86 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Pick a Property Section with Carousel */}
+      <section className="py-20 bg-white" data-testid="property-carousel">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <p className="text-yellow-600 font-semibold tracking-wider uppercase text-sm mb-3">Handpicked for You</p>
+            <h2 className="text-5xl font-bold mb-4 text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Pick a property that suits your taste
+            </h2>
+            <p className="text-slate-600 text-lg max-w-2xl mx-auto">
+              Discover our curated collection of luxury villas perfect for your next getaway
+            </p>
+          </div>
+
+          {/* Carousel */}
+          <div className="relative max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {featuredVillas.map((villa) => (
+                <Card key={villa.id} className="overflow-hidden elegant-shadow-hover border-0 group" data-testid={`carousel-villa-${villa.slug}`}>
+                  <div className="relative h-64">
+                    <img 
+                      src={villa.images?.[0] || 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600'} 
+                      alt={villa.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute top-4 right-4">
+                      <Badge className="bg-yellow-600 text-white px-3 py-1">
+                        ₹{villa.pricePerNight?.toLocaleString()}/night
+                      </Badge>
+                    </div>
+                  </div>
+                  <CardContent className="p-6">
+                    <h3 className="text-2xl font-bold mb-2 text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>
+                      {villa.name}
+                    </h3>
+                    <div className="flex items-center gap-2 text-slate-600 mb-3">
+                      <MapPin className="h-4 w-4" />
+                      <span className="text-sm">{villa.location}</span>
+                    </div>
+                    <p className="text-slate-600 text-sm mb-6 line-clamp-3">
+                      {villa.description}
+                    </p>
+                    <div className="flex items-center justify-between mb-4 text-sm text-slate-600">
+                      <span>{villa.bedrooms} Bedrooms</span>
+                      <span>•</span>
+                      <span>Up to {villa.maxGuests} Guests</span>
+                    </div>
+                    <Button 
+                      onClick={() => {
+                        const message = `Hi! I'm interested in booking ${villa.name} in ${villa.location}. Could you please provide more details?`;
+                        const encodedMessage = encodeURIComponent(message);
+                        window.open(`https://wa.me/918446620191?text=${encodedMessage}`, '_blank');
+                      }}
+                      className="w-full bg-green-600 hover:bg-green-700 text-white"
+                      data-testid={`book-now-${villa.slug}`}
+                    >
+                      Book Now
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            
+            {featuredVillas.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-slate-500">No properties available at the moment</p>
+              </div>
+            )}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link href="/villas">
+              <Button variant="outline" size="lg" className="px-8" data-testid="view-all-properties">
+                View All Properties
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Popular Locations */}
       <section className="py-20 bg-slate-50" data-testid="popular-locations">
         <div className="container mx-auto px-4">
