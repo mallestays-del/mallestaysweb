@@ -291,9 +291,10 @@ export default function HomePage() {
                     </div>
                     <Button 
                       onClick={() => {
+                        const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '918446620191';
                         const message = `Hi! I'm interested in booking ${villa.name} in ${villa.location}. Could you please provide more details?`;
                         const encodedMessage = encodeURIComponent(message);
-                        window.open(`https://wa.me/918446620191?text=${encodedMessage}`, '_blank');
+                        window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
                       }}
                       className="w-full bg-green-600 hover:bg-green-700 text-white"
                       data-testid={`book-now-${villa.slug}`}
