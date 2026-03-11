@@ -145,6 +145,104 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Villa Categories */}
+      <section className="py-20 bg-white" data-testid="villa-categories">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <p className="text-yellow-600 font-semibold tracking-wider uppercase text-sm mb-3">Collections</p>
+            <h2 className="text-5xl font-bold mb-4 text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Villa Categories
+            </h2>
+            <p className="text-slate-600 text-lg max-w-2xl mx-auto">
+              Discover your perfect escape - from serene mountains to pristine beaches
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <Link href="/villas?category=Poolside Villa">
+              <Card className="overflow-hidden elegant-shadow-hover border-0 group cursor-pointer h-full" data-testid="category-poolside">
+                <div className="relative h-64">
+                  <img 
+                    src="https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600" 
+                    alt="Poolside Villa"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                    <Waves className="h-8 w-8 mb-3 text-yellow-600" />
+                    <h3 className="text-2xl font-semibold mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>Poolside Villas</h3>
+                    <p className="text-slate-300 text-sm">Private infinity pools with stunning views</p>
+                  </div>
+                </div>
+              </Card>
+            </Link>
+            <Link href="/villas?category=Beach Villa">
+              <Card className="overflow-hidden elegant-shadow-hover border-0 group cursor-pointer h-full" data-testid="category-beach">
+                <div className="relative h-64">
+                  <img 
+                    src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600" 
+                    alt="Beach Villa"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-3 text-yellow-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+                    </svg>
+                    <h3 className="text-2xl font-semibold mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>Beach Villas</h3>
+                    <p className="text-slate-300 text-sm">Beachfront luxury with ocean views</p>
+                  </div>
+                </div>
+              </Card>
+            </Link>
+            <Link href="/villas?category=Mountain Villa">
+              <Card className="overflow-hidden elegant-shadow-hover border-0 group cursor-pointer h-full" data-testid="category-mountain">
+                <div className="relative h-64">
+                  <img 
+                    src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600" 
+                    alt="Mountain Villa"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-3 text-yellow-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="m8 3 4 8 5-5 5 15H2L8 3z"/>
+                    </svg>
+                    <h3 className="text-2xl font-semibold mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>Mountain Villas</h3>
+                    <p className="text-slate-300 text-sm">Serene retreats in the hills</p>
+                  </div>
+                </div>
+              </Card>
+            </Link>
+            <Link href="/villas?category=Farmhouse Villa">
+              <Card className="overflow-hidden elegant-shadow-hover border-0 group cursor-pointer h-full" data-testid="category-farmhouse">
+                <div className="relative h-64">
+                  <img 
+                    src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600" 
+                    alt="Farmhouse Villa"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-3 text-yellow-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M3 13h18"/>
+                      <path d="m3 17 3 3 3-3"/>
+                      <path d="m15 17 3 3 3-3"/>
+                      <path d="M6 9h.01"/>
+                      <path d="M10 9h.01"/>
+                      <path d="M14 9h.01"/>
+                      <path d="M18 9h.01"/>
+                      <path d="M12 2 2 7l10 5 10-5-10-5z"/>
+                    </svg>
+                    <h3 className="text-2xl font-semibold mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>Farmhouse Villas</h3>
+                    <p className="text-slate-300 text-sm">Rustic charm with modern luxury</p>
+                  </div>
+                </div>
+              </Card>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Popular Locations */}
       <section className="py-20 bg-slate-50" data-testid="popular-locations">
         <div className="container mx-auto px-4">
