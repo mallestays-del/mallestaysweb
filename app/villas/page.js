@@ -32,6 +32,7 @@ export default function VillasPage() {
     try {
       const params = new URLSearchParams();
       if (filters.location && filters.location !== 'all') params.append('location', filters.location);
+      if (filters.category && filters.category !== 'all') params.append('category', filters.category);
       if (filters.minPrice) params.append('minPrice', filters.minPrice);
       if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
       if (filters.guests) params.append('guests', filters.guests);
@@ -48,6 +49,7 @@ export default function VillasPage() {
   };
 
   const locations = ['Lonavala', 'Alibaug', 'Karjat', 'Igatpuri', 'Neral', 'Khopoli', 'Badlapur'];
+  const categories = ['Poolside Villa', 'Beach Villa', 'Mountain Villa', 'Farmhouse Villa'];
 
   const FilterContent = () => (
     <div className="space-y-4">
