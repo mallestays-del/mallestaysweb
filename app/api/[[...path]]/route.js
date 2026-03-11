@@ -82,7 +82,7 @@ export async function GET(request) {
       const session = await checkAuth(request);
       if (session.error) return session;
 
-      const bookings = await db.collection('bookings').find().sort({ createdAt: -1 }).toArray();
+      const bookings = await db.collection('bookings').find().sort({ createdAt: -1 }).limit(100).toArray();
       return NextResponse.json({ bookings });
     }
 
