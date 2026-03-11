@@ -235,9 +235,9 @@ export async function POST(request) {
       const session = await checkAuth(request);
       if (session.error) return session;
 
-      const { name, location, description, pricePerNight, bedrooms, maxGuests, amenities, images, mapLocation } = body;
+      const { name, location, category, description, pricePerNight, bedrooms, maxGuests, amenities, images, mapLocation } = body;
 
-      if (!name || !location || !description || !pricePerNight) {
+      if (!name || !location || !category || !description || !pricePerNight) {
         return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
       }
 
@@ -248,6 +248,7 @@ export async function POST(request) {
         name,
         slug,
         location,
+        category,
         description,
         pricePerNight: parseFloat(pricePerNight),
         bedrooms: parseInt(bedrooms) || 1,
@@ -257,7 +258,7 @@ export async function POST(request) {
         mapLocation: mapLocation || '',
         seoTitle: name,
         seoDescription: description.substring(0, 160),
-        seoKeywords: `${name}, ${location}, luxury villa, vacation rental`,
+        seoKeywords: `${name}, ${location}, ${category}, luxury villa, vacation rental`,
         createdBy: session.user.email,
         createdAt: new Date().toISOString()
       };
