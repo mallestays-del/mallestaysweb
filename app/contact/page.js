@@ -38,7 +38,7 @@ Sent via Malle Stays Contact Form`;
       const encodedMessage = encodeURIComponent(whatsappMessage);
       
       // Your WhatsApp number (country code + number without + or spaces)
-      const whatsappNumber = '918446620191';
+      const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '918446620191';
       
       // Construct WhatsApp URL
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
