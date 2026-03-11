@@ -43,7 +43,7 @@ Sent via Malle Stays Partnership Form`;
       const encodedMessage = encodeURIComponent(whatsappMessage);
       
       // Your WhatsApp number
-      const whatsappNumber = '918446620191';
+      const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '918446620191';
       
       // Construct WhatsApp URL
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
