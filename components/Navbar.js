@@ -27,10 +27,11 @@ export default function Navbar() {
             <Image 
               src="https://customer-assets.emergentagent.com/job_villa-retreat-app/artifacts/5po3y6s4_image.png" 
               alt="Malle Stays Logo" 
-              width={120}
-              height={40}
-              className="h-10 w-auto"
+              width={150}
+              height={50}
+              className="h-12 w-auto"
               priority
+              quality={100}
             />
           </Link>
 
