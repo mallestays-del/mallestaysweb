@@ -5,7 +5,7 @@ import { MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function WhatsAppButton() {
-  const phoneNumber = '918446620191'; // Format: country code + number without + or spaces
+  const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '918446620191';
   const message = 'Hello Malle Stays! I would like to inquire about luxury villa bookings.';
   
   const handleWhatsAppClick = () => {
