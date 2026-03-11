@@ -12,10 +12,13 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <Link href="/" className="flex items-center space-x-3 mb-6">
-              <img 
+              <Image 
                 src="https://customer-assets.emergentagent.com/job_villa-retreat-app/artifacts/5po3y6s4_image.png" 
                 alt="Malle Stays Logo" 
-                className="h-10 w-auto"
+                width={150}
+                height={50}
+                className="h-12 w-auto"
+                quality={100}
               />
             </Link>
             <p className="text-slate-400 mb-6 leading-relaxed">
