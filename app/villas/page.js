@@ -16,6 +16,7 @@ export default function VillasPage() {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     location: searchParams.get('location') || 'all',
+    category: searchParams.get('category') || 'all',
     minPrice: '',
     maxPrice: '',
     guests: searchParams.get('guests') || '',
