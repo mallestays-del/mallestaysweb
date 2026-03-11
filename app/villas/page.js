@@ -19,8 +19,8 @@ export default function VillasPage() {
     category: searchParams.get('category') || 'all',
     minPrice: '',
     maxPrice: '',
-    guests: searchParams.get('guests') || '',
-    bedrooms: ''
+    guests: searchParams.get('guests') || 'any',
+    bedrooms: 'any'
   });
 
   useEffect(() => {
