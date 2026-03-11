@@ -67,20 +67,49 @@ export default function VillaDetailsPage() {
 
     try {
       const totalPrice = calculatePrice();
-      const response = await fetch('/api/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          villaId: villa.id,
-          villaName: villa.name,
-          ...bookingData,
-          totalPrice
-        })
-      });
+      const checkIn = new Date(bookingData.checkIn);
+      const checkOut = new Date(bookingData.checkOut);
+      const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+      
+      // Format the message for WhatsApp
+      const whatsappMessage = `*New Villa Booking Request*
 
-      const data = await response.json();
-      if (response.ok) {
-        toast.success('Booking request submitted! We will contact you soon.');
+🏠 *Villa:* ${villa.name}
+📍 *Location:* ${villa.location}
+
+📅 *Check-in:* ${new Date(bookingData.checkIn).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+📅 *Check-out:* ${new Date(bookingData.checkOut).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+🌙 *Nights:* ${nights}
+👥 *Guests:* ${bookingData.guests}
+
+💰 *Total Price:* ₹${totalPrice.toLocaleString('en-IN')}
+
+👤 *Guest Details:*
+Name: ${bookingData.name}
+Email: ${bookingData.email}
+Phone: ${bookingData.phone}
+${bookingData.specialRequests ? `\n📝 *Special Requests:*\n${bookingData.specialRequests}` : ''}
+
+---
+Sent via Malle Stays Booking System`;
+
+      // Encode the message for URL
+      const encodedMessage = encodeURIComponent(whatsappMessage);
+      
+      // Your WhatsApp number
+      const whatsappNumber = '918446620191';
+      
+      // Construct WhatsApp URL
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+      
+      // Open WhatsApp in a new tab
+      window.open(whatsappUrl, '_blank');
+      
+      // Show success message
+      toast.success('Redirecting to WhatsApp... Please send the booking request from there.');
+      
+      // Reset form after a short delay
+      setTimeout(() => {
         setBookingData({
           checkIn: '',
           checkOut: '',
@@ -90,11 +119,10 @@ export default function VillaDetailsPage() {
           phone: '',
           specialRequests: ''
         });
-      } else {
-        toast.error(data.error || 'Failed to submit booking');
-      }
+      }, 1000);
+      
     } catch (error) {
-      toast.error('An error occurred');
+      toast.error('Failed to process booking. Please try again.');
     } finally {
       setBookingLoading(false);
     }
