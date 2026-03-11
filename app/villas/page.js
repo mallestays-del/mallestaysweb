@@ -201,6 +201,11 @@ export default function VillasPage() {
                         alt={villa.name}
                         className="w-full h-full object-cover"
                       />
+                      {villa.category && (
+                        <Badge className="absolute top-4 left-4 bg-yellow-600 hover:bg-yellow-700 border-0">
+                          {villa.category}
+                        </Badge>
+                      )}
                     </div>
                     <CardHeader>
                       <div className="flex justify-between items-start">
