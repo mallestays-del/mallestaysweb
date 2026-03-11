@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
-import { Menu, X, Home, Building2, Image, Star, Phone, Handshake } from 'lucide-react';
+import { Menu, X, Home, Building2, Image as ImageIcon, Star, Phone, Handshake } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Navbar() {
