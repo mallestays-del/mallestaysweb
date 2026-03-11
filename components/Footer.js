@@ -27,6 +27,9 @@ export default function Footer() {
               <a href="https://x.com/MalleStays" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-yellow-600 transition-colors duration-300" data-testid="social-twitter">
                 <Twitter className="h-5 w-5" />
               </a>
+              <a href="https://www.linkedin.com/in/mallestays" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-yellow-600 transition-colors duration-300" data-testid="social-linkedin">
+                <Linkedin className="h-5 w-5" />
+              </a>
             </div>
           </div>
 
