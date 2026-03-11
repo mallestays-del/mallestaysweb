@@ -10,10 +10,13 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
           <div>
-            <div className="flex items-center space-x-3 mb-6">
-              <Building2 className="h-8 w-8 text-yellow-600" />
-              <span className="text-2xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>Malle Stays</span>
-            </div>
+            <Link href="/" className="flex items-center space-x-3 mb-6">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_villa-retreat-app/artifacts/5po3y6s4_image.png" 
+                alt="Malle Stays Logo" 
+                className="h-10 w-auto"
+              />
+            </Link>
             <p className="text-slate-400 mb-6 leading-relaxed">
               Curated luxury villas and estates for discerning travelers seeking exceptional experiences.
             </p>
