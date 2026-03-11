@@ -35,6 +35,7 @@ export async function GET(request) {
     // Get all villas
     if (pathname === '/api/villas') {
       const location = searchParams.get('location');
+      const category = searchParams.get('category');
       const minPrice = searchParams.get('minPrice');
       const maxPrice = searchParams.get('maxPrice');
       const guests = searchParams.get('guests');
@@ -42,6 +43,7 @@ export async function GET(request) {
       
       let query = {};
       if (location && location !== 'all') query.location = location;
+      if (category && category !== 'all') query.category = category;
       if (minPrice) query.pricePerNight = { ...query.pricePerNight, $gte: parseFloat(minPrice) };
       if (maxPrice) query.pricePerNight = { ...query.pricePerNight, $lte: parseFloat(maxPrice) };
       if (guests) query.maxGuests = { $gte: parseInt(guests) };
