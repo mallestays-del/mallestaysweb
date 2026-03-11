@@ -121,6 +121,21 @@ export async function GET(request) {
       return NextResponse.json({ admins });
     }
 
+    // Get single villa by ID for editing
+    if (pathname.startsWith('/api/admin/villas/')) {
+      const session = await checkAuth(request);
+      if (session.error) return session;
+
+      const id = pathname.split('/api/admin/villas/')[1];
+      const villa = await db.collection('villas').findOne({ id });
+      
+      if (!villa) {
+        return NextResponse.json({ error: 'Villa not found' }, { status: 404 });
+      }
+      
+      return NextResponse.json({ villa });
+    }
+
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   } catch (error) {
     console.error('GET Error:', error);
