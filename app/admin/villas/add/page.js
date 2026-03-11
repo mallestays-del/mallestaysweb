@@ -247,36 +247,26 @@ export default function AddVilla() {
             <Card>
               <CardHeader>
                 <CardTitle>Villa Images</CardTitle>
-                <CardDescription>Add image URLs for the villa (at least one required)</CardDescription>
+                <CardDescription>Upload images or add image URLs (at least one required)</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {imageUrls.map((url, index) => (
-                  <div key={index} className="flex gap-2">
-                    <Input
-                      value={url}
-                      onChange={(e) => updateImageUrl(index, e.target.value)}
-                      placeholder="https://example.com/image.jpg"
-                      className="flex-1"
-                    />
-                    {imageUrls.length > 1 && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => removeImageUrl(index)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
-                <Button type="button" variant="outline" onClick={addImageUrl} className="w-full">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Another Image
-                </Button>
-                <p className="text-xs text-slate-500">
-                  Tip: You can use image hosting services like Imgur, Cloudinary, or upload to Google Drive and get shareable links
-                </p>
+              <CardContent>
+                <FileUpload
+                  accept="image/*,.pdf"
+                  multiple={true}
+                  label="Villa Images"
+                  onFilesChange={(files) => {
+                    // Handle both uploaded files and URLs
+                    const imageData = files.map(file => {
+                      if (typeof file === 'string') {
+                        return file; // URL
+                      } else if (file.data) {
+                        return file.data; // Base64 from uploaded file
+                      }
+                      return file;
+                    });
+                    setImageUrls(imageData);
+                  }}
+                />
               </CardContent>
             </Card>
 
