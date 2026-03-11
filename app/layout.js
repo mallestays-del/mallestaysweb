@@ -89,6 +89,7 @@ export default function RootLayout({ children }) {
         </main>
         <Footer />
         <ChatBot />
+        <WhatsAppButton />
         <Toaster />
       </body>
     </html>
