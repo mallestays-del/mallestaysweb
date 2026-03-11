@@ -71,7 +71,9 @@ export async function GET(request) {
 
     // Get locations
     if (pathname === '/api/locations') {
-      const locations = await db.collection('locations').find().sort({ name: 1 }).limit(100).toArray();
+      const locations = await db.collection('locations').find({}, { 
+        projection: { name: 1, image: 1, id: 1 } 
+      }).sort({ name: 1 }).limit(100).toArray();
       return NextResponse.json({ locations });
     }
 
