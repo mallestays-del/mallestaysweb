@@ -23,21 +23,44 @@ export default function PartnerPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/partner', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
+      // Format the message for WhatsApp
+      const whatsappMessage = `*New Partnership Request*
 
-      const data = await response.json();
-      if (response.ok) {
-        toast.success('Partnership request submitted successfully! We will contact you soon.');
+🤝 *Property Owner Details:*
+
+👤 *Name:* ${formData.name}
+📧 *Email:* ${formData.email}
+📱 *Phone:* ${formData.phone}
+📍 *Property Location:* ${formData.location}
+
+🏠 *Property Description:*
+${formData.description}
+
+---
+Sent via Malle Stays Partnership Form`;
+
+      // Encode the message for URL
+      const encodedMessage = encodeURIComponent(whatsappMessage);
+      
+      // Your WhatsApp number
+      const whatsappNumber = '918446620191';
+      
+      // Construct WhatsApp URL
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+      
+      // Open WhatsApp in a new tab
+      window.open(whatsappUrl, '_blank');
+      
+      // Show success message
+      toast.success('Redirecting to WhatsApp... Please send the partnership request from there.');
+      
+      // Reset form after a short delay
+      setTimeout(() => {
         setFormData({ name: '', email: '', phone: '', location: '', description: '' });
-      } else {
-        toast.error(data.error || 'Failed to submit request');
-      }
+      }, 1000);
+      
     } catch (error) {
-      toast.error('An error occurred');
+      toast.error('Failed to process request. Please try again.');
     } finally {
       setLoading(false);
     }
