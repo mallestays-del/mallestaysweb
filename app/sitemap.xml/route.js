@@ -1,7 +1,7 @@
 import { getDatabase } from '@/lib/mongodb';
 
 export async function GET() {
-  const baseUrl = 'https://villa-retreat-app.preview.emergentagent.com';
+  const baseUrl = 'https://jovial-mccarthy-2.preview.emergentagent.com';
   
   try {
     const db = await getDatabase();

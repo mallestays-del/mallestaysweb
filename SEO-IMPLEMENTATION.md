@@ -96,7 +96,7 @@
 - Image sitemaps for villa photos
 - Last modification dates
 
-**Access:** https://villa-retreat-app.preview.emergentagent.com/sitemap.xml
+**Access:** https://jovial-mccarthy-2.preview.emergentagent.com/sitemap.xml
 
 ### 6. Robots.txt
 
@@ -107,7 +107,7 @@
 - Sitemap reference included
 - Crawl delay: 1 second
 
-**Access:** https://villa-retreat-app.preview.emergentagent.com/robots.txt
+**Access:** https://jovial-mccarthy-2.preview.emergentagent.com/robots.txt
 
 ### 7. URL Structure
 
@@ -253,8 +253,8 @@
 
 ## 🔗 Important SEO URLs
 
-- Sitemap: https://villa-retreat-app.preview.emergentagent.com/sitemap.xml
-- Robots: https://villa-retreat-app.preview.emergentagent.com/robots.txt
+- Sitemap: https://jovial-mccarthy-2.preview.emergentagent.com/sitemap.xml
+- Robots: https://jovial-mccarthy-2.preview.emergentagent.com/robots.txt
 
 ## 📝 Notes for Ongoing SEO
 
