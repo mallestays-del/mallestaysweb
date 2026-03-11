@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { MapPin, Users, Bed, ArrowLeft, Calendar, Phone, Mail, User } from 'lucide-react';
+import { MapPin, Users, Bed, ArrowLeft, Calendar, Phone, Mail, User, Waves, Wifi, Car, UtensilsCrossed } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
