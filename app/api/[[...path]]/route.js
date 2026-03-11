@@ -95,7 +95,13 @@ export async function GET(request) {
       const session = await checkAuth(request);
       if (session.error) return session;
 
-      const bookings = await db.collection('bookings').find().sort({ createdAt: -1 }).limit(100).toArray();
+      const bookings = await db.collection('bookings').find({}, { 
+        projection: { 
+          id: 1, villaId: 1, villaName: 1, checkIn: 1, checkOut: 1, 
+          guests: 1, name: 1, email: 1, phone: 1, status: 1, 
+          totalPrice: 1, createdAt: 1 
+        } 
+      }).sort({ createdAt: -1 }).limit(100).toArray();
       return NextResponse.json({ bookings });
     }
 
