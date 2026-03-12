@@ -45,9 +45,19 @@ export default function Footer() {
             <h3 className="font-semibold mb-6 text-lg">Quick Links</h3>
             <ul className="space-y-3">
               <li><Link href="/villas" className="text-slate-400 hover:text-yellow-600 transition-colors duration-300" data-testid="footer-villas">Browse Properties</Link></li>
+              <li><Link href="/about" className="text-slate-400 hover:text-yellow-600 transition-colors duration-300" data-testid="footer-about">About Us</Link></li>
               <li><Link href="/gallery" className="text-slate-400 hover:text-yellow-600 transition-colors duration-300" data-testid="footer-gallery">Gallery</Link></li>
               <li><Link href="/reviews" className="text-slate-400 hover:text-yellow-600 transition-colors duration-300" data-testid="footer-reviews">Reviews</Link></li>
               <li><Link href="/partner" className="text-slate-400 hover:text-yellow-600 transition-colors duration-300" data-testid="footer-partner">Partner With Us</Link></li>
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h3 className="font-semibold mb-6 text-lg">Legal</h3>
+            <ul className="space-y-3">
+              <li><Link href="/privacy" className="text-slate-400 hover:text-yellow-600 transition-colors duration-300">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="text-slate-400 hover:text-yellow-600 transition-colors duration-300">Terms & Conditions</Link></li>
             </ul>
           </div>
 
