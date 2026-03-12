@@ -20,6 +20,11 @@ export const metadata = {
   authors: [{ name: 'Malle Stays' }],
   creator: 'Malle Stays',
   publisher: 'Malle Stays',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+  },
   formatDetection: {
     email: false,
     address: false,
