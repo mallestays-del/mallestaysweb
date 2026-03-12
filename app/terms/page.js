@@ -42,7 +42,7 @@ export default function TermsPage() {
               </li>
               <li className="flex items-start">
                 <span className="font-semibold mr-2">No Refund:</span>
-                <span>Cancel &lt; 10 days before check-in → no refund.</span>
+                <span>Cancel less than 10 days before check-in → no refund.</span>
               </li>
             </ul>
           </section>
