@@ -3,6 +3,7 @@ import { getDatabase } from '@/lib/mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import { createDefaultAdmin, checkPermission } from '@/lib/auth';
 import { getServerSession } from 'next-auth/next';
+import bcrypt from 'bcryptjs';
 
 // Initialize default admin on startup
 createDefaultAdmin().catch(console.error);
