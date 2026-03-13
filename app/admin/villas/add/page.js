@@ -231,6 +231,20 @@ export default function AddVilla() {
                   </div>
 
                   <div>
+                    <label className="text-sm font-medium mb-2 block">Number of Bathrooms *</label>
+                    <Input
+                      type="number"
+                      value={formData.bathrooms}
+                      onChange={(e) => setFormData({ ...formData, bathrooms: e.target.value })}
+                      placeholder="3"
+                      required
+                      min="1"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
                     <label className="text-sm font-medium mb-2 block">Maximum Guests *</label>
                     <Input
                       type="number"
@@ -240,6 +254,19 @@ export default function AddVilla() {
                       required
                       min="1"
                     />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Parking Capacity *</label>
+                    <Input
+                      type="number"
+                      value={formData.parking}
+                      onChange={(e) => setFormData({ ...formData, parking: e.target.value })}
+                      placeholder="3"
+                      required
+                      min="1"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">Number of cars that can be parked</p>
                   </div>
                 </div>
               </CardContent>
