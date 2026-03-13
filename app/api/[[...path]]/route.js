@@ -449,6 +449,54 @@ export async function POST(request) {
       return NextResponse.json({ message: 'Password updated successfully' });
     }
 
+    // Admin: Create guest review
+    if (pathname === '/api/admin/guest-reviews') {
+      const session = await checkAuth(request);
+      if (session.error) return session;
+
+      const { guestName, location, reviewText, rating, imageUrl, source } = body;
+
+      if (!guestName || !location || !reviewText || !imageUrl) {
+        return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+      }
+
+      const review = {
+        id: uuidv4(),
+        guestName,
+        location,
+        reviewText,
+        rating: parseInt(rating) || 5,
+        imageUrl,
+        source: source || 'WhatsApp Review',
+        createdAt: new Date().toISOString()
+      };
+
+      await db.collection('guestReviews').insertOne(review);
+      return NextResponse.json({ review, message: 'Review created successfully' });
+    }
+
+      // Verify current password
+      const isValid = await bcrypt.compare(currentPassword, admin.password);
+      if (!isValid) {
+        return NextResponse.json({ error: 'Current password is incorrect' }, { status: 401 });
+      }
+
+      // Hash new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      // Update password
+      const result = await db.collection('admins').updateOne(
+        { email },
+        { $set: { password: hashedPassword, updatedAt: new Date().toISOString() } }
+      );
+
+      if (result.modifiedCount === 0) {
+        return NextResponse.json({ error: 'Failed to update password' }, { status: 500 });
+      }
+
+      return NextResponse.json({ message: 'Password updated successfully' });
+    }
+
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   } catch (error) {
     console.error('POST Error:', error);
