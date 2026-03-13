@@ -187,36 +187,109 @@ Sent via Malle Stays`;
         </Button>
       </div>
 
-      {/* Image Gallery Section */}
+      {/* Image Gallery Section with Slideshow */}
       <div className="container mx-auto px-4 mb-8">
-        {/* Main Image */}
-        <div className="relative h-[500px] rounded-xl overflow-hidden mb-4">
-          <img
-            src={villa.images?.[currentImageIndex] || 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200'}
-            alt={villa.name}
-            className="w-full h-full object-cover"
-          />
+        {/* Main Image Slideshow */}
+        <div className="relative h-[500px] rounded-xl overflow-hidden mb-4 group">
+          {/* Current Image with Fade Animation */}
+          <div className="relative w-full h-full">
+            <img
+              key={currentImageIndex}
+              src={villa.images?.[currentImageIndex] || 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200'}
+              alt={villa.name}
+              className="w-full h-full object-cover animate-fade-in"
+              style={{
+                animation: 'fadeIn 0.5s ease-in-out'
+              }}
+            />
+            
+            {/* Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+            
+            {/* Image Counter */}
+            <div className="absolute bottom-4 right-4 bg-black/70 text-white px-4 py-2 rounded-full text-sm">
+              {currentImageIndex + 1} / {villa.images?.length || 1}
+            </div>
+          </div>
+
+          {/* Navigation Arrows */}
+          {villa.images && villa.images.length > 1 && (
+            <>
+              <button
+                onClick={() => setCurrentImageIndex((prev) => (prev === 0 ? villa.images.length - 1 : prev - 1))}
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                aria-label="Previous image"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+              
+              <button
+                onClick={() => setCurrentImageIndex((prev) => (prev === villa.images.length - 1 ? 0 : prev + 1))}
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                aria-label="Next image"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </>
+          )}
         </div>
 
-        {/* Thumbnail Gallery */}
-        <div className="grid grid-cols-6 gap-4">
+        {/* Thumbnail Gallery with Hover Effects */}
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
           {villa.images?.slice(0, 6).map((image, index) => (
             <div
               key={index}
-              onClick={() => setCurrentImageIndex(index)}
-              className={`relative h-24 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
-                currentImageIndex === index ? 'border-yellow-600' : 'border-transparent hover:border-slate-300'
+              onClick={() => {
+                setImageLoading(true);
+                setCurrentImageIndex(index);
+                setTimeout(() => setImageLoading(false), 300);
+              }}
+              className={`relative h-24 rounded-lg overflow-hidden cursor-pointer border-2 transition-all duration-300 transform hover:scale-105 hover:shadow-xl ${
+                currentImageIndex === index 
+                  ? 'border-yellow-600 ring-2 ring-yellow-400 scale-105 shadow-lg' 
+                  : 'border-transparent hover:border-yellow-400'
               }`}
             >
               <img
                 src={image}
                 alt={`${villa.name} ${index + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
               />
+              {currentImageIndex === index && (
+                <div className="absolute inset-0 bg-yellow-600/20 flex items-center justify-center">
+                  <div className="bg-white rounded-full p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-600">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
       </div>
+
+      {/* CSS Animation */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: scale(1.05);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        
+        .animate-fade-in {
+          animation: fadeIn 0.5s ease-in-out;
+        }
+      `}</style>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 pb-12">
