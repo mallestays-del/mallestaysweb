@@ -17,6 +17,7 @@ export default function HomePage() {
     guests: ''
   });
   const [featuredVillas, setFeaturedVillas] = useState([]);
+  const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
     fetchFeaturedVillas();
