@@ -311,7 +311,7 @@ Sent via Malle Stays`;
         </div>
       </div>
 
-      {/* CSS Animation */}
+      {/* CSS Animations */}
       <style jsx>{`
         @keyframes fadeIn {
           from {
@@ -324,8 +324,38 @@ Sent via Malle Stays`;
           }
         }
         
+        @keyframes slideInFromRight {
+          from {
+            opacity: 0;
+            transform: translateX(100px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        
+        @keyframes slideInFromLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-100px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        
         .animate-fade-in {
           animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .animate-slide-in-right {
+          animation: slideInFromRight 0.6s ease-out;
+        }
+        
+        .animate-slide-in-left {
+          animation: slideInFromLeft 0.6s ease-out;
         }
       `}</style>
 
