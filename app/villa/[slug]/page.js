@@ -15,6 +15,7 @@ export default function VillaDetailsPage() {
   const [villa, setVilla] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [imageLoading, setImageLoading] = useState(false);
   
   const [bookingData, setBookingData] = useState({
     name: '',
