@@ -204,7 +204,7 @@ Sent via Malle Stays`;
       {/* Image Gallery Section with Slideshow */}
       <div className="container mx-auto px-4 mb-8">
         {/* Main Image Slideshow */}
-        <div className="relative h-[500px] rounded-xl overflow-hidden mb-4 group">
+        <div className="relative h-[300px] md:h-[500px] rounded-xl overflow-hidden mb-4 group">
           {/* Current Image with Fade Animation */}
           <div className="relative w-full h-full">
             <img
@@ -221,30 +221,30 @@ Sent via Malle Stays`;
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
             
             {/* Image Counter and Auto-play Toggle */}
-            <div className="absolute bottom-4 right-4 flex items-center gap-2">
+            <div className="absolute bottom-2 md:bottom-4 right-2 md:right-4 flex items-center gap-2">
               <button
                 onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-                className="bg-black/70 hover:bg-black/90 text-white px-3 py-2 rounded-full text-sm transition-colors flex items-center gap-2"
+                className="bg-black/70 hover:bg-black/90 text-white px-2 md:px-3 py-1 md:py-2 rounded-full text-xs md:text-sm transition-colors flex items-center gap-1 md:gap-2"
                 aria-label={isAutoPlaying ? "Pause slideshow" : "Play slideshow"}
               >
                 {isAutoPlaying ? (
                   <>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="md:w-[14px] md:h-[14px]">
                       <rect x="6" y="4" width="4" height="16"></rect>
                       <rect x="14" y="4" width="4" height="16"></rect>
                     </svg>
-                    Pause
+                    <span className="hidden md:inline">Pause</span>
                   </>
                 ) : (
                   <>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="md:w-[14px] md:h-[14px]">
                       <polygon points="5 3 19 12 5 21 5 3"></polygon>
                     </svg>
-                    Play
+                    <span className="hidden md:inline">Play</span>
                   </>
                 )}
               </button>
-              <div className="bg-black/70 text-white px-4 py-2 rounded-full text-sm">
+              <div className="bg-black/70 text-white px-2 md:px-4 py-1 md:py-2 rounded-full text-xs md:text-sm">
                 {currentImageIndex + 1} / {villa.images?.length || 1}
               </div>
             </div>
@@ -255,20 +255,20 @@ Sent via Malle Stays`;
             <>
               <button
                 onClick={() => setCurrentImageIndex((prev) => (prev === 0 ? villa.images.length - 1 : prev - 1))}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 p-2 md:p-3 rounded-full shadow-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300"
                 aria-label="Previous image"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="md:w-[24px] md:h-[24px]">
                   <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
               </button>
               
               <button
                 onClick={() => setCurrentImageIndex((prev) => (prev === villa.images.length - 1 ? 0 : prev + 1))}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 p-2 md:p-3 rounded-full shadow-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300"
                 aria-label="Next image"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="md:w-[24px] md:h-[24px]">
                   <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
               </button>
@@ -277,7 +277,7 @@ Sent via Malle Stays`;
         </div>
 
         {/* Thumbnail Gallery with Hover Effects */}
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-4">
           {villa.images?.slice(0, 6).map((image, index) => (
             <div
               key={index}
