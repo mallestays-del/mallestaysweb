@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Edit, Trash2, Star, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, Star, Image as ImageIcon, Eye } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function GuestReviewsPage() {
