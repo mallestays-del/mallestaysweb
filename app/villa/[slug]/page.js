@@ -361,21 +361,21 @@ Sent via Malle Stays`;
 
       {/* Main Content */}
       <div className="container mx-auto px-4 pb-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           {/* Left Column - Property Details */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 md:space-y-6">
             {/* Property Overview */}
             <Card>
-              <CardContent className="pt-6">
-                <h2 className="text-2xl font-bold mb-6 border-b-2 border-slate-200 pb-2">Property Overview</h2>
+              <CardContent className="pt-4 md:pt-6">
+                <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 border-b-2 border-slate-200 pb-2">Property Overview</h2>
                 
                 {/* Quick Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                    <Bed className="h-6 w-6 text-blue-600" />
-                    <div>
-                      <p className="text-sm text-slate-600">Bedrooms</p>
-                      <p className="font-semibold">{villa.bedrooms || 4} AC Bedrooms</p>
+                <div className="grid grid-cols-2 gap-3 md:gap-4 mb-4 md:mb-6">
+                  <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-slate-50 rounded-lg">
+                    <Bed className="h-5 w-5 md:h-6 md:w-6 text-blue-600 flex-shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-xs md:text-sm text-slate-600">Bedrooms</p>
+                      <p className="font-semibold text-xs md:text-base truncate">{villa.bedrooms || 4} Bedrooms</p>
                     </div>
                   </div>
                   
