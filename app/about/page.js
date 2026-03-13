@@ -43,57 +43,72 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Our Mission & Values Section */}
+      {/* Our Vision Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>
-              Our Mission & Values
+              Our Vision
             </h2>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
-              At Malle Stays, we are guided by principles that ensure every guest receives exceptional service and unforgettable experiences.
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
+              Our vision is to become one of the most trusted staycation brands for villa and farmhouse bookings near Mumbai by offering quality properties, great hospitality and memorable experiences.
             </p>
           </div>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Value 1 */}
-            <Card className="text-center hover:shadow-xl transition-shadow duration-300 border-0 bg-slate-50">
-              <CardContent className="pt-8 pb-8">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-yellow-100 mb-6">
-                  <Heart className="h-10 w-10 text-yellow-700" />
+      {/* Founder Section */}
+      <section className="py-20 bg-slate-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4 text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Meet Our Founder
+            </h2>
+          </div>
+          
+          <div className="max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
+              {/* Founder Image */}
+              <div className="lg:col-span-2">
+                <div className="relative">
+                  <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                    <img
+                      src="https://customer-assets.emergentagent.com/job_a4c1098d-f670-4e85-91f6-3f257cd66a10/artifacts/qx0fcb78_IMG-20260313-WA0008.jpg"
+                      alt="Priya Singh - Founder, Malle Stays"
+                      className="w-full h-auto object-cover"
+                    />
+                  </div>
+                  {/* Decorative Element */}
+                  <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-yellow-600 rounded-full opacity-20 -z-10"></div>
                 </div>
-                <h3 className="text-2xl font-bold mb-4 text-slate-900">Hospitality First</h3>
-                <p className="text-slate-600 leading-relaxed">
-                  We create warm, personalized, and memorable stays for every guest. Your comfort and satisfaction are our top priorities.
-                </p>
-              </CardContent>
-            </Card>
+              </div>
 
-            {/* Value 2 */}
-            <Card className="text-center hover:shadow-xl transition-shadow duration-300 border-0 bg-slate-50">
-              <CardContent className="pt-8 pb-8">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-yellow-100 mb-6">
-                  <Diamond className="h-10 w-10 text-yellow-700" />
-                </div>
-                <h3 className="text-2xl font-bold mb-4 text-slate-900">Luxury & Comfort</h3>
-                <p className="text-slate-600 leading-relaxed">
-                  Every villa is chosen to provide elegance with modern convenience. Experience the perfect blend of sophistication and relaxation.
-                </p>
-              </CardContent>
-            </Card>
+              {/* Founder Info */}
+              <div className="lg:col-span-3">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-3xl font-bold text-slate-900 mb-2">Priya Singh</h3>
+                    <p className="text-xl text-yellow-700 font-semibold mb-6">Founder, Malle Stays</p>
+                  </div>
+                  
+                  <div className="space-y-4 text-lg text-slate-700">
+                    <p className="leading-relaxed">
+                      Priya Singh founded Malle Stays with a vision to make staycations more accessible and enjoyable for travelers looking for relaxing getaways near Mumbai. With a passion for hospitality and travel, she focuses on creating comfortable villa experiences where guests can relax, celebrate and spend quality time with loved ones.
+                    </p>
+                    <p className="leading-relaxed">
+                      Under her leadership, Malle Stays continues to grow by connecting guests with beautiful villas and farmhouses that offer privacy, comfort and nature-filled surroundings.
+                    </p>
+                  </div>
 
-            {/* Value 3 */}
-            <Card className="text-center hover:shadow-xl transition-shadow duration-300 border-0 bg-slate-50">
-              <CardContent className="pt-8 pb-8">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-yellow-100 mb-6">
-                  <Globe className="h-10 w-10 text-yellow-700" />
+                  {/* Quote or Highlight */}
+                  <div className="border-l-4 border-yellow-600 pl-6 py-4 bg-yellow-50 rounded-r-lg">
+                    <p className="text-lg italic text-slate-700">
+                      "Creating memorable stays and unforgettable experiences is at the heart of everything we do at Malle Stays."
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-2xl font-bold mb-4 text-slate-900">Authentic Experiences</h3>
-                <p className="text-slate-600 leading-relaxed">
-                  We embrace local culture, ensuring every stay feels unique and special. Discover the true essence of each destination.
-                </p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </section>
