@@ -623,7 +623,7 @@ export async function DELETE(request) {
     }
 
     // Delete villa
-    if (pathname.startsWith('/api/admin/villas/')) {
+    if (pathname.startsWith('/api/admin/villas/') && !pathname.includes('guest-reviews')) {
       const id = pathname.split('/api/admin/villas/')[1];
       const result = await db.collection('villas').deleteOne({ id });
       
@@ -635,7 +635,7 @@ export async function DELETE(request) {
     }
 
     // Delete review
-    if (pathname.startsWith('/api/admin/reviews/')) {
+    if (pathname.startsWith('/api/admin/reviews/') && !pathname.includes('guest-reviews')) {
       const id = pathname.split('/api/admin/reviews/')[1];
       const result = await db.collection('reviews').deleteOne({ id });
       
@@ -644,6 +644,18 @@ export async function DELETE(request) {
       }
 
       return NextResponse.json({ message: 'Review deleted successfully' });
+    }
+
+    // Delete guest review
+    if (pathname.startsWith('/api/admin/guest-reviews/')) {
+      const id = pathname.split('/api/admin/guest-reviews/')[1];
+      const result = await db.collection('guestReviews').deleteOne({ id });
+      
+      if (result.deletedCount === 0) {
+        return NextResponse.json({ error: 'Guest review not found' }, { status: 404 });
+      }
+
+      return NextResponse.json({ message: 'Guest review deleted successfully' });
     }
 
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
