@@ -77,35 +77,35 @@ export default function HomePage() {
     <div className="min-h-screen" data-testid="home-page">
       {/* Hero Section */}
       <section 
-        className="relative h-[700px] bg-cover bg-center flex items-center"
+        className="relative h-[500px] md:h-[700px] bg-cover bg-center flex items-center"
         style={{ 
           backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)), url('https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1600')`,
-          backgroundAttachment: 'fixed'
+          backgroundAttachment: 'scroll'
         }}
         data-testid="hero-section"
       >
         <div className="container mx-auto px-4 text-center">
-          <div className="inline-block mb-6 px-6 py-2 border border-yellow-600/30 rounded-full backdrop-blur-sm">
-            <span className="text-yellow-600 font-medium tracking-wider text-sm uppercase flex items-center gap-2">
-              <Award className="h-4 w-4" />
+          <div className="inline-block mb-4 md:mb-6 px-4 md:px-6 py-2 border border-yellow-600/30 rounded-full backdrop-blur-sm">
+            <span className="text-yellow-600 font-medium tracking-wider text-xs md:text-sm uppercase flex items-center gap-2">
+              <Award className="h-3 w-3 md:h-4 md:w-4" />
               Curated Luxury Experiences
             </span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white" style={{ fontFamily: "'Playfair Display', serif" }} data-testid="hero-title">
+          <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold mb-4 md:mb-6 text-white px-4" style={{ fontFamily: "'Playfair Display', serif" }} data-testid="hero-title">
             Discover Your Perfect
             <span className="block luxury-text mt-2">Luxury Retreat</span>
           </h1>
-          <p className="text-xl md:text-2xl mb-12 text-slate-300 max-w-3xl mx-auto font-light" data-testid="hero-subtitle">
+          <p className="text-base md:text-xl lg:text-2xl mb-8 md:mb-12 text-slate-300 max-w-3xl mx-auto font-light px-4" data-testid="hero-subtitle">
             Exclusive collection of premium villas and estates for discerning travelers
           </p>
 
           <Card className="max-w-5xl mx-auto elegant-shadow bg-white/95 backdrop-blur-md border-0" data-testid="search-box">
-            <CardContent className="p-8">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <CardContent className="p-4 md:p-8">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
                 <div>
-                  <label className="text-sm font-semibold mb-3 block text-slate-700 uppercase tracking-wide">Location</label>
+                  <label className="text-xs md:text-sm font-semibold mb-2 md:mb-3 block text-slate-700 uppercase tracking-wide">Location</label>
                   <Select value={searchData.location} onValueChange={(val) => setSearchData({...searchData, location: val})}>
-                    <SelectTrigger data-testid="search-location" className="h-12 border-slate-300">
+                    <SelectTrigger data-testid="search-location" className="h-11 md:h-12 border-slate-300 text-sm md:text-base">
                       <SelectValue placeholder="Select destination" />
                     </SelectTrigger>
                     <SelectContent>
@@ -117,27 +117,27 @@ export default function HomePage() {
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-semibold mb-3 block text-slate-700 uppercase tracking-wide">Check-in</label>
+                  <label className="text-xs md:text-sm font-semibold mb-2 md:mb-3 block text-slate-700 uppercase tracking-wide">Check-in</label>
                   <Input 
                     type="date" 
                     value={searchData.checkIn}
                     onChange={(e) => setSearchData({...searchData, checkIn: e.target.value})}
                     data-testid="search-checkin"
-                    className="h-12 border-slate-300"
+                    className="h-11 md:h-12 border-slate-300 text-sm md:text-base"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-semibold mb-3 block text-slate-700 uppercase tracking-wide">Check-out</label>
+                  <label className="text-xs md:text-sm font-semibold mb-2 md:mb-3 block text-slate-700 uppercase tracking-wide">Check-out</label>
                   <Input 
                     type="date" 
                     value={searchData.checkOut}
                     onChange={(e) => setSearchData({...searchData, checkOut: e.target.value})}
                     data-testid="search-checkout"
-                    className="h-12 border-slate-300"
+                    className="h-11 md:h-12 border-slate-300 text-sm md:text-base"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-semibold mb-3 block text-slate-700 uppercase tracking-wide">Guests</label>
+                  <label className="text-xs md:text-sm font-semibold mb-2 md:mb-3 block text-slate-700 uppercase tracking-wide">Guests</label>
                   <Select value={searchData.guests} onValueChange={(val) => setSearchData({...searchData, guests: val})}>
                     <SelectTrigger data-testid="search-guests" className="h-12 border-slate-300">
                       <SelectValue placeholder="Select guests" />
