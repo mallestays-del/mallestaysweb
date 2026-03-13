@@ -220,9 +220,33 @@ Sent via Malle Stays`;
             {/* Gradient Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
             
-            {/* Image Counter */}
-            <div className="absolute bottom-4 right-4 bg-black/70 text-white px-4 py-2 rounded-full text-sm">
-              {currentImageIndex + 1} / {villa.images?.length || 1}
+            {/* Image Counter and Auto-play Toggle */}
+            <div className="absolute bottom-4 right-4 flex items-center gap-2">
+              <button
+                onClick={() => setIsAutoPlaying(!isAutoPlaying)}
+                className="bg-black/70 hover:bg-black/90 text-white px-3 py-2 rounded-full text-sm transition-colors flex items-center gap-2"
+                aria-label={isAutoPlaying ? "Pause slideshow" : "Play slideshow"}
+              >
+                {isAutoPlaying ? (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <rect x="6" y="4" width="4" height="16"></rect>
+                      <rect x="14" y="4" width="4" height="16"></rect>
+                    </svg>
+                    Pause
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    Play
+                  </>
+                )}
+              </button>
+              <div className="bg-black/70 text-white px-4 py-2 rounded-full text-sm">
+                {currentImageIndex + 1} / {villa.images?.length || 1}
+              </div>
             </div>
           </div>
 
