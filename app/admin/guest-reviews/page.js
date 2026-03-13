@@ -112,6 +112,7 @@ export default function GuestReviewsPage() {
   const handleCancel = () => {
     setShowForm(false);
     setEditingReview(null);
+    setImageFile(null);
     setFormData({
       guestName: '',
       location: '',
@@ -120,6 +121,52 @@ export default function GuestReviewsPage() {
       imageUrl: '',
       source: 'WhatsApp Review'
     });
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size should be less than 5MB');
+      return;
+    }
+
+    setImageFile(file);
+    setUploadingImage(true);
+
+    try {
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', file);
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formDataUpload,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setFormData({ ...formData, imageUrl: data.url });
+        alert('Image uploaded successfully!');
+      } else {
+        alert('Failed to upload image. Please try using URL instead.');
+        // Create a temporary URL for preview
+        const tempUrl = URL.createObjectURL(file);
+        setFormData({ ...formData, imageUrl: tempUrl });
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Error uploading image. You can paste URL instead.');
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   if (loading) {
