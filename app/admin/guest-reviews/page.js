@@ -41,6 +41,13 @@ export default function GuestReviewsPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate image is present
+    if (!formData.imageUrl) {
+      alert('Please upload an image or provide an image URL');
+      return;
+    }
+    
     try {
       const url = editingReview 
         ? `/api/admin/guest-reviews/${editingReview.id}`
@@ -58,6 +65,7 @@ export default function GuestReviewsPage() {
         alert(editingReview ? 'Review updated successfully!' : 'Review added successfully!');
         setShowForm(false);
         setEditingReview(null);
+        setImageFile(null);
         setFormData({
           guestName: '',
           location: '',
