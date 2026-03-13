@@ -25,7 +25,9 @@ export default function AddVilla() {
     category: '',
     pricePerNight: '',
     bedrooms: '',
+    bathrooms: '',
     maxGuests: '',
+    parking: '',
     images: [],
     amenities: []
   });
