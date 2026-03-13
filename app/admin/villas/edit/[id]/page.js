@@ -114,7 +114,9 @@ export default function EditVilla() {
         amenities: validAmenities,
         pricePerNight: Number(formData.pricePerNight),
         bedrooms: Number(formData.bedrooms),
-        maxGuests: Number(formData.maxGuests)
+        bathrooms: Number(formData.bathrooms),
+        maxGuests: Number(formData.maxGuests),
+        parking: Number(formData.parking)
       };
 
       const response = await fetch(`/api/admin/villas/${params.id}`, {
