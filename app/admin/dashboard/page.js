@@ -87,6 +87,10 @@ export default function AdminDashboard() {
             <p className="text-slate-600 mt-1">Welcome back, {session?.user?.email}</p>
           </div>
           <div className="space-x-3">
+            <Button onClick={() => router.push('/admin/guest-reviews')} variant="outline">
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Guest Reviews
+            </Button>
             <Button onClick={() => router.push('/admin/settings')} variant="outline">
               <Settings className="h-4 w-4 mr-2" />
               Settings
