@@ -241,6 +241,7 @@ export default function EditVilla() {
                     <option value="Mountain Villa">Mountain Villa</option>
                     <option value="Lake Villa">Lake Villa</option>
                     <option value="Garden Villa">Garden Villa</option>
+                    <option value="Farmhouse Villa">Farmhouse Villa</option>
                   </select>
                 </div>
 
