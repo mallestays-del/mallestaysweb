@@ -27,7 +27,9 @@ export default function EditVilla() {
     category: '',
     pricePerNight: '',
     bedrooms: '',
+    bathrooms: '',
     maxGuests: '',
+    parking: '',
     images: [],
     amenities: []
   });
