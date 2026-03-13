@@ -16,6 +16,20 @@ export default function VillaDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [imageLoading, setImageLoading] = useState(false);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false);
+
+  // Auto-play slideshow
+  useEffect(() => {
+    if (!isAutoPlaying || !villa?.images || villa.images.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => 
+        prev === villa.images.length - 1 ? 0 : prev + 1
+      );
+    }, 3000); // Change image every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, villa?.images]);
   
   const [bookingData, setBookingData] = useState({
     name: '',
