@@ -203,6 +203,47 @@ export default function GuestReviewsPage() {
           </Button>
         </div>
 
+        {/* Instructions Banner */}
+        {!showForm && (
+          <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-xl p-6 mb-8 shadow-sm">
+            <div className="flex items-start gap-4">
+              <div className="bg-yellow-600 text-white rounded-full p-3 flex-shrink-0">
+                <ImageIcon className="h-6 w-6" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-yellow-900 mb-3">📸 How to Upload Guest Review Images</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div className="bg-white rounded-lg p-4 border border-yellow-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="bg-yellow-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">1</span>
+                      <h4 className="font-semibold text-slate-900">Take Screenshot</h4>
+                    </div>
+                    <p className="text-sm text-slate-600">Screenshot reviews from WhatsApp, Instagram, Google, or Facebook</p>
+                  </div>
+                  <div className="bg-white rounded-lg p-4 border border-yellow-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="bg-yellow-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">2</span>
+                      <h4 className="font-semibold text-slate-900">Click "Add Review"</h4>
+                    </div>
+                    <p className="text-sm text-slate-600">Click the yellow "Add Review" button above to open the form</p>
+                  </div>
+                  <div className="bg-white rounded-lg p-4 border border-yellow-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="bg-yellow-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">3</span>
+                      <h4 className="font-semibold text-slate-900">Upload & Publish</h4>
+                    </div>
+                    <p className="text-sm text-slate-600">Upload image file OR paste URL, fill details, and submit!</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-yellow-900 bg-yellow-100 rounded-lg p-3">
+                  <Star className="h-4 w-4" />
+                  <span className="font-medium">Reviews appear instantly on homepage under "What Our Guests Say" section</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Add/Edit Form */}
         {showForm && (
           <Card className="mb-8">
