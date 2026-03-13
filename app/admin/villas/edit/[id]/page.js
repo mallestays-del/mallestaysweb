@@ -61,7 +61,9 @@ export default function EditVilla() {
         category: villa.category || '',
         pricePerNight: villa.pricePerNight || '',
         bedrooms: villa.bedrooms || '',
+        bathrooms: villa.bathrooms || '',
         maxGuests: villa.maxGuests || '',
+        parking: villa.parking || '',
         images: villa.images || [],
         amenities: villa.amenities || []
       });
