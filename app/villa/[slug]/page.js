@@ -257,7 +257,7 @@ Sent via Malle Stays`;
                     <Car className="h-6 w-6 text-blue-600" />
                     <div>
                       <p className="text-sm text-slate-600">Parking</p>
-                      <p className="font-semibold">3-4 Cars</p>
+                      <p className="font-semibold">{villa.parking || 3} Cars</p>
                     </div>
                   </div>
                 </div>
