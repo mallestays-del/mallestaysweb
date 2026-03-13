@@ -196,18 +196,28 @@ export default function GuestReviewsPage() {
     <div className="min-h-screen bg-slate-50 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">Guest Reviews Management</h1>
             <p className="text-slate-600 mt-2">Manage testimonials shown on the homepage</p>
           </div>
-          <Button
-            onClick={() => setShowForm(true)}
-            className="bg-yellow-600 hover:bg-yellow-700"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Review
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              onClick={() => window.open('/#reviews', '_blank')}
+              variant="outline"
+              className="border-yellow-600 text-yellow-700 hover:bg-yellow-50"
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              View Live on Homepage
+            </Button>
+            <Button
+              onClick={() => setShowForm(true)}
+              className="bg-yellow-600 hover:bg-yellow-700"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Review
+            </Button>
+          </div>
         </div>
 
         {/* Instructions Banner */}
