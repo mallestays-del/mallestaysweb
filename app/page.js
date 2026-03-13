@@ -21,6 +21,12 @@ export default function HomePage() {
 
   useEffect(() => {
     fetchFeaturedVillas();
+    
+    // Fetch guest reviews
+    fetch('/api/guest-reviews')
+      .then(res => res.json())
+      .then(data => setReviews(data.reviews || []))
+      .catch(err => console.error('Error fetching reviews:', err));
   }, []);
 
   const fetchFeaturedVillas = async () => {
