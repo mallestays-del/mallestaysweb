@@ -147,7 +147,7 @@ export async function GET(request) {
     }
 
     // Get single villa by ID for editing
-    if (pathname.startsWith('/api/admin/villas/')) {
+    if (pathname.startsWith('/api/admin/villas/') && !pathname.includes('guest-reviews')) {
       const session = await checkAuth(request);
       if (session.error) return session;
 
@@ -159,6 +159,31 @@ export async function GET(request) {
       }
       
       return NextResponse.json({ villa });
+    }
+
+    // Get all guest reviews
+    if (pathname === '/api/admin/guest-reviews') {
+      const session = await checkAuth(request);
+      if (session.error) return session;
+
+      const reviews = await db.collection('guestReviews').find({}, { 
+        projection: { 
+          id: 1, guestName: 1, location: 1, reviewText: 1, 
+          rating: 1, imageUrl: 1, source: 1, createdAt: 1 
+        } 
+      }).sort({ createdAt: -1 }).limit(100).toArray();
+      return NextResponse.json({ reviews });
+    }
+
+    // Get guest reviews for public display
+    if (pathname === '/api/guest-reviews') {
+      const reviews = await db.collection('guestReviews').find({}, { 
+        projection: { 
+          id: 1, guestName: 1, location: 1, reviewText: 1, 
+          rating: 1, imageUrl: 1, source: 1 
+        } 
+      }).sort({ createdAt: -1 }).limit(20).toArray();
+      return NextResponse.json({ reviews });
     }
 
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
