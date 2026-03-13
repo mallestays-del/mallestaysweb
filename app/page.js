@@ -27,6 +27,16 @@ export default function HomePage() {
       .then(res => res.json())
       .then(data => setReviews(data.reviews || []))
       .catch(err => console.error('Error fetching reviews:', err));
+
+    // Check for hash in URL to scroll to section
+    if (window.location.hash === '#reviews' || window.location.hash === '#guest-reviews') {
+      setTimeout(() => {
+        const reviewsSection = document.querySelector('[data-testid="reviews-section"]');
+        if (reviewsSection) {
+          reviewsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 500);
+    }
   }, []);
 
   const fetchFeaturedVillas = async () => {
