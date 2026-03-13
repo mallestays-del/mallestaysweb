@@ -96,7 +96,7 @@
 - Image sitemaps for villa photos
 - Last modification dates
 
-**Access:** https://jovial-mccarthy-2.preview.emergentagent.com/sitemap.xml
+**Access:** https://premium-property-hub-10.preview.emergentagent.com/sitemap.xml
 
 ### 6. Robots.txt
 
@@ -107,7 +107,7 @@
 - Sitemap reference included
 - Crawl delay: 1 second
 
-**Access:** https://jovial-mccarthy-2.preview.emergentagent.com/robots.txt
+**Access:** https://premium-property-hub-10.preview.emergentagent.com/robots.txt
 
 ### 7. URL Structure
 
@@ -253,8 +253,8 @@
 
 ## 🔗 Important SEO URLs
 
-- Sitemap: https://jovial-mccarthy-2.preview.emergentagent.com/sitemap.xml
-- Robots: https://jovial-mccarthy-2.preview.emergentagent.com/robots.txt
+- Sitemap: https://premium-property-hub-10.preview.emergentagent.com/sitemap.xml
+- Robots: https://premium-property-hub-10.preview.emergentagent.com/robots.txt
 
 ## 📝 Notes for Ongoing SEO
 
