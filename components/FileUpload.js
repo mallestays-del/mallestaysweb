@@ -120,29 +120,100 @@ export default function FileUpload({ onFilesChange, accept = 'image/*,.pdf', mul
             </div>
           </label>
 
-          {/* File Previews */}
+          {/* File Previews with Slideshow */}
           {files.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-              {files.map((file, index) => (
-                <Card key={index} className="relative p-2">
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                    onClick={() => removeFile(index)}
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
-                  {previews[index] ? (
-                    <img src={previews[index]} alt={file.name} className="w-full h-24 object-cover rounded" />
-                  ) : (
-                    <div className="w-full h-24 bg-slate-100 rounded flex items-center justify-center">
-                      <p className="text-xs text-slate-600 truncate px-2">{file.name}</p>
+            <div className="space-y-4 mt-4">
+              {/* Main Preview Slideshow */}
+              {previews.filter(p => p).length > 0 && (
+                <div className="relative">
+                  <div className="relative h-64 rounded-xl overflow-hidden bg-slate-100 group">
+                    <img 
+                      src={previews.filter(p => p)[currentPreviewIndex]} 
+                      alt={files[currentPreviewIndex]?.name || 'Preview'} 
+                      className="w-full h-full object-contain animate-fade-in"
+                      style={{ animation: 'fadeIn 0.4s ease-in-out' }}
+                    />
+                    
+                    {/* Navigation Arrows */}
+                    {previews.filter(p => p).length > 1 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setCurrentPreviewIndex((prev) => 
+                            prev === 0 ? previews.filter(p => p).length - 1 : prev - 1
+                          )}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                          </svg>
+                        </button>
+                        
+                        <button
+                          type="button"
+                          onClick={() => setCurrentPreviewIndex((prev) => 
+                            prev === previews.filter(p => p).length - 1 ? 0 : prev + 1
+                          )}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                          </svg>
+                        </button>
+                      </>
+                    )}
+                    
+                    {/* Image Counter */}
+                    <div className="absolute bottom-2 right-2 bg-black/70 text-white px-3 py-1 rounded-full text-xs">
+                      {currentPreviewIndex + 1} / {previews.filter(p => p).length}
                     </div>
-                  )}
-                </Card>
-              ))}
+                  </div>
+                  
+                  <style jsx>{`
+                    @keyframes fadeIn {
+                      from { opacity: 0; transform: scale(1.05); }
+                      to { opacity: 1; transform: scale(1); }
+                    }
+                  `}</style>
+                </div>
+              )}
+              
+              {/* Thumbnail Grid */}
+              <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
+                {files.map((file, index) => (
+                  <Card key={index} className="relative group">
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => removeFile(index)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                    <div
+                      onClick={() => previews[index] && setCurrentPreviewIndex(index)}
+                      className={`cursor-pointer transition-all duration-300 ${
+                        currentPreviewIndex === index && previews[index]
+                          ? 'ring-2 ring-primary'
+                          : ''
+                      }`}
+                    >
+                      {previews[index] ? (
+                        <img 
+                          src={previews[index]} 
+                          alt={file.name} 
+                          className="w-full h-20 object-cover rounded hover:scale-105 transition-transform"
+                        />
+                      ) : (
+                        <div className="w-full h-20 bg-slate-100 rounded flex items-center justify-center p-2">
+                          <p className="text-xs text-slate-600 truncate">{file.name}</p>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                ))}
+              </div>
             </div>
           )}
         </div>
