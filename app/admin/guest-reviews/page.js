@@ -62,7 +62,14 @@ export default function GuestReviewsPage() {
       });
 
       if (res.ok) {
-        alert(editingReview ? 'Review updated successfully!' : 'Review added successfully!');
+        const successMessage = editingReview 
+          ? 'Review updated successfully! Check homepage to see changes.' 
+          : 'Review added successfully! It\'s now live on homepage!';
+        
+        if (window.confirm(`${successMessage}\n\nWould you like to view it on the homepage now?`)) {
+          window.open('/#reviews', '_blank');
+        }
+        
         setShowForm(false);
         setEditingReview(null);
         setImageFile(null);
