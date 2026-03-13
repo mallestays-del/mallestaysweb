@@ -275,7 +275,7 @@ export async function POST(request) {
       const session = await checkAuth(request);
       if (session.error) return session;
 
-      const { name, location, category, description, pricePerNight, bedrooms, maxGuests, amenities, images, mapLocation } = body;
+      const { name, location, category, description, pricePerNight, bedrooms, bathrooms, maxGuests, parking, amenities, images, mapLocation } = body;
 
       if (!name || !location || !category || !description || !pricePerNight) {
         return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -292,7 +292,9 @@ export async function POST(request) {
         description,
         pricePerNight: parseFloat(pricePerNight),
         bedrooms: parseInt(bedrooms) || 1,
+        bathrooms: parseInt(bathrooms) || 1,
         maxGuests: parseInt(maxGuests) || 2,
+        parking: parseInt(parking) || 1,
         amenities: amenities || [],
         images: images || [],
         mapLocation: mapLocation || '',
