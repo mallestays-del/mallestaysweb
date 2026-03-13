@@ -11,6 +11,7 @@ export default function FileUpload({ onFilesChange, accept = 'image/*,.pdf', mul
   const [urlMode, setUrlMode] = useState(false);
   const [urls, setUrls] = useState(['']);
   const [previews, setPreviews] = useState([]);
+  const [currentPreviewIndex, setCurrentPreviewIndex] = useState(0);
 
   const handleFileChange = async (e) => {
     const selectedFiles = Array.from(e.target.files);
