@@ -514,7 +514,7 @@ export async function PUT(request) {
     if (session.error) return session;
 
     // Update villa
-    if (pathname.startsWith('/api/admin/villas/')) {
+    if (pathname.startsWith('/api/admin/villas/') && !pathname.includes('guest-reviews')) {
       const id = pathname.split('/api/admin/villas/')[1];
       const { name, location, description, category, pricePerNight, bedrooms, bathrooms, maxGuests, parking, amenities, images, mapLocation, seoTitle, seoDescription, seoKeywords } = body;
 
@@ -543,6 +543,29 @@ export async function PUT(request) {
       }
 
       return NextResponse.json({ message: 'Villa updated successfully' });
+    }
+
+    // Update guest review
+    if (pathname.startsWith('/api/admin/guest-reviews/')) {
+      const id = pathname.split('/api/admin/guest-reviews/')[1];
+      const { guestName, location, reviewText, rating, imageUrl, source } = body;
+
+      const updateData = {
+        guestName,
+        location,
+        reviewText,
+        rating: parseInt(rating),
+        imageUrl,
+        source,
+        updatedAt: new Date().toISOString()
+      };
+
+      const result = await db.collection('guestReviews').updateOne({ id }, { $set: updateData });
+      if (result.matchedCount === 0) {
+        return NextResponse.json({ error: 'Review not found' }, { status: 404 });
+      }
+
+      return NextResponse.json({ message: 'Review updated successfully' });
     }
 
     // Update booking status
