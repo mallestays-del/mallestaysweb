@@ -22,11 +22,8 @@ export default function HomePage() {
   useEffect(() => {
     fetchFeaturedVillas();
     
-    // Fetch guest reviews
-    fetch('/api/guest-reviews')
-      .then(res => res.json())
-      .then(data => setReviews(data.reviews || []))
-      .catch(err => console.error('Error fetching reviews:', err));
+    // Fetch guest reviews initially
+    fetchGuestReviews();
 
     // Check for hash in URL to scroll to section
     if (window.location.hash === '#reviews' || window.location.hash === '#guest-reviews') {
@@ -37,7 +34,24 @@ export default function HomePage() {
         }
       }, 500);
     }
+
+    // Poll for new reviews every 30 seconds (real-time updates)
+    const reviewInterval = setInterval(() => {
+      fetchGuestReviews();
+    }, 30000);
+
+    return () => clearInterval(reviewInterval);
   }, []);
+
+  const fetchGuestReviews = async () => {
+    try {
+      const response = await fetch('/api/guest-reviews');
+      const data = await response.json();
+      setReviews(data.reviews || []);
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+    }
+  };
 
   const fetchFeaturedVillas = async () => {
     try {
