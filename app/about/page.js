@@ -6,27 +6,27 @@ import { Card, CardContent } from '@/components/ui/card';
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Who We Are Section */}
+      {/* About Us Section */}
       <section className="py-20 bg-slate-50">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Column - Text */}
             <div>
               <h1 className="text-5xl font-bold mb-6 text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>
-                Who We Are
+                About Us
               </h1>
               <div className="space-y-4 text-lg text-slate-700">
                 <p className="leading-relaxed">
-                  <span className="font-semibold text-yellow-700">Malle Stays</span> is your trusted partner in discovering extraordinary luxury villas and premium vacation rentals. 
-                  We curate handpicked properties that promise not just accommodation, but unforgettable experiences.
+                  <span className="font-semibold text-yellow-700">Malle Stays</span> is a staycation brand dedicated to providing comfortable and memorable villa and farmhouse experiences near Mumbai. Our goal is to help travelers escape the busy city life and enjoy peaceful stays surrounded by nature.
                 </p>
                 <p className="leading-relaxed">
-                  Whether you're seeking a serene escape in the mountains, a beachside retreat, or a private pool villa for your family, 
-                  we bring you the finest stays across India's most coveted destinations.
+                  We offer carefully selected villas and farmhouses that are perfect for couples, families and group stays. Whether you are planning a weekend getaway, birthday celebration, family gathering or corporate outing, Malle Stays provides the ideal stay option with modern amenities and beautiful locations.
                 </p>
                 <p className="leading-relaxed">
-                  With a passionate team dedicated to redefining the art of hospitality, we ensure every moment of your getaway is filled 
-                  with comfort, luxury, and memories that last a lifetime.
+                  Our properties are located in some of the most popular staycation destinations such as <strong>Karjat</strong>, <strong>Badlapur</strong>, <strong>Neral</strong> and <strong>Igatpuri</strong>, offering guests a perfect blend of relaxation and entertainment. Many of our villas feature private swimming pools, nature views, indoor and outdoor games and in-house food options.
+                </p>
+                <p className="leading-relaxed">
+                  At Malle Stays, we focus on providing a smooth and hassle-free booking experience along with reliable customer support. Our mission is to make every stay special so that guests can create unforgettable memories with their friends and family.
                 </p>
               </div>
             </div>
@@ -35,7 +35,7 @@ export default function AboutPage() {
             <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
               <img
                 src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800"
-                alt="Luxury Villa Bedroom"
+                alt="Luxury Villa"
                 className="w-full h-full object-cover"
               />
             </div>
