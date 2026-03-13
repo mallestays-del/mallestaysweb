@@ -20,6 +20,8 @@ export default function GuestReviewsPage() {
     imageUrl: '',
     source: 'WhatsApp Review'
   });
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
 
   useEffect(() => {
     fetchReviews();
