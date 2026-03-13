@@ -1,32 +1,25 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Star, User } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function ReviewsPage() {
-  const [reviews, setReviews] = useState([]);
-  const [villas, setVillas] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({
-    villaId: '',
-    villaName: '',
-    name: '',
-    rating: '5',
-    comment: ''
-  });
-  const [submitting, setSubmitting] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    fetchReviews();
-    fetchVillas();
-  }, []);
+    // Redirect to homepage guest reviews section
+    router.push('/#reviews');
+  }, [router]);
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-slate-50">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-600 mx-auto mb-4"></div>
+        <p className="text-slate-600">Redirecting to Guest Reviews...</p>
+      </div>
+    </div>
+  );
+}
 
   const fetchReviews = async () => {
     try {
