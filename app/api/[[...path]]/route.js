@@ -441,15 +441,18 @@ export async function PUT(request) {
     // Update villa
     if (pathname.startsWith('/api/admin/villas/')) {
       const id = pathname.split('/api/admin/villas/')[1];
-      const { name, location, description, pricePerNight, bedrooms, maxGuests, amenities, images, mapLocation, seoTitle, seoDescription, seoKeywords } = body;
+      const { name, location, description, category, pricePerNight, bedrooms, bathrooms, maxGuests, parking, amenities, images, mapLocation, seoTitle, seoDescription, seoKeywords } = body;
 
       const updateData = {
         name,
         location,
         description,
+        category,
         pricePerNight: parseFloat(pricePerNight),
         bedrooms: parseInt(bedrooms),
+        bathrooms: parseInt(bathrooms),
         maxGuests: parseInt(maxGuests),
+        parking: parseInt(parking),
         amenities,
         images,
         mapLocation,
