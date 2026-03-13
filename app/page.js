@@ -464,6 +464,125 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Guest Reviews Section */}
+      <section className="py-20 bg-white" data-testid="reviews-section">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <p className="text-yellow-600 font-semibold tracking-wider uppercase text-sm mb-3">Testimonials</p>
+            <h2 className="text-5xl font-bold mb-4 text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>
+              What Our Guests Say
+            </h2>
+            <p className="text-slate-600 text-lg max-w-2xl mx-auto">
+              Real experiences from our valued guests who have stayed at our premium villas
+            </p>
+          </div>
+
+          {/* Reviews Grid - Mockup with Placeholder Images */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {/* Review 1 */}
+            <Card className="elegant-shadow-hover border-0 overflow-hidden group">
+              <CardContent className="p-0">
+                <div className="relative h-[400px] overflow-hidden">
+                  <img
+                    src="https://images.unsplash.com/photo-1522199755839-a2bacb67c546?w=600&h=800&fit=crop"
+                    alt="Guest Review 1"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                    <div className="flex items-center gap-1 mb-3">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
+                    <p className="text-sm italic mb-3">
+                      "Amazing experience! The villa exceeded all expectations. Perfect for a family getaway."
+                    </p>
+                    <p className="text-sm font-semibold">- Rahul & Family</p>
+                    <p className="text-xs text-slate-300">Mumbai</p>
+                  </div>
+                  <div className="absolute top-4 right-4 bg-yellow-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                    Instagram Review
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Review 2 */}
+            <Card className="elegant-shadow-hover border-0 overflow-hidden group">
+              <CardContent className="p-0">
+                <div className="relative h-[400px] overflow-hidden">
+                  <img
+                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=800&fit=crop"
+                    alt="Guest Review 2"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                    <div className="flex items-center gap-1 mb-3">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
+                    <p className="text-sm italic mb-3">
+                      "Absolutely loved the serene location and luxurious amenities. Highly recommended!"
+                    </p>
+                    <p className="text-sm font-semibold">- Priya Sharma</p>
+                    <p className="text-xs text-slate-300">Pune</p>
+                  </div>
+                  <div className="absolute top-4 right-4 bg-yellow-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                    WhatsApp Review
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Review 3 */}
+            <Card className="elegant-shadow-hover border-0 overflow-hidden group">
+              <CardContent className="p-0">
+                <div className="relative h-[400px] overflow-hidden">
+                  <img
+                    src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&h=800&fit=crop"
+                    alt="Guest Review 3"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                    <div className="flex items-center gap-1 mb-3">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
+                    <p className="text-sm italic mb-3">
+                      "Best staycation ever! The pool was amazing and staff was very helpful."
+                    </p>
+                    <p className="text-sm font-semibold">- Amit & Neha</p>
+                    <p className="text-xs text-slate-300">Mumbai</p>
+                  </div>
+                  <div className="absolute top-4 right-4 bg-yellow-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                    Google Review
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Instructions for Admin - Hidden in Production */}
+          <div className="bg-yellow-50 border-2 border-dashed border-yellow-300 rounded-lg p-6 max-w-3xl mx-auto">
+            <h3 className="text-lg font-bold text-yellow-900 mb-3 flex items-center gap-2">
+              <Star className="h-5 w-5" />
+              How to Update Guest Reviews
+            </h3>
+            <div className="text-sm text-yellow-800 space-y-2">
+              <p><strong>Step 1:</strong> Upload your guest review screenshots (WhatsApp, Instagram, Google reviews)</p>
+              <p><strong>Step 2:</strong> Update the image URLs in <code className="bg-yellow-100 px-2 py-1 rounded">page.js</code></p>
+              <p><strong>Step 3:</strong> Replace the placeholder text with actual guest names and reviews</p>
+              <p><strong>Tip:</strong> You can add more review cards by copying the Card component structure</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 bg-slate-50" data-testid="cta-section">
         <div className="container mx-auto px-4">
