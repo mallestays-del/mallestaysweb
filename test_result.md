@@ -260,7 +260,10 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Villa Update API - Authentication"
+    - "Villa Update API - PUT endpoint"
+    - "Villa Update API - Error handling"
   stuck_tasks:
     - "Guest Reviews API - DELETE review"
   test_all: false
