@@ -595,9 +595,9 @@ export async function DELETE(request) {
     const session = await checkAuth(request);
     if (session.error) return session;
 
-    // Only super admin can delete
-    if (session.user.role !== 'super_admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    // Only admin or super_admin can delete
+    if (session.user.role !== 'admin' && session.user.role !== 'super_admin') {
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     // Delete villa
