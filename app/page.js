@@ -508,22 +508,29 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Reviews Grid - Dynamic from Database */}
+          {/* Reviews Grid - Dynamic from Database - REAL USER IMAGES ONLY */}
           {reviews.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
               {reviews.map((review) => (
                 <Card key={review.id} className="elegant-shadow-hover border-0 overflow-hidden group">
                   <CardContent className="p-0">
-                    <div className="relative h-[400px] overflow-hidden">
-                      <img
-                        src={review.imageUrl || 'https://images.unsplash.com/photo-1522199755839-a2bacb67c546?w=600&h=800&fit=crop'}
-                        alt={`Review by ${review.guestName}`}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        onError={(e) => {
-                          console.error('Image failed to load:', review.imageUrl);
-                          e.target.src = 'https://images.unsplash.com/photo-1522199755839-a2bacb67c546?w=600&h=800&fit=crop';
-                        }}
-                      />
+                    <div className="relative h-[400px] overflow-hidden bg-slate-200">
+                      {review.imageUrl ? (
+                        <img
+                          src={review.imageUrl}
+                          alt={`Review by ${review.guestName}`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          onError={(e) => {
+                            console.error('❌ Failed to load review image:', review.imageUrl);
+                            e.target.style.display = 'none';
+                            e.target.parentElement.innerHTML = '<div class="flex items-center justify-center h-full bg-slate-100"><p class="text-slate-500 text-sm px-4 text-center">Image not available</p></div>';
+                          }}
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full bg-slate-100">
+                          <p className="text-slate-500 text-sm px-4 text-center">No image uploaded</p>
+                        </div>
+                      )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                       <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                         <div className="flex items-center gap-1 mb-3">
