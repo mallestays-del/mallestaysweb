@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import { v2 as cloudinary } from 'cloudinary';
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(request) {
   try {
@@ -26,31 +31,36 @@ export async function POST(request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Create unique filename
-    const fileExtension = file.name.split('.').pop();
-    const fileName = `review_${Date.now()}_${uuidv4().substring(0, 8)}.${fileExtension}`;
-    
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), 'public', 'uploads', 'reviews');
-    await mkdir(uploadsDir, { recursive: true });
+    // Upload to Cloudinary using upload_stream
+    const uploadResult = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'malle-stays/reviews',
+          resource_type: 'image',
+          transformation: [
+            { width: 1200, height: 1200, crop: 'limit', quality: 'auto' }
+          ]
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
 
-    // Save file
-    const filePath = join(uploadsDir, fileName);
-    await writeFile(filePath, buffer);
-    
-    console.log('✅ File uploaded successfully:', fileName);
-    console.log('   Path:', filePath);
+      uploadStream.end(buffer);
+    });
+
+    console.log('✅ File uploaded to Cloudinary successfully');
+    console.log('   Public ID:', uploadResult.public_id);
+    console.log('   URL:', uploadResult.secure_url);
     console.log('   Size:', file.size, 'bytes');
 
-    // Return the full public URL
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const url = `${baseUrl}/uploads/reviews/${fileName}`;
-    
     return NextResponse.json({ 
       success: true, 
-      url,
-      fileName,
-      message: 'Image uploaded successfully!'
+      url: uploadResult.secure_url,
+      publicId: uploadResult.public_id,
+      fileName: file.name,
+      message: 'Image uploaded successfully to cloud storage!'
     });
   } catch (error) {
     console.error('❌ Upload error:', error);
