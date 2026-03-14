@@ -3,6 +3,7 @@ import { getDatabase } from '@/lib/mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import { createDefaultAdmin, checkPermission } from '@/lib/auth';
 import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import bcrypt from 'bcryptjs';
 
 // Initialize default admin on startup
@@ -19,11 +20,12 @@ async function getBody(request) {
 
 // Helper to check authentication
 async function checkAuth(request) {
-  const session = await getServerSession();
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const session = await getServerSession(authOptions);
+  console.log('Session in checkAuth:', session);
+  if (!session || !session.user) {
+    return NextResponse.json({ error: 'Unauthorized - No session' }, { status: 401 });
   }
-  return session;
+  return { user: session.user };
 }
 
 // ==================== VILLAS API ====================
