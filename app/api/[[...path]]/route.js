@@ -135,10 +135,10 @@ export async function GET(request) {
 
     // Get admins list
     if (pathname === '/api/admin/users') {
-      const session = await checkAuth(request);
-      if (session.error) return session;
+      const authResult = await checkAuth(request);
+      if (authResult.error) return authResult.response;
       
-      if (session.user.role !== 'super_admin') {
+      if (authResult.user.role !== 'super_admin') {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
