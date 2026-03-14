@@ -490,8 +490,8 @@ export async function PUT(request) {
   const body = await getBody(request);
 
   try {
-    const session = await checkAuth(request);
-    if (session.error) return session;
+    const authResult = await checkAuth(request);
+    if (authResult.error) return authResult.response;
 
     // Update villa
     if (pathname.startsWith('/api/admin/villas/') && !pathname.includes('guest-reviews')) {
