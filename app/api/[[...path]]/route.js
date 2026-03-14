@@ -110,8 +110,8 @@ export async function GET(request) {
 
     // Get admin stats
     if (pathname === '/api/admin/stats') {
-      const session = await checkAuth(request);
-      if (session.error) return session;
+      const authResult = await checkAuth(request);
+      if (authResult.error) return authResult.response;
 
       const totalVillas = await db.collection('villas').countDocuments();
       const totalBookings = await db.collection('bookings').countDocuments();
