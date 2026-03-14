@@ -101,3 +101,112 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Test the Cloudinary file upload integration that was just implemented. The upload endpoint accepts image files via POST request with multipart/form-data, has 5MB max file size, only allows image files, and should return Cloudinary URLs. Also test guest reviews API integration with uploaded images."
+
+backend:
+  - task: "Cloudinary Upload API"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/upload/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Cloudinary upload endpoint implemented with file validation, size limits, and proper error handling"
+
+  - task: "Guest Reviews API - GET all reviews"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "GET /api/admin/guest-reviews endpoint implemented for fetching all guest reviews"
+
+  - task: "Guest Reviews API - POST create review"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "POST /api/admin/guest-reviews endpoint implemented for creating new guest reviews with image URLs"
+
+  - task: "Guest Reviews API - PUT update review"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "PUT /api/admin/guest-reviews/{id} endpoint implemented for updating guest reviews"
+
+  - task: "Guest Reviews API - DELETE review"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "DELETE /api/admin/guest-reviews/{id} endpoint implemented for deleting guest reviews"
+
+  - task: "Public Guest Reviews API"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "GET /api/guest-reviews endpoint implemented for public display of guest reviews"
+
+frontend:
+  - task: "Frontend Integration Testing"
+    implemented: false
+    working: "NA"
+    file: "N/A"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Frontend testing not required as per testing agent guidelines"
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Cloudinary Upload API"
+    - "Guest Reviews API - GET all reviews"
+    - "Guest Reviews API - POST create review"
+    - "Guest Reviews API - PUT update review"
+    - "Guest Reviews API - DELETE review"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "testing"
+    message: "Starting comprehensive testing of Cloudinary upload integration and guest reviews API. Will test file upload validation, Cloudinary integration, and full CRUD operations for guest reviews."
