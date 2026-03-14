@@ -49,7 +49,7 @@ export default function AddVilla() {
 
   const updateImageUrl = (index, value) => {
     const newUrls = [...imageUrls];
-    newUrls[index] = value;
+    newUrls[index] = value || ''; // Ensure we never set null/undefined
     setImageUrls(newUrls);
   };
 
@@ -64,7 +64,7 @@ export default function AddVilla() {
 
   const updateAmenity = (index, value) => {
     const newAmenities = [...amenities];
-    newAmenities[index] = value;
+    newAmenities[index] = value || ''; // Ensure we never set null/undefined
     setAmenities(newAmenities);
   };
 
