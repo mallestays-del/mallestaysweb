@@ -105,6 +105,51 @@
 user_problem_statement: "Test the villa update (PUT) functionality that was just fixed. The checkAuth function return format issue was resolved, and the PUT endpoint at /api/admin/villas/{id} now correctly handles authentication. Test authentication check, villa update operations, and error handling."
 
 backend:
+  - task: "Villa Update API - Authentication"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "checkAuth function return format was fixed to properly return user object and error status"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - Authentication working correctly: NextAuth session established successfully, checkAuth function returns proper user object with role, admin stats endpoint accessible with valid session"
+
+  - task: "Villa Update API - PUT endpoint"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "PUT /api/admin/villas/{id} endpoint implemented for updating villa details with proper authentication"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - Villa update endpoint working perfectly: successfully updates all fields (name, description, pricePerNight, bedrooms, bathrooms, maxGuests, parking, amenities, images, SEO fields), properly parses numeric fields from strings, saves changes to database correctly, returns 200 with success message"
+
+  - task: "Villa Update API - Error handling"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Error handling implemented for non-existent villa updates"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - Error handling working correctly: returns 404 Not Found for non-existent villa IDs, proper error messages returned"
+
   - task: "Cloudinary Upload API"
     implemented: true
     working: true
