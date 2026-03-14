@@ -1,17 +1,16 @@
 const { v2: cloudinary } = require('cloudinary');
-require('dotenv').config();
 
 // Configure Cloudinary
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: 'drwpabrdg',
+  api_key: '749994822632324',
+  api_secret: 'YWXUmyuk_-nib4fy3t6MHxf69Ts',
 });
 
 console.log('Testing Cloudinary Configuration:');
-console.log('Cloud Name:', process.env.CLOUDINARY_CLOUD_NAME);
-console.log('API Key:', process.env.CLOUDINARY_API_KEY ? '✓ Set' : '✗ Not set');
-console.log('API Secret:', process.env.CLOUDINARY_API_SECRET ? '✓ Set' : '✗ Not set');
+console.log('Cloud Name:', 'drwpabrdg');
+console.log('API Key:', '✓ Set');
+console.log('API Secret:', '✓ Set');
 
 // Test connection
 cloudinary.api.ping()
