@@ -98,9 +98,9 @@ export default function EditVilla() {
     setLoading(true);
 
     try {
-      // Filter out empty strings
-      const validImages = imageUrls.filter(url => url.trim() !== '');
-      const validAmenities = amenities.filter(amenity => amenity.trim() !== '');
+      // Filter out empty, null, or undefined values
+      const validImages = imageUrls.filter(url => url && typeof url === 'string' && url.trim() !== '');
+      const validAmenities = amenities.filter(amenity => amenity && typeof amenity === 'string' && amenity.trim() !== '');
 
       if (validImages.length === 0) {
         toast.error('Please add at least one image');
