@@ -63,13 +63,28 @@ export async function GET(request) {
     }
 
     // Get single villa by slug
-    if (pathname.startsWith('/api/villas/')) {
+    if (pathname.startsWith('/api/villas/') && pathname.split('/').length === 4) {
       const slug = pathname.split('/api/villas/')[1];
       const villa = await db.collection('villas').findOne({ slug });
       if (!villa) {
         return NextResponse.json({ error: 'Villa not found' }, { status: 404 });
       }
       return NextResponse.json({ villa });
+    }
+
+    // Get reviews for a specific villa
+    if (pathname.match(/^\/api\/villas\/[^\/]+\/reviews$/)) {
+      const villaId = pathname.split('/')[3];
+      const reviews = await db.collection('reviews').find({ 
+        villaId,
+        approved: true 
+      }, { 
+        projection: { 
+          villaId: 1, villaName: 1, name: 1, rating: 1, comment: 1,
+          imageUrl: 1, approved: 1, createdAt: 1, id: 1 
+        } 
+      }).sort({ createdAt: -1 }).limit(50).toArray();
+      return NextResponse.json({ reviews });
     }
 
     // Get locations
