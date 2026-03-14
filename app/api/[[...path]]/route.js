@@ -23,9 +23,9 @@ async function checkAuth(request) {
   const session = await getServerSession(authOptions);
   console.log('Session in checkAuth:', session);
   if (!session || !session.user) {
-    return NextResponse.json({ error: 'Unauthorized - No session' }, { status: 401 });
+    return { error: true, response: NextResponse.json({ error: 'Unauthorized - No session' }, { status: 401 }) };
   }
-  return { user: session.user };
+  return { error: false, user: session.user };
 }
 
 // ==================== VILLAS API ====================
