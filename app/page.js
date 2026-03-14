@@ -516,9 +516,13 @@ export default function HomePage() {
                   <CardContent className="p-0">
                     <div className="relative h-[400px] overflow-hidden">
                       <img
-                        src={review.imageUrl}
+                        src={review.imageUrl || 'https://images.unsplash.com/photo-1522199755839-a2bacb67c546?w=600&h=800&fit=crop'}
                         alt={`Review by ${review.guestName}`}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => {
+                          console.error('Image failed to load:', review.imageUrl);
+                          e.target.src = 'https://images.unsplash.com/photo-1522199755839-a2bacb67c546?w=600&h=800&fit=crop';
+                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                       <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
