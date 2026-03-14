@@ -362,8 +362,10 @@ export default function EditVilla() {
                         return file.data;
                       }
                       return file;
-                    });
-                    setImageUrls(imageData);
+                    }).filter(img => img && typeof img === 'string' && img.trim() !== ''); // Filter out null/undefined/empty
+                    
+                    // Ensure we always have at least one empty string for the UI
+                    setImageUrls(imageData.length > 0 ? imageData : ['']);
                   }}
                 />
                 {/* Show current images */}
