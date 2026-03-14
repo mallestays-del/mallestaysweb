@@ -40,6 +40,19 @@ export default function VillaDetailsPage() {
     checkOut: ''
   });
   const [bookingLoading, setBookingLoading] = useState(false);
+  
+  // Review state
+  const [reviews, setReviews] = useState([]);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewData, setReviewData] = useState({
+    name: '',
+    rating: 5,
+    comment: '',
+    imageUrl: ''
+  });
+  const [reviewImageFile, setReviewImageFile] = useState(null);
+  const [uploadingReviewImage, setUploadingReviewImage] = useState(false);
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
     if (params.slug) {
