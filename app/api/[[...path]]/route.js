@@ -594,11 +594,11 @@ export async function DELETE(request) {
   const db = await getDatabase();
 
   try {
-    const session = await checkAuth(request);
-    if (session.error) return session;
+    const authResult = await checkAuth(request);
+    if (authResult.error) return authResult.response;
 
     // Only super_admin or sub_admin can delete
-    const userRole = session.user?.role;
+    const userRole = authResult.user?.role;
     if (userRole !== 'sub_admin' && userRole !== 'super_admin') {
       return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
