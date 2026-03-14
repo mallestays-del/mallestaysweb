@@ -95,8 +95,8 @@ export async function GET(request) {
 
     // Get bookings
     if (pathname === '/api/bookings') {
-      const session = await checkAuth(request);
-      if (session.error) return session;
+      const authResult = await checkAuth(request);
+      if (authResult.error) return authResult.response;
 
       const bookings = await db.collection('bookings').find({}, { 
         projection: { 
