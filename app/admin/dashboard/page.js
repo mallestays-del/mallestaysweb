@@ -51,18 +51,28 @@ export default function AdminDashboard() {
     if (!confirm('Are you sure you want to delete this villa?')) return;
     
     try {
+      console.log('Deleting villa:', villaId);
+      
       const response = await fetch(`/api/admin/villas/${villaId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        }
       });
+      
+      const data = await response.json();
+      console.log('Delete response:', response.status, data);
       
       if (response.ok) {
         toast.success('Villa deleted successfully');
         fetchData();
       } else {
-        toast.error('Failed to delete villa');
+        toast.error(data.error || 'Failed to delete villa');
+        console.error('Delete failed:', data);
       }
     } catch (error) {
-      toast.error('An error occurred');
+      console.error('Delete error:', error);
+      toast.error('An error occurred: ' + error.message);
     }
   };
 
