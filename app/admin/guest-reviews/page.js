@@ -417,16 +417,23 @@ export default function GuestReviewsPage() {
           {reviews.map((review) => (
             <Card key={review.id} className="overflow-hidden">
               <CardContent className="p-0">
-                <div className="relative h-64">
-                  <img
-                    src={review.imageUrl || 'https://images.unsplash.com/photo-1522199755839-a2bacb67c546?w=600&h=800&fit=crop'}
-                    alt={`Review by ${review.guestName}`}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      console.error('Admin: Image failed to load:', review.imageUrl);
-                      e.target.src = 'https://images.unsplash.com/photo-1522199755839-a2bacb67c546?w=600&h=800&fit=crop';
-                    }}
-                  />
+                <div className="relative h-64 bg-slate-200">
+                  {review.imageUrl ? (
+                    <img
+                      src={review.imageUrl}
+                      alt={`Review by ${review.guestName}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.error('❌ Admin: Failed to load image:', review.imageUrl);
+                        e.target.style.display = 'none';
+                        e.target.parentElement.innerHTML = '<div class="flex items-center justify-center h-full bg-slate-100"><p class="text-slate-500 text-xs">Image load failed</p></div>';
+                      }}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full bg-slate-100">
+                      <p className="text-slate-500 text-xs">No image</p>
+                    </div>
+                  )}
                   <div className="absolute top-2 right-2 bg-yellow-600 text-white px-2 py-1 rounded-full text-xs">
                     {review.source}
                   </div>
