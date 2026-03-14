@@ -453,8 +453,8 @@ export async function POST(request) {
 
     // Admin: Create guest review
     if (pathname === '/api/admin/guest-reviews') {
-      const session = await checkAuth(request);
-      if (session.error) return session;
+      const authResult = await checkAuth(request);
+      if (authResult.error) return authResult.response;
 
       const { guestName, location, reviewText, rating, imageUrl, source } = body;
 
