@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the Cloudinary file upload integration that was just implemented. The upload endpoint accepts image files via POST request with multipart/form-data, has 5MB max file size, only allows image files, and should return Cloudinary URLs. Also test guest reviews API integration with uploaded images."
+user_problem_statement: "Test the villa update (PUT) functionality that was just fixed. The checkAuth function return format issue was resolved, and the PUT endpoint at /api/admin/villas/{id} now correctly handles authentication. Test authentication check, villa update operations, and error handling."
 
 backend:
   - task: "Cloudinary Upload API"
