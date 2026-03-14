@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Backend API Testing Script for Villa Update Functionality
-Tests the PUT /api/admin/villas/{id} endpoint with authentication
+Backend API Testing Script for Villa Creation and Update Functionality
+Tests the POST /api/admin/villas and PUT /api/admin/villas/{id} endpoints with authentication
 """
 
 import requests
