@@ -328,7 +328,7 @@ export async function POST(request) {
         seoTitle: name,
         seoDescription: description.substring(0, 160),
         seoKeywords: `${name}, ${location}, ${category}, luxury villa, vacation rental`,
-        createdBy: session.user.email,
+        createdBy: authResult.user.email,
         createdAt: new Date().toISOString()
       };
 
