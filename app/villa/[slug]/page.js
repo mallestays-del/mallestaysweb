@@ -57,7 +57,15 @@ export default function VillaDetailsPage() {
   useEffect(() => {
     if (params.slug) {
       fetchVilla();
+      fetchReviews();
     }
+    
+    // Poll for new reviews every 30 seconds (real-time updates)
+    const reviewInterval = setInterval(() => {
+      fetchReviews();
+    }, 30000);
+
+    return () => clearInterval(reviewInterval);
   }, [params.slug]);
 
   const fetchVilla = async () => {
