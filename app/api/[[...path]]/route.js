@@ -150,8 +150,8 @@ export async function GET(request) {
 
     // Get single villa by ID for editing
     if (pathname.startsWith('/api/admin/villas/') && !pathname.includes('guest-reviews')) {
-      const session = await checkAuth(request);
-      if (session.error) return session;
+      const authResult = await checkAuth(request);
+      if (authResult.error) return authResult.response;
 
       const id = pathname.split('/api/admin/villas/')[1];
       const villa = await db.collection('villas').findOne({ id });
