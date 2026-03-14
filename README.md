@@ -95,7 +95,7 @@ yarn install
 # Already configured in /app/.env
 MONGO_URL=mongodb://localhost:27017
 DB_NAME=mallestays
-NEXTAUTH_URL=https://premium-property-hub-10.preview.emergentagent.com
+NEXTAUTH_URL=https://malle-stays-1.preview.emergentagent.com
 NEXTAUTH_SECRET=mallestays-secret-key-change-in-production
 
 # Mock API Keys (to be replaced)
@@ -110,7 +110,7 @@ CLOUDINARY_API_SECRET=mock-api-secret
 sudo supervisorctl restart all
 ```
 
-The application will be available at: **https://premium-property-hub-10.preview.emergentagent.com**
+The application will be available at: **https://malle-stays-1.preview.emergentagent.com**
 
 ## 🔐 Default Admin Credentials
 
