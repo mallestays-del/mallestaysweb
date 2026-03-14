@@ -357,36 +357,65 @@ class VillaCreationTester:
         print(f"[{timestamp}] {level}: {message}")
         
     def login_admin(self):
-        """Login as admin to get session"""
-        self.log("🔐 Testing Admin Authentication...")
+        """Login as admin to get session - using proper NextAuth flow"""
+        self.log("🔐 Attempting admin login...")
         
         try:
-            # First get the login page to establish session
-            login_url = f"{BASE_URL}/admin/login"
-            response = self.session.get(login_url)
-            self.log(f"Login page status: {response.status_code}")
-            
-            # Try to login via NextAuth
-            auth_url = f"{BASE_URL}/api/auth/signin"
-            response = self.session.get(auth_url)
-            self.log(f"Auth page status: {response.status_code}")
-            
-            # Check if we can access admin stats (requires authentication)
-            stats_response = self.session.get(f"{API_BASE}/admin/stats")
-            self.log(f"Admin stats access: {stats_response.status_code}")
-            
-            if stats_response.status_code == 200:
-                self.log("✅ Authentication successful", "SUCCESS")
-                return True
-            elif stats_response.status_code == 401:
-                self.log("❌ Authentication failed - Unauthorized", "ERROR")
-                return False
+            # First get the CSRF token
+            csrf_response = self.session.get(f"{BASE_URL}/api/auth/csrf")
+            if csrf_response.status_code == 200:
+                csrf_token = csrf_response.json().get('csrfToken')
+                self.log(f"Got CSRF token: {csrf_token[:20]}...")
             else:
-                self.log(f"⚠️  Unexpected response: {stats_response.status_code}", "WARN")
+                self.log("Failed to get CSRF token, proceeding without it")
+                csrf_token = None
+            
+            # Prepare login data
+            login_data = {
+                "email": ADMIN_EMAIL,
+                "password": ADMIN_PASSWORD,
+                "redirect": "false",
+                "json": "true"
+            }
+            
+            if csrf_token:
+                login_data["csrfToken"] = csrf_token
+            
+            # Attempt login
+            auth_response = self.session.post(
+                f"{BASE_URL}/api/auth/callback/credentials",
+                data=login_data,
+                headers={'Content-Type': 'application/x-www-form-urlencoded'}
+            )
+            
+            self.log(f"Auth response status: {auth_response.status_code}")
+            self.log(f"Auth response text: {auth_response.text[:100]}...")
+            
+            # Check session cookies
+            cookies = [cookie.name for cookie in self.session.cookies]
+            self.log(f"Session cookies: {cookies}")
+            
+            if auth_response.status_code == 200 and any('session' in cookie for cookie in cookies):
+                self.log("✅ Login successful - session established", "SUCCESS")
+                
+                # Verify authentication with admin stats
+                self.log("🔍 Testing authentication with admin stats endpoint...")
+                stats_response = self.session.get(f"{API_BASE}/admin/stats")
+                self.log(f"Auth test response status: {stats_response.status_code}")
+                
+                if stats_response.status_code == 200:
+                    stats = stats_response.json()
+                    self.log(f"✅ Authentication working - got stats: {stats}", "SUCCESS")
+                    return True
+                else:
+                    self.log(f"❌ Authentication verification failed: {stats_response.status_code}", "ERROR")
+                    return False
+            else:
+                self.log("❌ Login failed - no session established", "ERROR")
                 return False
                 
         except Exception as e:
-            self.log(f"❌ Authentication error: {str(e)}", "ERROR")
+            self.log(f"❌ Login error: {str(e)}", "ERROR")
             return False
     
     def test_villa_creation_with_valid_data(self):
