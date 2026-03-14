@@ -577,12 +577,32 @@ class VillaCreationTester:
         return results
 
 def main():
-    """Main test execution"""
-    tester = VillaUpdateTester()
-    results = tester.run_all_tests()
+    """Main test execution - Focus on Villa Creation"""
+    print("🧪 Starting Villa Creation API Tests...")
+    print("=" * 80)
     
-    # Exit with appropriate code
-    if all(results.values()):
+    # Test villa creation first (the main focus)
+    creation_tester = VillaCreationTester()
+    creation_results = creation_tester.run_all_tests()
+    
+    # Only run update tests if creation tests pass or if requested
+    print("\n" + "=" * 80)
+    print("🔄 Running Villa Update Tests for completeness...")
+    
+    update_tester = VillaUpdateTester()
+    update_results = update_tester.run_all_tests()
+    
+    # Combined results
+    all_creation_passed = all(creation_results.values())
+    all_update_passed = all(update_results.values())
+    
+    print("\n" + "=" * 80)
+    print("📋 FINAL SUMMARY")
+    print("=" * 80)
+    print(f"Villa Creation Tests: {'✅ PASS' if all_creation_passed else '❌ FAIL'}")
+    print(f"Villa Update Tests: {'✅ PASS' if all_update_passed else '❌ FAIL'}")
+    
+    if all_creation_passed and all_update_passed:
         print("\n🎉 All tests passed!")
         sys.exit(0)
     else:
