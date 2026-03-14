@@ -86,6 +86,112 @@ export default function VillaDetailsPage() {
     }
   };
 
+  const fetchReviews = async () => {
+    if (!villa?.id) return;
+    
+    try {
+      const response = await fetch(`/api/villas/${villa.id}/reviews`);
+      if (response.ok) {
+        const data = await response.json();
+        setReviews(data.reviews || []);
+      }
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+    }
+  };
+
+  const handleReviewImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size must be less than 5MB');
+      return;
+    }
+
+    setReviewImageFile(file);
+    setUploadingReviewImage(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.url) {
+        setReviewData({ ...reviewData, imageUrl: data.url });
+        toast.success('Image uploaded successfully!');
+      } else {
+        toast.error('Upload failed: ' + (data.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Error uploading image');
+    } finally {
+      setUploadingReviewImage(false);
+    }
+  };
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    
+    if (!reviewData.name || !reviewData.comment) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    setSubmittingReview(true);
+
+    try {
+      const response = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          villaId: villa.id,
+          villaName: villa.name,
+          name: reviewData.name,
+          rating: reviewData.rating,
+          comment: reviewData.comment,
+          imageUrl: reviewData.imageUrl
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success('Review submitted successfully! It will be visible after approval.');
+        setShowReviewForm(false);
+        setReviewData({
+          name: '',
+          rating: 5,
+          comment: '',
+          imageUrl: ''
+        });
+        setReviewImageFile(null);
+        // Refresh reviews
+        fetchReviews();
+      } else {
+        toast.error(data.error || 'Failed to submit review');
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      toast.error('An error occurred while submitting review');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
   const handleBooking = async (e) => {
     e.preventDefault();
     
