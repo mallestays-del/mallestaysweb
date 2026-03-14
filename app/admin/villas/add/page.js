@@ -94,23 +94,34 @@ export default function AddVilla() {
         parking: Number(formData.parking)
       };
 
+      console.log('Submitting villa data:', villaData);
+
       const response = await fetch('/api/admin/villas', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include', // Ensure cookies are sent
         body: JSON.stringify(villaData)
       });
 
+      console.log('Response status:', response.status);
+      
       const data = await response.json();
+      console.log('Response data:', data);
       
       if (response.ok) {
         toast.success('Villa added successfully!');
         router.push('/admin/dashboard');
       } else {
-        toast.error(data.error || 'Failed to add villa');
+        // Show specific error message from server
+        const errorMessage = data.error || data.message || 'Failed to add villa';
+        console.error('Server error:', errorMessage);
+        toast.error(errorMessage);
       }
     } catch (error) {
-      console.error('Error:', error);
-      toast.error('An error occurred');
+      console.error('Error submitting villa:', error);
+      toast.error(`An error occurred: ${error.message || 'Please try again'}`);
     } finally {
       setLoading(false);
     }
