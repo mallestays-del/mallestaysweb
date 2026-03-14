@@ -89,7 +89,7 @@ export default function EditVilla() {
 
   const updateAmenity = (index, value) => {
     const newAmenities = [...amenities];
-    newAmenities[index] = value;
+    newAmenities[index] = value || ''; // Ensure we never set null/undefined
     setAmenities(newAmenities);
   };
 
