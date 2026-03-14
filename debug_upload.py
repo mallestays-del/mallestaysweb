@@ -1,79 +1,39 @@
 #!/usr/bin/env python3
 """
-Detailed debug of upload issues
+Create a real large file for testing
 """
 
 import requests
 import io
-from PIL import Image
+import os
 
 BASE_URL = "https://malle-stays-1.preview.emergentagent.com"
 
-def create_test_image_exact_size(size_mb):
-    """Create a test image of exact size"""
-    target_bytes = size_mb * 1024 * 1024
+def create_large_file():
+    """Create a real 6MB file"""
+    # Create 6MB of random data
+    large_data = os.urandom(6 * 1024 * 1024)
     
-    # Start with a small image and adjust quality to reach target size
-    img = Image.new('RGB', (1000, 1000), color='red')
+    # Create a fake JPEG header to make it look like an image
+    jpeg_header = b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x01\x00H\x00H\x00\x00\xff\xdb\x00C\x00'
+    jpeg_footer = b'\xff\xd9'
     
-    # Try different quality settings to get close to target size
-    for quality in range(95, 10, -5):
-        img_bytes = io.BytesIO()
-        img.save(img_bytes, format='JPEG', quality=quality)
-        current_size = img_bytes.tell()
-        
-        if current_size <= target_bytes:
-            img_bytes.seek(0)
-            print(f"Created image: target={target_bytes} bytes, actual={current_size} bytes, quality={quality}")
-            return img_bytes, current_size
+    fake_jpeg = jpeg_header + large_data + jpeg_footer
     
-    # If we can't get small enough, create a larger image with low quality
-    img = Image.new('RGB', (2000, 2000), color='red')
-    img_bytes = io.BytesIO()
-    img.save(img_bytes, format='JPEG', quality=10)
-    current_size = img_bytes.tell()
-    img_bytes.seek(0)
-    print(f"Created large image: target={target_bytes} bytes, actual={current_size} bytes")
-    return img_bytes, current_size
+    return io.BytesIO(fake_jpeg), len(fake_jpeg)
 
-def test_file_sizes():
-    """Test different file sizes"""
+def test_real_large_file():
+    """Test with a real large file"""
+    print("Creating real 6MB file...")
+    large_file, size = create_large_file()
     
-    # Test 4MB (should pass)
-    print("Testing 4MB file (should pass)...")
-    img_4mb, actual_size = create_test_image_exact_size(4)
-    files = {'file': ('4mb.jpg', img_4mb, 'image/jpeg')}
+    print(f"File size: {size} bytes ({size / (1024*1024):.1f} MB)")
+    
+    files = {'file': ('large.jpg', large_file, 'image/jpeg')}
     response = requests.post(f"{BASE_URL}/api/upload", files=files)
-    print(f"4MB test - Status: {response.status_code}, Actual size: {actual_size} bytes")
-    print(f"Response: {response.text[:200]}...")
-    print()
     
-    # Test 6MB (should fail)
-    print("Testing 6MB file (should fail)...")
-    img_6mb, actual_size = create_test_image_exact_size(6)
-    files = {'file': ('6mb.jpg', img_6mb, 'image/jpeg')}
-    response = requests.post(f"{BASE_URL}/api/upload", files=files)
-    print(f"6MB test - Status: {response.status_code}, Actual size: {actual_size} bytes")
-    print(f"Response: {response.text[:200]}...")
-    print()
-
-def test_empty_form():
-    """Test with proper form data but no file"""
-    print("Testing with proper multipart form but no file...")
-    
-    # Send multipart form data with no file field
-    response = requests.post(f"{BASE_URL}/api/upload", data={})
-    print(f"Empty form - Status: {response.status_code}")
+    print(f"Status: {response.status_code}")
     print(f"Response: {response.text}")
-    print()
-    
-    # Send multipart form data with empty file field
-    files = {'file': ('', io.BytesIO(b''), 'application/octet-stream')}
-    response = requests.post(f"{BASE_URL}/api/upload", files=files)
-    print(f"Empty file field - Status: {response.status_code}")
-    print(f"Response: {response.text}")
-    print()
 
 if __name__ == "__main__":
-    test_file_sizes()
-    test_empty_form()
+    test_real_large_file()
