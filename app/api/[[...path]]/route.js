@@ -338,8 +338,8 @@ export async function POST(request) {
 
     // Admin: Create location
     if (pathname === '/api/admin/locations') {
-      const session = await checkAuth(request);
-      if (session.error) return session;
+      const authResult = await checkAuth(request);
+      if (authResult.error) return authResult.response;
 
       const { name, image } = body;
 
