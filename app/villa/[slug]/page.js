@@ -702,6 +702,164 @@ Sent via Malle Stays`;
             </div>
           </div>
         </div>
+
+        {/* Reviews Section */}
+        <div className="mt-12">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold">Guest Reviews</h2>
+                <Button
+                  onClick={() => setShowReviewForm(!showReviewForm)}
+                  className="bg-yellow-700 hover:bg-yellow-800"
+                >
+                  {showReviewForm ? 'Cancel' : 'Write a Review'}
+                </Button>
+              </div>
+
+              {/* Review Submission Form */}
+              {showReviewForm && (
+                <Card className="mb-6 bg-slate-50">
+                  <CardContent className="pt-6">
+                    <form onSubmit={handleSubmitReview} className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Your Name <span className="text-red-500">*</span>
+                        </label>
+                        <Input
+                          type="text"
+                          placeholder="John Doe"
+                          value={reviewData.name}
+                          onChange={(e) => setReviewData({ ...reviewData, name: e.target.value })}
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Rating <span className="text-red-500">*</span>
+                        </label>
+                        <div className="flex gap-2">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                              key={star}
+                              type="button"
+                              onClick={() => setReviewData({ ...reviewData, rating: star })}
+                              className="focus:outline-none"
+                            >
+                              <Star
+                                className={`h-8 w-8 ${
+                                  star <= reviewData.rating
+                                    ? 'fill-yellow-500 text-yellow-500'
+                                    : 'text-slate-300'
+                                }`}
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Your Review <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                          className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-600"
+                          rows={4}
+                          placeholder="Share your experience..."
+                          value={reviewData.comment}
+                          onChange={(e) => setReviewData({ ...reviewData, comment: e.target.value })}
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Upload Photo (Optional)
+                        </label>
+                        <div className="flex items-center gap-4">
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleReviewImageUpload}
+                            disabled={uploadingReviewImage}
+                            className="flex-1"
+                          />
+                          {uploadingReviewImage && (
+                            <span className="text-sm text-slate-500">Uploading...</span>
+                          )}
+                        </div>
+                        {reviewData.imageUrl && (
+                          <div className="mt-2">
+                            <img
+                              src={reviewData.imageUrl}
+                              alt="Review preview"
+                              className="h-24 w-24 object-cover rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <Button
+                        type="submit"
+                        disabled={submittingReview || uploadingReviewImage}
+                        className="w-full bg-yellow-700 hover:bg-yellow-800"
+                      >
+                        {submittingReview ? 'Submitting...' : 'Submit Review'}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Reviews List */}
+              <div className="space-y-4">
+                {reviews.length > 0 ? (
+                  reviews.filter(r => r.approved).map((review) => (
+                    <Card key={review.id} className="border-slate-200">
+                      <CardContent className="pt-6">
+                        <div className="flex gap-4">
+                          {review.imageUrl && (
+                            <img
+                              src={review.imageUrl}
+                              alt={`Review by ${review.name}`}
+                              className="h-20 w-20 object-cover rounded"
+                            />
+                          )}
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h3 className="font-semibold">{review.name}</h3>
+                              <div className="flex">
+                                {[...Array(review.rating || 5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className="h-4 w-4 fill-yellow-500 text-yellow-500"
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <p className="text-slate-600">{review.comment}</p>
+                            <p className="text-xs text-slate-400 mt-2">
+                              {new Date(review.createdAt).toLocaleDateString('en-IN', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  <p className="text-center text-slate-500 py-8">
+                    No reviews yet. Be the first to share your experience!
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
