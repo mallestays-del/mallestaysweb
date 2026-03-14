@@ -416,9 +416,13 @@ export default function GuestReviewsPage() {
               <CardContent className="p-0">
                 <div className="relative h-64">
                   <img
-                    src={review.imageUrl}
+                    src={review.imageUrl || 'https://images.unsplash.com/photo-1522199755839-a2bacb67c546?w=600&h=800&fit=crop'}
                     alt={`Review by ${review.guestName}`}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      console.error('Admin: Image failed to load:', review.imageUrl);
+                      e.target.src = 'https://images.unsplash.com/photo-1522199755839-a2bacb67c546?w=600&h=800&fit=crop';
+                    }}
                   />
                   <div className="absolute top-2 right-2 bg-yellow-600 text-white px-2 py-1 rounded-full text-xs">
                     {review.source}
