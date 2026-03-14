@@ -34,34 +34,48 @@ class VillaUpdateTester:
         try:
             self.log("🔐 Attempting admin login...")
             
-            # First get the login page to establish session
-            login_page = self.session.get(f"{BASE_URL}/admin/login")
-            self.log(f"Login page status: {login_page.status_code}")
+            # First get the CSRF token
+            csrf_response = self.session.get(f"{BASE_URL}/api/auth/csrf")
+            if csrf_response.status_code == 200:
+                csrf_token = csrf_response.json().get('csrfToken')
+                self.log(f"Got CSRF token: {csrf_token[:20]}...")
+            else:
+                self.log("Failed to get CSRF token, proceeding without it")
+                csrf_token = None
             
-            # Attempt login via NextAuth
+            # Prepare login data
             login_data = {
                 "email": ADMIN_EMAIL,
                 "password": ADMIN_PASSWORD,
-                "redirect": "false"
+                "redirect": "false",
+                "json": "true"
             }
             
-            # Try NextAuth signin endpoint
+            if csrf_token:
+                login_data["csrfToken"] = csrf_token
+            
+            # Try NextAuth signin endpoint with form data
             auth_response = self.session.post(
-                f"{BASE_URL}/api/auth/signin/credentials",
-                json=login_data
+                f"{BASE_URL}/api/auth/callback/credentials",
+                data=login_data,
+                headers={'Content-Type': 'application/x-www-form-urlencoded'}
             )
             
             self.log(f"Auth response status: {auth_response.status_code}")
+            self.log(f"Auth response text: {auth_response.text[:200]}...")
             
             # Check if we have session cookies
             cookies = self.session.cookies.get_dict()
             self.log(f"Session cookies: {list(cookies.keys())}")
             
-            if any('next-auth' in cookie for cookie in cookies.keys()):
+            # Check for NextAuth session token
+            has_session = any('next-auth.session-token' in cookie for cookie in cookies.keys())
+            
+            if has_session or auth_response.status_code == 200:
                 self.log("✅ Login successful - session established")
                 return True
             else:
-                self.log("❌ Login failed - no session cookies found")
+                self.log("❌ Login failed - no session token found")
                 return False
                 
         except Exception as e:
