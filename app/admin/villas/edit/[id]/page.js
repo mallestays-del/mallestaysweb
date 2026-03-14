@@ -119,23 +119,34 @@ export default function EditVilla() {
         parking: Number(formData.parking)
       };
 
+      console.log('Updating villa data:', villaData);
+
       const response = await fetch(`/api/admin/villas/${params.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include', // Ensure cookies are sent
         body: JSON.stringify(villaData)
       });
 
+      console.log('Response status:', response.status);
+      
       const data = await response.json();
+      console.log('Response data:', data);
       
       if (response.ok) {
         toast.success('Villa updated successfully!');
         router.push('/admin/dashboard');
       } else {
-        toast.error(data.error || 'Failed to update villa');
+        // Show specific error message from server
+        const errorMessage = data.error || data.message || 'Failed to update villa';
+        console.error('Server error:', errorMessage);
+        toast.error(errorMessage);
       }
     } catch (error) {
-      console.error('Error:', error);
-      toast.error('An error occurred');
+      console.error('Error updating villa:', error);
+      toast.error(`An error occurred: ${error.message || 'Please try again'}`);
     } finally {
       setLoading(false);
     }
