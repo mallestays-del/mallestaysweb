@@ -597,9 +597,9 @@ export async function DELETE(request) {
     const session = await checkAuth(request);
     if (session.error) return session;
 
-    // Only admin or super_admin can delete
+    // Only super_admin or sub_admin can delete
     const userRole = session.user?.role;
-    if (userRole !== 'admin' && userRole !== 'super_admin') {
+    if (userRole !== 'sub_admin' && userRole !== 'super_admin') {
       return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
