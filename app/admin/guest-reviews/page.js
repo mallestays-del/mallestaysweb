@@ -144,13 +144,13 @@ export default function GuestReviewsPage() {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file');
+      alert('Please upload an image file (JPG, PNG, etc.)');
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('Image size should be less than 5MB');
+      alert('Image size must be less than 5MB');
       return;
     }
 
@@ -161,24 +161,27 @@ export default function GuestReviewsPage() {
       const formDataUpload = new FormData();
       formDataUpload.append('file', file);
 
+      console.log('📤 Uploading image:', file.name, 'Size:', (file.size / 1024).toFixed(2), 'KB');
+
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formDataUpload,
       });
 
-      if (response.ok) {
-        const data = await response.json();
+      const data = await response.json();
+      console.log('📥 Upload response:', data);
+
+      if (response.ok && data.url) {
         setFormData({ ...formData, imageUrl: data.url });
-        alert('Image uploaded successfully!');
+        alert('✅ Image uploaded successfully! URL: ' + data.url);
+        console.log('✅ Image ready to use:', data.url);
       } else {
-        alert('Failed to upload image. Please try using URL instead.');
-        // Create a temporary URL for preview
-        const tempUrl = URL.createObjectURL(file);
-        setFormData({ ...formData, imageUrl: tempUrl });
+        alert('❌ Upload failed: ' + (data.error || 'Unknown error'));
+        console.error('Upload failed:', data);
       }
     } catch (error) {
-      console.error('Error uploading image:', error);
-      alert('Error uploading image. You can paste URL instead.');
+      console.error('❌ Upload error:', error);
+      alert('❌ Error uploading image: ' + error.message);
     } finally {
       setUploadingImage(false);
     }
