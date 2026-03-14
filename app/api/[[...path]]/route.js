@@ -246,7 +246,7 @@ export async function POST(request) {
 
     // Submit review
     if (pathname === '/api/reviews') {
-      const { villaId, villaName, name, rating, comment } = body;
+      const { villaId, villaName, name, rating, comment, imageUrl } = body;
 
       if (!villaId || !name || !rating || !comment) {
         return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -259,6 +259,7 @@ export async function POST(request) {
         name,
         rating: parseInt(rating),
         comment,
+        imageUrl: imageUrl || null,
         approved: false,
         createdAt: new Date().toISOString()
       };
