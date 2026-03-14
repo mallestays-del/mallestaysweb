@@ -414,8 +414,8 @@ export async function POST(request) {
 
     // Admin: Change Password
     if (pathname === '/api/admin/settings/password') {
-      const session = await checkAuth(request);
-      if (session.error) return session;
+      const authResult = await checkAuth(request);
+      if (authResult.error) return authResult.response;
 
       const { email, currentPassword, newPassword } = body;
 
