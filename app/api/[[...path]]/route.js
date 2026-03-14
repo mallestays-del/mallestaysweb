@@ -165,8 +165,8 @@ export async function GET(request) {
 
     // Get all guest reviews
     if (pathname === '/api/admin/guest-reviews') {
-      const session = await checkAuth(request);
-      if (session.error) return session;
+      const authResult = await checkAuth(request);
+      if (authResult.error) return authResult.response;
 
       const reviews = await db.collection('guestReviews').find({}, { 
         projection: { 
