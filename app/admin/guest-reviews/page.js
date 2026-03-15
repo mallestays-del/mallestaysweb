@@ -345,12 +345,11 @@ export default function GuestReviewsPage() {
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     <ImageIcon className="inline h-4 w-4 mr-1" />
-                    Review Image
+                    Review Image *
                   </label>
                   
-                  {/* File Upload Option */}
+                  {/* File Upload */}
                   <div className="mb-4">
-                    <label className="block text-sm text-slate-600 mb-2">Option 1: Upload Image</label>
                     <div className="flex items-center gap-3">
                       <input
                         type="file"
@@ -358,28 +357,20 @@ export default function GuestReviewsPage() {
                         onChange={handleImageUpload}
                         className="flex-1 px-3 py-2 border border-slate-300 rounded-md file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-yellow-50 file:text-yellow-700 hover:file:bg-yellow-100"
                         disabled={uploadingImage}
+                        required
                       />
                       {uploadingImage && (
                         <div className="text-sm text-slate-500">Uploading...</div>
                       )}
                     </div>
-                  </div>
-
-                  {/* URL Input Option */}
-                  <div>
-                    <label className="block text-sm text-slate-600 mb-2">Option 2: Or Paste Image URL</label>
-                    <input
-                      type="url"
-                      className="w-full px-3 py-2 border border-slate-300 rounded-md"
-                      value={formData.imageUrl}
-                      onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                      placeholder="https://example.com/image.jpg"
-                    />
+                    <p className="text-xs text-slate-500 mt-1">
+                      Supported formats: JPG, PNG, JPEG (Max 5MB)
+                    </p>
                   </div>
                   
-                  {!formData.imageUrl && (
+                  {!formData.imageUrl && !uploadingImage && (
                     <p className="text-sm text-red-500 mt-2">
-                      * Please upload an image or provide an image URL
+                      * Please upload an image
                     </p>
                   )}
                 </div>
