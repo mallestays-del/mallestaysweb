@@ -1,21 +1,20 @@
 import { NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-// Log configuration on startup (without exposing secret)
-console.log('🔧 Cloudinary Configuration:');
-console.log('   Cloud Name:', process.env.CLOUDINARY_CLOUD_NAME);
-console.log('   API Key:', process.env.CLOUDINARY_API_KEY ? `${process.env.CLOUDINARY_API_KEY.substring(0, 6)}...` : 'NOT SET');
-console.log('   API Secret:', process.env.CLOUDINARY_API_SECRET ? 'SET' : 'NOT SET');
-
 export async function POST(request) {
   try {
+    // Configure Cloudinary inside the function to ensure env vars are loaded
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+    });
+
+    console.log('🔧 Cloudinary Configuration:');
+    console.log('   Cloud Name:', process.env.CLOUDINARY_CLOUD_NAME);
+    console.log('   API Key:', process.env.CLOUDINARY_API_KEY ? `${process.env.CLOUDINARY_API_KEY.substring(0, 6)}...` : 'NOT SET');
+    console.log('   API Secret:', process.env.CLOUDINARY_API_SECRET ? 'SET' : 'NOT SET');
+
     const formData = await request.formData();
     const file = formData.get('file');
 
