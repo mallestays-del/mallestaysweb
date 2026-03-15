@@ -8,6 +8,12 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// Log configuration on startup (without exposing secret)
+console.log('🔧 Cloudinary Configuration:');
+console.log('   Cloud Name:', process.env.CLOUDINARY_CLOUD_NAME);
+console.log('   API Key:', process.env.CLOUDINARY_API_KEY ? `${process.env.CLOUDINARY_API_KEY.substring(0, 6)}...` : 'NOT SET');
+console.log('   API Secret:', process.env.CLOUDINARY_API_SECRET ? 'SET' : 'NOT SET');
+
 export async function POST(request) {
   try {
     const formData = await request.formData();
@@ -27,6 +33,11 @@ export async function POST(request) {
       return NextResponse.json({ error: 'File size must be less than 5MB' }, { status: 400 });
     }
 
+    console.log('📤 Starting upload to Cloudinary...');
+    console.log('   File:', file.name);
+    console.log('   Size:', file.size, 'bytes');
+    console.log('   Type:', file.type);
+
     // Convert file to buffer
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
@@ -42,8 +53,12 @@ export async function POST(request) {
           ]
         },
         (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
+          if (error) {
+            console.error('❌ Cloudinary upload error:', error);
+            reject(error);
+          } else {
+            resolve(result);
+          }
         }
       );
 
@@ -53,7 +68,6 @@ export async function POST(request) {
     console.log('✅ File uploaded to Cloudinary successfully');
     console.log('   Public ID:', uploadResult.public_id);
     console.log('   URL:', uploadResult.secure_url);
-    console.log('   Size:', file.size, 'bytes');
 
     return NextResponse.json({ 
       success: true, 
