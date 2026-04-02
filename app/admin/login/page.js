@@ -94,12 +94,6 @@ export default function AdminLoginPage() {
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
-
-          <div className="mt-6 p-4 bg-slate-50 rounded-lg text-sm" data-testid="demo-credentials">
-            <p className="font-semibold mb-2">Demo Credentials:</p>
-            <p className="text-slate-600">Super Admin: admin@mallestays.com / admin123</p>
-            <p className="text-slate-600">Sub Admin: subadmin@mallestays.com / subadmin123</p>
-          </div>
         </CardContent>
       </Card>
     </div>
