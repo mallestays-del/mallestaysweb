@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import SchemaMarkup from '@/components/SchemaMarkup';
+import { generateOrganizationSchema, generateWebsiteSchema, generateLocalBusinessSchema, generateReviewSchema } from '@/lib/schema';
 
 export default function HomePage() {
   const [searchData, setSearchData] = useState({
