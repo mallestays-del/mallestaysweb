@@ -322,6 +322,15 @@ Sent via Malle Stays`;
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Schema Markup for SEO */}
+      <SchemaMarkup schema={generateVillaSchema(villa)} />
+      <SchemaMarkup schema={generateAccommodationSchema(villa)} />
+      <SchemaMarkup schema={generateBreadcrumbSchema([
+        { name: 'Home', url: process.env.NEXT_PUBLIC_BASE_URL || 'https://mallestays.com' },
+        { name: 'Villas', url: `${process.env.NEXT_PUBLIC_BASE_URL}/villas` },
+        { name: villa.name, url: `${process.env.NEXT_PUBLIC_BASE_URL}/villa/${villa.slug}` }
+      ])} />
+      
       {/* Back Button */}
       <div className="container mx-auto px-4 py-6">
         <Button variant="ghost" onClick={() => router.push('/villas')} className="mb-4">
