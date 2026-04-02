@@ -91,6 +91,12 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen" data-testid="home-page">
+      {/* Schema Markup for SEO */}
+      <SchemaMarkup schema={generateOrganizationSchema()} />
+      <SchemaMarkup schema={generateWebsiteSchema()} />
+      <SchemaMarkup schema={generateLocalBusinessSchema()} />
+      {reviews.length > 0 && <SchemaMarkup schema={generateReviewSchema(reviews)} />}
+
       {/* Hero Section */}
       <section 
         className="relative h-[500px] md:h-[700px] bg-cover bg-center flex items-center"
