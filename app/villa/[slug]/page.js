@@ -326,7 +326,7 @@ Sent via Malle Stays`;
       <SchemaMarkup schema={generateVillaSchema(villa)} />
       <SchemaMarkup schema={generateAccommodationSchema(villa)} />
       <SchemaMarkup schema={generateBreadcrumbSchema([
-        { name: 'Home', url: process.env.NEXT_PUBLIC_BASE_URL || 'https://mallestays.com' },
+        { name: 'Home', url: process.env.NEXT_PUBLIC_BASE_URL },
         { name: 'Villas', url: `${process.env.NEXT_PUBLIC_BASE_URL}/villas` },
         { name: villa.name, url: `${process.env.NEXT_PUBLIC_BASE_URL}/villa/${villa.slug}` }
       ])} />
