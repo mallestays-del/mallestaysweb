@@ -1,7 +1,7 @@
 import { getDatabase } from '@/lib/mongodb';
 
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://malle-stays-1.preview.emergentagent.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://malle-deployment.preview.emergentagent.com';
   
   try {
     const db = await getDatabase();

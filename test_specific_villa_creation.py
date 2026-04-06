@@ -7,7 +7,7 @@ import requests
 import json
 
 # Configuration
-BASE_URL = "https://malle-stays-1.preview.emergentagent.com"
+BASE_URL = "https://malle-deployment.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 def test_specific_villa_creation():

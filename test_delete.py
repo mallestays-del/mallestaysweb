@@ -5,7 +5,7 @@ Quick test of DELETE endpoint after fix
 
 import requests
 
-BASE_URL = "https://malle-stays-1.preview.emergentagent.com"
+BASE_URL = "https://malle-deployment.preview.emergentagent.com"
 ADMIN_EMAIL = "admin@mallestays.com"
 ADMIN_PASSWORD = "admin123"
 
