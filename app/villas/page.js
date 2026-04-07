@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { MapPin, Users, Bed, ArrowRight, SlidersHorizontal } from 'lucide-react';
@@ -12,6 +12,14 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Badge } from '@/components/ui/badge';
 
 export default function VillasPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div></div>}>
+      <VillasContent />
+    </Suspense>
+  );
+}
+
+function VillasContent() {
   const searchParams = useSearchParams();
   const [villas, setVillas] = useState([]);
   const [loading, setLoading] = useState(true);

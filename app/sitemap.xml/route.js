@@ -1,12 +1,20 @@
 import { getDatabase } from '@/lib/mongodb';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://malle-deployment.preview.emergentagent.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://mallestaysweb.vercel.app';
+  
+  let villas = [];
+  let locations = [];
   
   try {
     const db = await getDatabase();
-    const villas = await db.collection('villas').find({}).toArray();
-    const locations = await db.collection('locations').find({}).toArray();
+    villas = await db.collection('villas').find({}).toArray();
+    locations = await db.collection('locations').find({}).toArray();
+  } catch (error) {
+    console.error('Sitemap DB error (using static sitemap):', error.message);
+  }
     
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -124,8 +132,4 @@ export async function GET() {
         'Cache-Control': 'public, max-age=3600, s-maxage=3600'
       }
     });
-  } catch (error) {
-    console.error('Sitemap generation error:', error);
-    return new Response('Error generating sitemap', { status: 500 });
-  }
 }

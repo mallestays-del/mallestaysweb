@@ -7,7 +7,9 @@ const nextConfig = {
       },
     ],
   },
-  serverExternalPackages: ['mongodb'],
+  experimental: {
+    serverComponentsExternalPackages: ['mongodb'],
+  },
   async headers() {
     return [
       {
