@@ -17,7 +17,7 @@ export default function AboutPage() {
               </h1>
               <div className="space-y-4 text-lg text-slate-700">
                 <p className="leading-relaxed">
-                  <span className="font-semibold text-yellow-700">Malle Stays</span> is a staycation brand dedicated to providing comfortable and memorable villa and farmhouse experiences near Mumbai. Our goal is to help travelers escape the busy city life and enjoy peaceful stays surrounded by nature.
+                  <span className="font-semibold text-yellow-700">Malle Stays™</span> is a staycation brand dedicated to providing comfortable and memorable villa and farmhouse experiences near Mumbai. Our goal is to help travelers escape the busy city life and enjoy peaceful stays surrounded by nature.
                 </p>
                 <p className="leading-relaxed">
                   We offer carefully selected villas and farmhouses that are perfect for couples, families and group stays. Whether you are planning a weekend getaway, birthday celebration, family gathering or corporate outing, Malle Stays provides the ideal stay option with modern amenities and beautiful locations.

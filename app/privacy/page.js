@@ -106,7 +106,7 @@ export default function PrivacyPolicyPage() {
 
           <div className="mt-12 pt-8 border-t border-slate-200">
             <p className="text-center text-slate-600">
-              © 2026 Malle Stays. All rights reserved.<br />
+              © 2026 Malle Stays™. All rights reserved.<br />
               Contact: <a href="tel:+918446620191" className="text-yellow-700 font-semibold hover:underline">+91 84466 20191</a> | <a href="mailto:connect@mallestays.com" className="text-yellow-700 font-semibold hover:underline">connect@mallestays.com</a>
             </p>
           </div>

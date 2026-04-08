@@ -13,7 +13,7 @@ export const metadata = {
   metadataBase: new URL(seoConfig.siteUrl),
   title: {
     default: seoConfig.defaultTitle,
-    template: '%s | Malle Stays'
+    template: '%s | Malle Stays™'
   },
   description: seoConfig.defaultDescription,
   keywords: seoConfig.keywords.join(', '),

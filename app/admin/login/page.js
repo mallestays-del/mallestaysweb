@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Building2, Mail, Lock, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -93,6 +94,11 @@ export default function AdminLoginPage() {
             <Button type="submit" className="w-full" disabled={loading} data-testid="login-submit-button">
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>
+            <div className="text-center mt-2">
+              <Link href="/admin/forgot-password" className="text-sm text-primary hover:underline">
+                Forgot Password?
+              </Link>
+            </div>
           </form>
         </CardContent>
       </Card>

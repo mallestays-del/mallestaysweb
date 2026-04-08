@@ -93,7 +93,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-slate-800 mt-12 pt-8 text-center">
-          <p className="text-slate-500">&copy; {new Date().getFullYear()} Malle Stays. All rights reserved. Crafted with excellence.</p>
+          <p className="text-slate-500">&copy; {new Date().getFullYear()} Malle Stays™. All rights reserved. Crafted with excellence.</p>
         </div>
       </div>
     </footer>

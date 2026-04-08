@@ -160,7 +160,7 @@ export default function AdminDashboard() {
             <div className="flex items-center space-x-4">
               <Building2 className="h-8 w-8 text-primary" />
               <div>
-                <h1 className="text-2xl font-bold">Malle Stays Admin</h1>
+                <h1 className="text-2xl font-bold">Malle Stays™ Admin</h1>
                 <p className="text-sm text-slate-600">{session.user.name} ({session.user.role})</p>
               </div>
             </div>

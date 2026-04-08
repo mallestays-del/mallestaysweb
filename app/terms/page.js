@@ -22,7 +22,7 @@ export default function TermsPage() {
         <Alert className="mb-8 bg-yellow-50 border-yellow-200">
           <AlertCircle className="h-4 w-4 text-yellow-700" />
           <AlertDescription className="text-yellow-800">
-            Malle Stays is an online & offline platform providing temporary properties/accommodations under the brand "Malle Stays". 
+            Malle Stays™ is an online & offline platform providing temporary properties/accommodations under the brand "Malle Stays™". 
             These Terms apply to all Guests booking via any channel (website, app, third party, offline, referrals, etc.). 
             Please read carefully before booking. We may revise these Terms at any time without notice. Continued use means you accept changes.
           </AlertDescription>
@@ -143,7 +143,7 @@ export default function TermsPage() {
 
         <div className="mt-12 pt-8 border-t border-slate-200">
           <p className="text-center text-slate-600">
-            © 2026 Malle Stays. All rights reserved.<br />
+            © 2026 Malle Stays™. All rights reserved.<br />
             Contact: <a href="tel:+918446620191" className="text-yellow-700 font-semibold hover:underline">+91 84466 20191</a> | <a href="mailto:connect@mallestays.com" className="text-yellow-700 font-semibold hover:underline">connect@mallestays.com</a>
           </p>
         </div>

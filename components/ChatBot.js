@@ -9,7 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { type: 'bot', text: 'Hello! Welcome to Malle Stays. How can I help you today?' }
+    { type: 'bot', text: 'Hello! Welcome to Malle Stays™. How can I help you today?' }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
