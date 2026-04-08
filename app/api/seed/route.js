@@ -20,13 +20,22 @@ export async function GET() {
       }, { status: 500 });
     }
 
-    // Connect directly to avoid any caching issues
-    client = new MongoClient(mongoUrl, {
+    const isLocal = mongoUrl.includes('localhost') || mongoUrl.includes('127.0.0.1');
+    
+    const options = isLocal ? {
       maxPoolSize: 5,
       serverSelectionTimeoutMS: 15000,
       connectTimeoutMS: 15000,
-    });
-    
+    } : {
+      maxPoolSize: 5,
+      serverSelectionTimeoutMS: 15000,
+      connectTimeoutMS: 15000,
+      tls: true,
+      retryWrites: true,
+      w: 'majority',
+    };
+
+    client = new MongoClient(mongoUrl, options);
     await client.connect();
     const db = client.db(dbName);
     const admins = db.collection('admins');
@@ -86,7 +95,7 @@ export async function GET() {
     return NextResponse.json({ 
       success: false, 
       error: error.message,
-      hint: 'Check if MONGO_URL environment variable is correctly set in Vercel and MongoDB Atlas allows connections from all IPs (0.0.0.0/0)'
+      hint: 'Check: 1) MONGO_URL is correct in Vercel env vars, 2) MongoDB Atlas Network Access allows 0.0.0.0/0, 3) Database user password is correct'
     }, { status: 500 });
   }
 }
