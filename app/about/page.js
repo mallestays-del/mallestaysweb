@@ -1,6 +1,6 @@
 'use client';
 
-import { Heart, Diamond, Globe, Users, Award, TrendingUp } from 'lucide-react';
+import { Heart, Diamond, Globe, Users, Award, TrendingUp, MapPin, Shield, Phone } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 
 export default function AboutPage() {
@@ -17,16 +17,25 @@ export default function AboutPage() {
               </h1>
               <div className="space-y-4 text-lg text-slate-700">
                 <p className="leading-relaxed">
-                  <span className="font-semibold text-yellow-700">Malle Stays™</span> is a staycation brand dedicated to providing comfortable and memorable villa and farmhouse experiences near Mumbai. Our goal is to help travelers escape the busy city life and enjoy peaceful stays surrounded by nature.
+                  <span className="font-semibold text-yellow-700">Malle Stays™</span> is a growing premium staycation brand in India, offering handpicked villas and farmhouse experiences across the country. With a vision to redefine short getaways, we aim to provide travelers with luxurious, comfortable, and memorable stays in the most beautiful destinations.
                 </p>
                 <p className="leading-relaxed">
-                  We offer carefully selected villas and farmhouses that are perfect for couples, families and group stays. Whether you are planning a weekend getaway, birthday celebration, family gathering or corporate outing, Malle Stays provides the ideal stay option with modern amenities and beautiful locations.
+                  From the scenic hills of <strong>Lonavala</strong> and <strong>Igatpuri</strong> to upcoming destinations across India, Malle Stays is expanding rapidly to bring high-quality staycation options to every major travel hub.
                 </p>
                 <p className="leading-relaxed">
-                  Our properties are located in some of the most popular staycation destinations such as <strong>Karjat</strong>, <strong>Badlapur</strong>, <strong>Neral</strong> and <strong>Igatpuri</strong>, offering guests a perfect blend of relaxation and entertainment. Many of our villas feature private swimming pools, nature views, indoor and outdoor games and in-house food options.
+                  We specialize in curated villas that are perfect for <em>families, couples, and group stays</em>. Whether it's a weekend getaway, birthday celebration, private party, or a relaxing vacation, our properties are designed to offer the perfect blend of <strong>luxury, privacy, and comfort</strong>.
                 </p>
                 <p className="leading-relaxed">
-                  At Malle Stays, we focus on providing a smooth and hassle-free booking experience along with reliable customer support. Our mission is to make every stay special so that guests can create unforgettable memories with their friends and family.
+                  Each villa listed with Malle Stays is carefully selected and verified to meet our quality standards. Our stays often feature <em>private swimming pools, scenic views, modern interiors, and premium amenities</em>, ensuring a consistent and elevated experience for every guest.
+                </p>
+                <p className="leading-relaxed">
+                  At Malle Stays, we are committed to providing a <em>seamless and hassle-free booking experience</em>. With dedicated customer support and a focus on trust and transparency, we make sure your journey from booking to checkout is smooth and enjoyable.
+                </p>
+                <p className="leading-relaxed">
+                  As we continue our <em>Pan India expansion</em>, our mission remains the same — to create unforgettable stay experiences and become one of India's most trusted villa stay brands.
+                </p>
+                <p className="leading-relaxed font-semibold text-slate-900 text-xl mt-6">
+                  Stay anywhere in India. Stay with Malle Stays™.
                 </p>
               </div>
             </div>
@@ -51,7 +60,7 @@ export default function AboutPage() {
               Our Vision
             </h2>
             <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
-              Our vision is to become one of the most trusted staycation brands for villa and farmhouse bookings near Mumbai by offering quality properties, great hospitality and memorable experiences.
+              To become one of India's most trusted and loved premium staycation brands — offering quality properties, exceptional hospitality, and unforgettable experiences across every major destination in the country.
             </p>
           </div>
         </div>
@@ -78,7 +87,6 @@ export default function AboutPage() {
                       className="w-full h-auto object-cover"
                     />
                   </div>
-                  {/* Decorative Element */}
                   <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-yellow-600 rounded-full opacity-20 -z-10"></div>
                 </div>
               </div>
@@ -88,19 +96,18 @@ export default function AboutPage() {
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-3xl font-bold text-slate-900 mb-2">Priya Singh</h3>
-                    <p className="text-xl text-yellow-700 font-semibold mb-6">Founder, Malle Stays</p>
+                    <p className="text-xl text-yellow-700 font-semibold mb-6">Founder, Malle Stays™</p>
                   </div>
                   
                   <div className="space-y-4 text-lg text-slate-700">
                     <p className="leading-relaxed">
-                      Priya Singh founded Malle Stays with a vision to make staycations more accessible and enjoyable for travelers looking for relaxing getaways near Mumbai. With a passion for hospitality and travel, she focuses on creating comfortable villa experiences where guests can relax, celebrate and spend quality time with loved ones.
+                      Priya Singh founded Malle Stays with a vision to make staycations more accessible and enjoyable for travelers looking for relaxing getaways across India. With a passion for hospitality and travel, she focuses on creating comfortable villa experiences where guests can relax, celebrate and spend quality time with loved ones.
                     </p>
                     <p className="leading-relaxed">
                       Under her leadership, Malle Stays continues to grow by connecting guests with beautiful villas and farmhouses that offer privacy, comfort and nature-filled surroundings.
                     </p>
                   </div>
 
-                  {/* Quote or Highlight */}
                   <div className="border-l-4 border-yellow-600 pl-6 py-4 bg-yellow-50 rounded-r-lg">
                     <p className="text-lg italic text-slate-700">
                       "Creating memorable stays and unforgettable experiences is at the heart of everything we do at Malle Stays."
@@ -114,11 +121,11 @@ export default function AboutPage() {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>
-              Why Choose Malle Stays?
+              Why Choose Malle Stays™?
             </h2>
           </div>
 
@@ -129,7 +136,27 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-bold mb-3 text-slate-900">Handpicked Properties</h3>
               <p className="text-slate-600">
-                Every villa is carefully selected to meet our high standards of quality, luxury, and comfort.
+                Every villa is carefully selected and verified to meet our high standards of quality, luxury, and comfort.
+              </p>
+            </div>
+
+            <div className="flex flex-col items-center text-center p-6">
+              <div className="w-16 h-16 rounded-full bg-yellow-600 flex items-center justify-center mb-4">
+                <Shield className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-slate-900">Trust & Transparency</h3>
+              <p className="text-slate-600">
+                Seamless and hassle-free booking experience with dedicated customer support from booking to checkout.
+              </p>
+            </div>
+
+            <div className="flex flex-col items-center text-center p-6">
+              <div className="w-16 h-16 rounded-full bg-yellow-600 flex items-center justify-center mb-4">
+                <MapPin className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-slate-900">Pan India Presence</h3>
+              <p className="text-slate-600">
+                From Lonavala and Igatpuri to destinations across India — premium staycation options in every travel hub.
               </p>
             </div>
 
@@ -137,19 +164,29 @@ export default function AboutPage() {
               <div className="w-16 h-16 rounded-full bg-yellow-600 flex items-center justify-center mb-4">
                 <Users className="h-8 w-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold mb-3 text-slate-900">Dedicated Support</h3>
+              <h3 className="text-xl font-bold mb-3 text-slate-900">Perfect for Everyone</h3>
               <p className="text-slate-600">
-                Our team is available to assist you before, during, and after your stay. We're just a message away on WhatsApp.
+                Ideal for families, couples, and groups — weekend getaways, birthdays, parties, or relaxing vacations.
               </p>
             </div>
 
             <div className="flex flex-col items-center text-center p-6">
               <div className="w-16 h-16 rounded-full bg-yellow-600 flex items-center justify-center mb-4">
-                <TrendingUp className="h-8 w-8 text-white" />
+                <Diamond className="h-8 w-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold mb-3 text-slate-900">Best Locations</h3>
+              <h3 className="text-xl font-bold mb-3 text-slate-900">Premium Amenities</h3>
               <p className="text-slate-600">
-                From beachside escapes to mountain retreats, we offer villas in India's most sought-after destinations.
+                Private swimming pools, scenic views, modern interiors, BBQ setups, and more at every property.
+              </p>
+            </div>
+
+            <div className="flex flex-col items-center text-center p-6">
+              <div className="w-16 h-16 rounded-full bg-yellow-600 flex items-center justify-center mb-4">
+                <Phone className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-slate-900">Dedicated Support</h3>
+              <p className="text-slate-600">
+                Our team is available to assist you before, during, and after your stay. We're just a call or message away.
               </p>
             </div>
           </div>
