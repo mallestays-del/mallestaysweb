@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
-import { MongoClient } from 'mongodb';
-import bcrypt from 'bcryptjs';
-import { v4 as uuidv4 } from 'uuid';
 
 export const dynamic = 'force-dynamic';
-export const maxDuration = 30;
+export const runtime = 'nodejs';
 
 export async function GET() {
   let client;
   
   try {
+    const { MongoClient } = require('mongodb');
+    const bcrypt = require('bcryptjs');
+    const { v4: uuidv4 } = require('uuid');
     const mongoUrl = process.env.MONGO_URL;
     const dbName = process.env.DB_NAME || 'mallestays';
     

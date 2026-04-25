@@ -59,7 +59,9 @@ export async function GET(request) {
           amenities: 1, createdAt: 1, id: 1
         } 
       }).sort({ createdAt: -1 }).limit(100).toArray();
-      return NextResponse.json({ villas });
+      const res = NextResponse.json({ villas });
+      res.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
+      return res;
     }
 
     // Get single villa by slug
@@ -69,7 +71,9 @@ export async function GET(request) {
       if (!villa) {
         return NextResponse.json({ error: 'Villa not found' }, { status: 404 });
       }
-      return NextResponse.json({ villa });
+      const res = NextResponse.json({ villa });
+      res.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
+      return res;
     }
 
     // Get reviews for a specific villa
@@ -200,7 +204,9 @@ export async function GET(request) {
           rating: 1, imageUrl: 1, source: 1 
         } 
       }).sort({ createdAt: -1 }).limit(20).toArray();
-      return NextResponse.json({ reviews });
+      const res = NextResponse.json({ reviews });
+      res.headers.set('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=300');
+      return res;
     }
 
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
