@@ -160,16 +160,16 @@ export default function HomePage() {
                 </div>
                 <div>
                   <label className="text-xs md:text-sm font-semibold mb-2 md:mb-3 block text-slate-700 uppercase tracking-wide">Guests</label>
-                  <Select value={searchData.guests} onValueChange={(val) => setSearchData({...searchData, guests: val})}>
-                    <SelectTrigger data-testid="search-guests" className="h-12 border-slate-300">
-                      <SelectValue placeholder="Select guests" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[2, 4, 6, 8, 10].map(num => (
-                        <SelectItem key={num} value={num.toString()}>{num} Guests</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Input 
+                    type="number" 
+                    min="1" 
+                    max="100"
+                    placeholder="Number of guests"
+                    value={searchData.guests}
+                    onChange={(e) => setSearchData({...searchData, guests: e.target.value})}
+                    data-testid="search-guests"
+                    className="h-12 border-slate-300"
+                  />
                 </div>
               </div>
               <Button 
