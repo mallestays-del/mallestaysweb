@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Heart, Diamond, Globe, Users, Award, TrendingUp } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -151,6 +152,52 @@ export default function AboutPage() {
               <p className="text-slate-600">
                 From beachside escapes to mountain retreats, we offer villas in India's most sought-after destinations.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Certifications Section */}
+      <section id="certifications" className="py-20 bg-white" data-testid="about-certifications-section">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-yellow-50 text-yellow-700 border border-yellow-200 px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase mb-4">
+              <Award className="h-3.5 w-3.5" />
+              Our Certifications
+            </div>
+            <h2 className="text-4xl font-bold mb-4 text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Internationally Recognized Quality
+            </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              We're proud to be officially certified for delivering excellence in every stay.
+            </p>
+          </div>
+
+          <div className="max-w-3xl mx-auto bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-8 md:p-12 shadow-2xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              <div className="flex justify-center">
+                <Image
+                  src="https://customer-assets.emergentagent.com/job_b1d835aa-4c65-43d7-a984-604f09f9b89e/artifacts/bp6ln6rx_ISO.jpeg"
+                  alt="ISO 9001:2015 Certified - Quality Management System for Travel & Accommodation Services"
+                  width={260}
+                  height={260}
+                  className="h-52 w-52 md:h-60 md:w-60 object-contain"
+                />
+              </div>
+              <div className="text-white">
+                <p className="text-xs font-bold tracking-[0.2em] text-yellow-500 uppercase mb-2">Certificate</p>
+                <h3 className="text-2xl md:text-3xl font-bold mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  ISO 9001:2015
+                </h3>
+                <p className="text-slate-300 mb-5 leading-relaxed">
+                  Quality Management System certification for Travel & Accommodation Services — independently verified to international standards.
+                </p>
+                <div className="space-y-2 text-sm text-slate-300">
+                  <p className="flex items-center gap-2"><span className="text-yellow-500">✓</span> Globally recognized quality standard</p>
+                  <p className="flex items-center gap-2"><span className="text-yellow-500">✓</span> Audited & verified compliance</p>
+                  <p className="flex items-center gap-2"><span className="text-yellow-500">✓</span> Continuous improvement framework</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

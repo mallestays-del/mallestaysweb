@@ -92,8 +92,32 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-slate-800 mt-12 pt-8 text-center">
-          <p className="text-slate-500">&copy; {new Date().getFullYear()} Malle Stays. All rights reserved. Crafted with excellence.</p>
+        {/* Certifications */}
+        <div className="border-t border-slate-800 mt-12 pt-8">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-6">
+            <a
+              href="/about#certifications"
+              className="group flex items-center gap-4 bg-slate-800/60 hover:bg-slate-800 border border-yellow-600/30 hover:border-yellow-600/60 rounded-xl px-5 py-3 transition-all duration-300"
+              data-testid="iso-badge-footer"
+              aria-label="ISO 9001:2015 Certified - Quality Management System"
+            >
+              <Image
+                src="https://customer-assets.emergentagent.com/job_b1d835aa-4c65-43d7-a984-604f09f9b89e/artifacts/bp6ln6rx_ISO.jpeg"
+                alt="ISO 9001:2015 Certified"
+                width={56}
+                height={56}
+                className="h-14 w-14 object-contain rounded-md"
+              />
+              <div className="text-left">
+                <p className="text-sm font-semibold text-yellow-500 leading-tight">ISO 9001:2015 Certified</p>
+                <p className="text-xs text-slate-400 leading-tight">Quality Management System</p>
+                <p className="text-[11px] text-slate-500 leading-tight">Travel & Accommodation Services</p>
+              </div>
+            </a>
+          </div>
+          <div className="text-center">
+            <p className="text-slate-500">&copy; {new Date().getFullYear()} Malle Stays. All rights reserved. Crafted with excellence.</p>
+          </div>
         </div>
       </div>
     </footer>

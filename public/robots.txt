@@ -9,7 +9,7 @@ Disallow: /admin/
 Disallow: /api/
 
 # Sitemap location
-Sitemap: https://malle-stays-1.preview.emergentagent.com/sitemap.xml
+Sitemap: https://luxury-rental-test.preview.emergentagent.com/sitemap.xml
 
 # Crawl delay (optional)
 Crawl-delay: 1

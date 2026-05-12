@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Search, MapPin, ArrowRight, Waves, UtensilsCrossed, Wifi, Car, Star, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -565,6 +566,64 @@ export default function HomePage() {
               <p className="text-slate-500 text-lg">No reviews yet. Check back soon!</p>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Certifications & Trust Section */}
+      <section className="py-20 bg-gradient-to-b from-white to-slate-50" data-testid="certifications-section">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-yellow-50 text-yellow-700 border border-yellow-200 px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase mb-4">
+              <Award className="h-3.5 w-3.5" />
+              Certified Excellence
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Quality You Can Trust
+            </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Malle Stays is officially certified for delivering world-class quality in travel and accommodation services.
+            </p>
+          </div>
+
+          <div className="max-w-4xl mx-auto">
+            <Card className="elegant-shadow border-0 overflow-hidden">
+              <div className="grid grid-cols-1 md:grid-cols-5 items-center">
+                <div className="md:col-span-2 bg-slate-900 p-10 flex items-center justify-center">
+                  <Image
+                    src="https://customer-assets.emergentagent.com/job_b1d835aa-4c65-43d7-a984-604f09f9b89e/artifacts/bp6ln6rx_ISO.jpeg"
+                    alt="ISO 9001:2015 Certified - Quality Management System"
+                    width={260}
+                    height={260}
+                    className="h-48 w-48 md:h-56 md:w-56 object-contain drop-shadow-2xl"
+                    data-testid="iso-certificate-image"
+                  />
+                </div>
+                <div className="md:col-span-3 p-8 md:p-12">
+                  <p className="text-xs font-bold tracking-[0.2em] text-yellow-600 uppercase mb-3">Internationally Certified</p>
+                  <h3 className="text-3xl font-bold text-slate-900 mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
+                    ISO 9001:2015 Certified
+                  </h3>
+                  <p className="text-slate-600 mb-6 leading-relaxed">
+                    Our commitment to excellence is independently verified through the globally recognized ISO 9001:2015 Quality Management System standard for Travel & Accommodation Services.
+                  </p>
+                  <ul className="space-y-2.5">
+                    <li className="flex items-start gap-3 text-slate-700">
+                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-yellow-600 flex-shrink-0" />
+                      <span className="text-sm">Consistently delivering premium guest experiences</span>
+                    </li>
+                    <li className="flex items-start gap-3 text-slate-700">
+                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-yellow-600 flex-shrink-0" />
+                      <span className="text-sm">Rigorous quality controls across every villa</span>
+                    </li>
+                    <li className="flex items-start gap-3 text-slate-700">
+                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-yellow-600 flex-shrink-0" />
+                      <span className="text-sm">Continuous improvement & customer satisfaction focus</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
+          </div>
         </div>
       </section>
 
