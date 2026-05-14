@@ -590,7 +590,7 @@ export default function HomePage() {
               <div className="grid grid-cols-1 md:grid-cols-5 items-center">
                 <div className="md:col-span-2 bg-slate-900 p-10 flex items-center justify-center">
                   <Image
-                    src="https://customer-assets.emergentagent.com/job_b1d835aa-4c65-43d7-a984-604f09f9b89e/artifacts/bp6ln6rx_ISO.jpeg"
+                    src="https://customer-assets.emergentagent.com/job_b1d835aa-4c65-43d7-a984-604f09f9b89e/artifacts/mj1huj7p_ISO.jpeg"
                     alt="ISO 9001:2015 Certified - Quality Management System"
                     width={260}
                     height={260}

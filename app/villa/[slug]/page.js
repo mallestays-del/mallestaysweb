@@ -721,7 +721,7 @@ Sent via Malle Stays`;
               >
                 <div className="flex items-center gap-3">
                   <Image
-                    src="https://customer-assets.emergentagent.com/job_b1d835aa-4c65-43d7-a984-604f09f9b89e/artifacts/bp6ln6rx_ISO.jpeg"
+                    src="https://customer-assets.emergentagent.com/job_b1d835aa-4c65-43d7-a984-604f09f9b89e/artifacts/mj1huj7p_ISO.jpeg"
                     alt="ISO 9001:2015 Certified"
                     width={56}
                     height={56}
