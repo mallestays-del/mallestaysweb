@@ -8,8 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Calendar, ChevronLeft, ChevronRight, X, Check, Clock, Ban } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Calendar, ChevronLeft, ChevronRight, X, Ban, Phone, Mail, IndianRupee, Users, TrendingUp, Eye } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export default function BookingCalendar() {
   const { data: session, status } = useSession();
@@ -21,11 +22,25 @@ export default function BookingCalendar() {
   const [bookings, setBookings] = useState([]);
   const [blockedDates, setBlockedDates] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Dialogs
   const [blockDialogOpen, setBlockDialogOpen] = useState(false);
+  const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  
+  // Block form
   const [blockVillaId, setBlockVillaId] = useState('');
   const [blockStartDate, setBlockStartDate] = useState('');
   const [blockEndDate, setBlockEndDate] = useState('');
   const [blockReason, setBlockReason] = useState('maintenance');
+  
+  // Filters
+  const [showConfirmed, setShowConfirmed] = useState(true);
+  const [showPending, setShowPending] = useState(true);
+  const [showCancelled, setShowCancelled] = useState(false);
+  
+  // Stats
+  const [stats, setStats] = useState({ totalBookings: 0, totalRevenue: 0, occupancyRate: 0 });
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -49,12 +64,31 @@ export default function BookingCalendar() {
   const fetchBookingsAndAvailability = async () => {
     setLoading(true);
     try {
-      // Fetch all bookings
       const bookingsRes = await fetch('/api/v1/bookings');
       const bookingsData = await bookingsRes.json();
-      setBookings(bookingsData.bookings || []);
+      const allBookings = bookingsData.bookings || [];
+      setBookings(allBookings);
 
-      // Fetch blocked dates for selected villa
+      // Calculate stats
+      const monthStart = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+      const monthEnd = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
+      
+      const monthBookings = allBookings.filter(b => {
+        const checkIn = new Date(b.checkIn);
+        return checkIn >= monthStart && checkIn <= monthEnd && b.status !== 'cancelled';
+      });
+      
+      const totalRevenue = monthBookings.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+      const daysInMonth = monthEnd.getDate();
+      const bookedNights = monthBookings.reduce((sum, b) => sum + (b.nights || 1), 0);
+      const occupancyRate = Math.round((bookedNights / daysInMonth) * 100);
+      
+      setStats({
+        totalBookings: monthBookings.length,
+        totalRevenue,
+        occupancyRate
+      });
+
       if (selectedVilla !== 'all') {
         const availRes = await fetch(`/api/v1/availability?villaId=${selectedVilla}`);
         const availData = await availRes.json();
@@ -83,7 +117,11 @@ export default function BookingCalendar() {
   const isDateBooked = (dateStr) => {
     return bookings.some(booking => {
       if (selectedVilla !== 'all' && booking.villaId !== selectedVilla) return false;
-      if (booking.status === 'cancelled') return false;
+      
+      // Apply status filters
+      if (booking.status === 'confirmed' && !showConfirmed) return false;
+      if (booking.status === 'pending' && !showPending) return false;
+      if (booking.status === 'cancelled' && !showCancelled) return false;
       
       const checkIn = new Date(booking.checkIn);
       const checkOut = new Date(booking.checkOut);
@@ -99,7 +137,11 @@ export default function BookingCalendar() {
   const getBookingForDate = (dateStr) => {
     return bookings.find(booking => {
       if (selectedVilla !== 'all' && booking.villaId !== selectedVilla) return null;
-      if (booking.status === 'cancelled') return null;
+      
+      // Apply status filters
+      if (booking.status === 'confirmed' && !showConfirmed) return null;
+      if (booking.status === 'pending' && !showPending) return null;
+      if (booking.status === 'cancelled' && !showCancelled) return null;
       
       const checkIn = new Date(booking.checkIn);
       const checkOut = new Date(booking.checkOut);
@@ -145,6 +187,9 @@ export default function BookingCalendar() {
       if (response.ok) {
         alert(`Blocked ${dates.length} dates`);
         setBlockDialogOpen(false);
+        setBlockVillaId('');
+        setBlockStartDate('');
+        setBlockEndDate('');
         fetchBookingsAndAvailability();
       } else {
         alert('Failed to block dates');
@@ -155,16 +200,52 @@ export default function BookingCalendar() {
     }
   };
 
+  const handleUnblockDate = async (dateStr) => {
+    if (!selectedVilla || selectedVilla === 'all') {
+      alert('Please select a specific villa to unblock dates');
+      return;
+    }
+    
+    if (!confirm(`Unblock ${dateStr}?`)) return;
+
+    try {
+      const response = await fetch('/api/v1/availability', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          villaId: selectedVilla,
+          dates: [dateStr],
+          action: 'unblock'
+        })
+      });
+
+      if (response.ok) {
+        alert('Date unblocked');
+        fetchBookingsAndAvailability();
+      } else {
+        alert('Failed to unblock date');
+      }
+    } catch (error) {
+      console.error('Error unblocking date:', error);
+      alert('Error unblocking date');
+    }
+  };
+
+  const handleCellClick = (dateStr, booking) => {
+    if (booking) {
+      setSelectedBooking(booking);
+      setBookingDialogOpen(true);
+    }
+  };
+
   const renderCalendar = () => {
     const { daysInMonth, startingDayOfWeek, year, month } = getDaysInMonth(currentMonth);
     const days = [];
     
-    // Empty cells for days before month starts
     for (let i = 0; i < startingDayOfWeek; i++) {
-      days.push(<div key={`empty-${i}`} className="h-24 bg-slate-50"></div>);
+      days.push(<div key={`empty-${i}`} className="h-28 bg-slate-50"></div>);
     }
     
-    // Days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       const isBooked = isDateBooked(dateStr);
@@ -175,10 +256,11 @@ export default function BookingCalendar() {
       days.push(
         <div 
           key={day} 
-          className={`h-24 border border-slate-200 p-2 relative ${
+          onClick={() => handleCellClick(dateStr, booking)}
+          className={`h-28 border border-slate-200 p-2 relative cursor-pointer transition-all ${
             isToday ? 'ring-2 ring-yellow-500' : ''
           } ${
-            isBooked ? 'bg-blue-50' : isBlocked ? 'bg-red-50' : 'bg-white hover:bg-slate-50'
+            isBooked ? 'bg-blue-50 hover:bg-blue-100' : isBlocked ? 'bg-red-50 hover:bg-red-100' : 'bg-white hover:bg-slate-50'
           }`}
         >
           <div className="flex items-center justify-between">
@@ -186,15 +268,30 @@ export default function BookingCalendar() {
               {day}
             </span>
             {isBooked && <Badge className="text-xs bg-blue-600">Booked</Badge>}
-            {isBlocked && !isBooked && <Badge className="text-xs bg-red-600">Blocked</Badge>}
+            {isBlocked && !isBooked && (
+              <Badge 
+                className="text-xs bg-red-600 cursor-pointer hover:bg-red-700"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleUnblockDate(dateStr);
+                }}
+              >
+                Blocked ✕
+              </Badge>
+            )}
           </div>
           {booking && (
             <div className="mt-1 text-xs">
               <p className="font-medium text-slate-900 truncate">{booking.guestName}</p>
               <p className="text-slate-600 truncate">{booking.villaName}</p>
-              <Badge className="mt-1" variant={booking.status === 'confirmed' ? 'default' : 'secondary'}>
-                {booking.status}
-              </Badge>
+              <div className="flex items-center gap-1 mt-1">
+                <Badge className="text-xs" variant={booking.status === 'confirmed' ? 'default' : 'secondary'}>
+                  {booking.status}
+                </Badge>
+                {booking.totalAmount && (
+                  <span className="text-xs text-green-700 font-semibold">₹{booking.totalAmount.toLocaleString()}</span>
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -222,6 +319,43 @@ export default function BookingCalendar() {
         <p className="text-slate-600">View and manage all villa bookings and availability</p>
       </div>
 
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-600">Total Bookings</p>
+                <p className="text-2xl font-bold text-slate-900">{stats.totalBookings}</p>
+              </div>
+              <Calendar className="h-8 w-8 text-blue-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-600">Total Revenue</p>
+                <p className="text-2xl font-bold text-green-700">₹{stats.totalRevenue.toLocaleString()}</p>
+              </div>
+              <IndianRupee className="h-8 w-8 text-green-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-600">Occupancy Rate</p>
+                <p className="text-2xl font-bold text-purple-700">{stats.occupancyRate}%</p>
+              </div>
+              <TrendingUp className="h-8 w-8 text-purple-600" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Controls */}
       <div className="mb-6 flex flex-wrap items-center gap-4">
         <Select value={selectedVilla} onValueChange={setSelectedVilla}>
@@ -240,7 +374,7 @@ export default function BookingCalendar() {
           <Button variant="outline" size="icon" onClick={handlePrevMonth}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <div className="text-lg font-semibold px-4">
+          <div className="text-lg font-semibold px-4 min-w-[200px] text-center">
             {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
           </div>
           <Button variant="outline" size="icon" onClick={handleNextMonth}>
@@ -248,7 +382,23 @@ export default function BookingCalendar() {
           </Button>
         </div>
 
-        <Button onClick={() => setBlockDialogOpen(true)} className="ml-auto bg-red-600 hover:bg-red-700">
+        {/* Status Filters */}
+        <div className="flex items-center gap-4 ml-auto">
+          <div className="flex items-center gap-2">
+            <Checkbox checked={showConfirmed} onCheckedChange={setShowConfirmed} id="confirmed" />
+            <label htmlFor="confirmed" className="text-sm cursor-pointer">Confirmed</label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox checked={showPending} onCheckedChange={setShowPending} id="pending" />
+            <label htmlFor="pending" className="text-sm cursor-pointer">Pending</label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox checked={showCancelled} onCheckedChange={setShowCancelled} id="cancelled" />
+            <label htmlFor="cancelled" className="text-sm cursor-pointer">Cancelled</label>
+          </div>
+        </div>
+
+        <Button onClick={() => setBlockDialogOpen(true)} className="bg-red-600 hover:bg-red-700">
           <Ban className="h-4 w-4 mr-2" />
           Block Dates
         </Button>
@@ -340,14 +490,133 @@ export default function BookingCalendar() {
               </Select>
             </div>
           </div>
-          <div className="flex justify-end gap-3">
+          <DialogFooter>
             <Button variant="outline" onClick={() => setBlockDialogOpen(false)}>
               Cancel
             </Button>
             <Button onClick={handleBlockDates} className="bg-red-600 hover:bg-red-700">
               Block Dates
             </Button>
-          </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Booking Details Dialog */}
+      <Dialog open={bookingDialogOpen} onOpenChange={setBookingDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Booking Details</DialogTitle>
+          </DialogHeader>
+          {selectedBooking && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-slate-600">Booking ID</p>
+                  <p className="font-semibold">{selectedBooking.bookingId}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-slate-600">Status</p>
+                  <Badge variant={selectedBooking.status === 'confirmed' ? 'default' : 'secondary'}>
+                    {selectedBooking.status}
+                  </Badge>
+                </div>
+              </div>
+              
+              <div className="border-t pt-4">
+                <h4 className="font-semibold mb-2">Guest Information</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-slate-600">Name</p>
+                    <p className="font-medium">{selectedBooking.guestName}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-600">Guests</p>
+                    <p className="font-medium flex items-center gap-1">
+                      <Users className="h-4 w-4" />
+                      {selectedBooking.guests || 2}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-600">Phone</p>
+                    <a href={`tel:${selectedBooking.guestPhone}`} className="font-medium text-blue-600 hover:underline flex items-center gap-1">
+                      <Phone className="h-4 w-4" />
+                      {selectedBooking.guestPhone}
+                    </a>
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-600">Email</p>
+                    <a href={`mailto:${selectedBooking.guestEmail}`} className="font-medium text-blue-600 hover:underline flex items-center gap-1">
+                      <Mail className="h-4 w-4" />
+                      {selectedBooking.guestEmail || 'N/A'}
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <h4 className="font-semibold mb-2">Villa & Dates</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-slate-600">Villa</p>
+                    <p className="font-medium">{selectedBooking.villaName}</p>
+                    <p className="text-sm text-slate-500">{selectedBooking.villaLocation}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-600">Duration</p>
+                    <p className="font-medium">{selectedBooking.nights || 1} nights</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-600">Check-in</p>
+                    <p className="font-medium">{new Date(selectedBooking.checkIn).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-600">Check-out</p>
+                    <p className="font-medium">{new Date(selectedBooking.checkOut).toLocaleDateString()}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <h4 className="font-semibold mb-2">Payment Details</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-slate-600">Total Amount</p>
+                    <p className="font-semibold text-lg text-green-700">₹{(selectedBooking.totalAmount || 0).toLocaleString()}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-600">Amount Paid</p>
+                    <p className="font-semibold text-lg">₹{(selectedBooking.amountPaid || 0).toLocaleString()}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-600">Payment Mode</p>
+                    <Badge>{selectedBooking.paymentMode === 'full' ? 'Full Payment' : '20% Advance'}</Badge>
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-600">Payment Status</p>
+                    <Badge variant={selectedBooking.paymentStatus === 'paid' ? 'default' : 'secondary'}>
+                      {selectedBooking.paymentStatus || 'pending'}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              {selectedBooking.specialRequests && (
+                <div className="border-t pt-4">
+                  <h4 className="font-semibold mb-2">Special Requests</h4>
+                  <p className="text-sm text-slate-600">{selectedBooking.specialRequests}</p>
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBookingDialogOpen(false)}>
+              Close
+            </Button>
+            <Button onClick={() => window.open(`/villa/${selectedBooking?.villaSlug}`, '_blank')}>
+              <Eye className="h-4 w-4 mr-2" />
+              View Villa
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
