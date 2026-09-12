@@ -623,3 +623,8 @@ agent_communication:
 - lib/schema.js rewritten: Organization (@id, real address/phone/email), LodgingBusiness (geo, areaServed, aggregateRating), WebSite SearchAction, Product, VacationRental, FAQPage, ItemList. Homepage: removed duplicate Organization, added FAQPage (lib/faqs.js shared) + ItemList.
 - layout.js: viewport moved to export const viewport (Next 14), verification from env (NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION / NEXT_PUBLIC_BING_SITE_VERIFICATION), OG/Twitter image now real: /api/og (ImageResponse) replacing missing /og-image.jpg.
 - Verified via curl: robots 200, sitemap valid, villa <title>/<meta>/canonical/JSON-LD parse OK, /api/og 200 PNG, checkout noindex.
+
+## Session: Deployment Fix (Feb 2026)
+- Root cause of failed Emergent deploy: "'sharp' is required in standalone mode" -> added `sharp` ^0.35.4 to package.json (next/image used in app/page.js, Navbar, Footer).
+- Second blocker found by deployment_agent: .gitignore had corrupted duplicate lines (82-163) ignoring .env -> removed; .env no longer ignored. Added memory/test_credentials.md to .gitignore.
+- `yarn next build` exit 0; deployment_agent re-scan: PASS.
