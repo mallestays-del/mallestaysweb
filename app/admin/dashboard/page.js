@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Building2, Users, Calendar, MapPin, Plus, Eye, Edit, Trash2, Settings, MessageCircle } from 'lucide-react';
+import { Building2, Users, Calendar, MapPin, Plus, Eye, Edit, Trash2, Settings, MessageCircle, DollarSign, CalendarDays } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
@@ -152,64 +152,77 @@ export default function AdminDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* Manage Guest Reviews Card */}
-          <Card className="border-2 border-yellow-300 bg-yellow-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/admin/guest-reviews')}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Booking Calendar Card */}
+          <Card className="border-2 border-blue-300 bg-blue-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/admin/bookings')}>
             <CardHeader>
-              <CardTitle className="flex items-center gap-3 text-yellow-900">
-                <MessageCircle className="h-6 w-6 text-yellow-600" />
-                Manage Guest Reviews
+              <CardTitle className="flex items-center gap-3 text-blue-900 text-lg">
+                <CalendarDays className="h-6 w-6 text-blue-600" />
+                Booking Calendar
               </CardTitle>
-              <CardDescription className="text-yellow-800">
-                Upload and manage customer testimonials and review images
+              <CardDescription className="text-blue-800">
+                View and manage all villa bookings
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-yellow-200 flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-yellow-900 text-sm font-bold">1</span>
-                  </div>
-                  <p className="text-sm text-yellow-900">Click "Guest Reviews" button above or this card</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-yellow-200 flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-yellow-900 text-sm font-bold">2</span>
-                  </div>
-                  <p className="text-sm text-yellow-900">Upload review screenshots from WhatsApp/Instagram/Google</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-yellow-200 flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-yellow-900 text-sm font-bold">3</span>
-                  </div>
-                  <p className="text-sm text-yellow-900">Reviews appear instantly on homepage "What Our Guests Say"</p>
-                </div>
-              </div>
-              <Button className="w-full mt-4 bg-yellow-600 hover:bg-yellow-700">
+              <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                <CalendarDays className="h-4 w-4 mr-2" />
+                Open Calendar
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Pricing Manager Card */}
+          <Card className="border-2 border-green-300 bg-green-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/admin/pricing')}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3 text-green-900 text-lg">
+                <DollarSign className="h-6 w-6 text-green-600" />
+                Pricing Manager
+              </CardTitle>
+              <CardDescription className="text-green-800">
+                Configure rates and fees per villa
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button className="w-full bg-green-600 hover:bg-green-700">
+                <DollarSign className="h-4 w-4 mr-2" />
+                Manage Pricing
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Manage Guest Reviews Card */}
+          <Card className="border-2 border-yellow-300 bg-yellow-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/admin/guest-reviews')}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3 text-yellow-900 text-lg">
+                <MessageCircle className="h-6 w-6 text-yellow-600" />
+                Guest Reviews
+              </CardTitle>
+              <CardDescription className="text-yellow-800">
+                Upload customer testimonials
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button className="w-full bg-yellow-600 hover:bg-yellow-700">
                 <MessageCircle className="h-4 w-4 mr-2" />
-                Go to Guest Reviews
+                Manage Reviews
               </Button>
             </CardContent>
           </Card>
 
           {/* Add New Villa Card */}
-          <Card className="border-2 border-blue-200 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/admin/villas/add')}>
+          <Card className="border-2 border-purple-200 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/admin/villas/add')}>
             <CardHeader>
-              <CardTitle className="flex items-center gap-3 text-slate-900">
-                <Building2 className="h-6 w-6 text-blue-600" />
-                Add New Villa
+              <CardTitle className="flex items-center gap-3 text-slate-900 text-lg">
+                <Building2 className="h-6 w-6 text-purple-600" />
+                Add Villa
               </CardTitle>
               <CardDescription>
-                List a new property on the website
+                List a new property
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2 text-sm text-slate-600 mb-4">
-                <p>• Add villa details, images, amenities</p>
-                <p>• Set pricing and availability</p>
-                <p>• Publish instantly to website</p>
-              </div>
-              <Button className="w-full" variant="outline">
+              <Button className="w-full bg-purple-600 hover:bg-purple-700">
                 <Plus className="h-4 w-4 mr-2" />
                 Add New Villa
               </Button>
