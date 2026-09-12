@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://malle-deployment.preview.emergentagent.com"
+BASE_URL = "https://stays-checkout-flow.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 # Test credentials

@@ -54,7 +54,7 @@ export async function GET(request) {
 
       const villas = await db.collection('villas').find(query, { 
         projection: { 
-          name: 1, slug: 1, location: 1, category: 1, pricePerNight: 1, 
+          name: 1, slug: 1, location: 1, category: 1, pricePerNight: 1, originalPrice: 1, 
           bedrooms: 1, maxGuests: 1, images: 1, description: 1, 
           amenities: 1, createdAt: 1, id: 1
         } 
@@ -324,7 +324,7 @@ export async function POST(request) {
       const authResult = await checkAuth(request);
       if (authResult.error) return authResult.response;
 
-      const { name, location, category, description, pricePerNight, bedrooms, bathrooms, maxGuests, parking, amenities, images, mapLocation } = body;
+      const { name, location, category, description, pricePerNight, originalPrice, bedrooms, bathrooms, maxGuests, parking, amenities, images, mapLocation } = body;
 
       if (!name || !location || !category || !description || !pricePerNight) {
         return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -340,6 +340,7 @@ export async function POST(request) {
         category,
         description,
         pricePerNight: parseFloat(pricePerNight),
+        originalPrice: originalPrice ? parseFloat(originalPrice) : null,
         bedrooms: parseInt(bedrooms) || 1,
         bathrooms: parseInt(bathrooms) || 1,
         maxGuests: parseInt(maxGuests) || 2,
@@ -624,7 +625,7 @@ export async function PUT(request) {
     // Update villa
     if (pathname.startsWith('/api/admin/villas/') && !pathname.includes('guest-reviews')) {
       const id = pathname.split('/api/admin/villas/')[1];
-      const { name, location, description, category, pricePerNight, bedrooms, bathrooms, maxGuests, parking, amenities, images, mapLocation, seoTitle, seoDescription, seoKeywords } = body;
+      const { name, location, description, category, pricePerNight, originalPrice, bedrooms, bathrooms, maxGuests, parking, amenities, images, mapLocation, seoTitle, seoDescription, seoKeywords } = body;
 
       const updateData = {
         name,
@@ -632,6 +633,7 @@ export async function PUT(request) {
         description,
         category,
         pricePerNight: parseFloat(pricePerNight),
+        originalPrice: originalPrice ? parseFloat(originalPrice) : null,
         bedrooms: parseInt(bedrooms),
         bathrooms: parseInt(bathrooms),
         maxGuests: parseInt(maxGuests),

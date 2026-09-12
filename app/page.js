@@ -11,6 +11,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge';
 import SchemaMarkup from '@/components/SchemaMarkup';
 import { generateOrganizationSchema, generateWebsiteSchema, generateLocalBusinessSchema, generateReviewSchema } from '@/lib/schema';
+import PriceDisplay from '@/components/PriceDisplay';
 
 export default function HomePage() {
   const [searchData, setSearchData] = useState({
@@ -429,9 +430,9 @@ export default function HomePage() {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute top-4 right-4">
-                      <Badge className="bg-yellow-600 text-white px-3 py-1">
-                        ₹{villa.pricePerNight?.toLocaleString()}/night
-                      </Badge>
+                      <div className="bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg">
+                        <PriceDisplay price={villa.pricePerNight} originalPrice={villa.originalPrice} size="sm" />
+                      </div>
                     </div>
                   </div>
                   <CardContent className="p-6">
@@ -644,10 +645,7 @@ export default function HomePage() {
                       <span>{villa.maxGuests} Guests</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <div>
-                        <span className="text-3xl font-bold text-slate-900">₹{villa.pricePerNight?.toLocaleString()}</span>
-                        <span className="text-slate-600 text-sm ml-2">/ night</span>
-                      </div>
+                      <PriceDisplay price={villa.pricePerNight} originalPrice={villa.originalPrice} size="md" />
                     </div>
                   </CardContent>
                   <CardFooter className="p-6 pt-0">

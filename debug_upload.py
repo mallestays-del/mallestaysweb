@@ -7,7 +7,7 @@ import requests
 import io
 import os
 
-BASE_URL = "https://malle-deployment.preview.emergentagent.com"
+BASE_URL = "https://stays-checkout-flow.preview.emergentagent.com"
 
 def create_large_file():
     """Create a real 6MB file"""

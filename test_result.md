@@ -511,3 +511,10 @@ agent_communication:
     message: "✅ TESTING COMPLETE - Cloudinary upload integration working excellently. All upload validations work correctly, files upload to Cloudinary successfully with proper URLs. Guest reviews CRUD mostly working - only DELETE endpoint has session role issue (403 error). Made minor fix to handle undefined role gracefully. Core functionality is solid."
   - agent: "testing"
     message: "🔄 VILLA UPDATE TESTING COMPLETE - All villa update functionality working perfectly! Authentication fixed: NextAuth session properly established, checkAuth function returns correct user object with role. PUT endpoint working flawlessly: updates all villa fields correctly (name, description, numeric fields like bathrooms/parking), proper data type parsing, database persistence verified. Error handling working: 404 for non-existent villas. The checkAuth fix resolved the authentication issues completely."
+## Session: Premium OTA-style Price Display (Feb 2026)
+- Created shared `/app/components/PriceDisplay.js` (bold current price, inline strikethrough original, "per night" below).
+- Applied to: homepage carousel + property grid (`app/page.js`), listings (`app/villas/page.js`), villa detail booking card (`app/villa/[slug]/page.js`).
+- `AvailabilityCalendar` now rendered on villa detail page (left column, below amenities) - verified via screenshot.
+- Added `originalPrice` field support: API projection/create/update in `app/api/[[...path]]/route.js`; admin add/edit villa forms have new "Original Price" input.
+- Seeded originalPrice on azure-villa/rudra-villa/serenity-villa for demo.
+- Verified via screenshots on /, /villas, /villa/rudra-villa. Backend/frontend testing agents not run (small UI change).

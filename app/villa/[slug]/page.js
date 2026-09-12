@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import SchemaMarkup from '@/components/SchemaMarkup';
 import { generateVillaSchema, generateAccommodationSchema, generateBreadcrumbSchema } from '@/lib/schema';
 import AvailabilityCalendar from '@/components/AvailabilityCalendar';
+import PriceDisplay from '@/components/PriceDisplay';
 
 export default function VillaDetailsPage() {
   const params = useParams();
@@ -533,6 +534,9 @@ export default function VillaDetailsPage() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Availability Calendar */}
+            <AvailabilityCalendar villaId={villa.slug || villa.id} villaName={villa.name} />
           </div>
 
           {/* Right Column - Booking Form */}
@@ -541,7 +545,9 @@ export default function VillaDetailsPage() {
               <Card className="shadow-lg">
                 <CardContent className="pt-6">
                   <h2 className="text-2xl font-bold mb-2 text-center">Book Your Stay</h2>
-                  <p className="text-center text-slate-500 text-sm mb-6">₹{villa.pricePerNight?.toLocaleString('en-IN')} / night</p>
+                  <div className="flex justify-center mb-6">
+                    <PriceDisplay price={villa.pricePerNight} originalPrice={villa.originalPrice} size="lg" align="center" />
+                  </div>
                   
                   <form onSubmit={handleBooking} className="space-y-4">
                     {/* Check-in Date */}

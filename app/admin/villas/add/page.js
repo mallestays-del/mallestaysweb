@@ -24,6 +24,7 @@ export default function AddVilla() {
     description: '',
     category: '',
     pricePerNight: '',
+    originalPrice: '',
     bedrooms: '',
     bathrooms: '',
     maxGuests: '',
@@ -88,6 +89,7 @@ export default function AddVilla() {
         images: validImages,
         amenities: validAmenities,
         pricePerNight: Number(formData.pricePerNight),
+        originalPrice: formData.originalPrice ? Number(formData.originalPrice) : null,
         bedrooms: Number(formData.bedrooms),
         bathrooms: Number(formData.bathrooms),
         maxGuests: Number(formData.maxGuests),
@@ -230,6 +232,19 @@ export default function AddVilla() {
                       required
                       min="0"
                     />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Original Price (₹) <span className="text-slate-400 font-normal">- shown crossed out</span></label>
+                    <Input
+                      type="number"
+                      value={formData.originalPrice}
+                      onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
+                      placeholder="18000"
+                      min="0"
+                      data-testid="original-price-input"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">Optional. Must be higher than price per night to display the discount.</p>
                   </div>
 
                   <div>

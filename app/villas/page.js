@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
+import PriceDisplay from '@/components/PriceDisplay';
 
 export default function VillasPage() {
   return (
@@ -226,8 +227,7 @@ function VillasContent() {
                           </p>
                         </div>
                         <div className="text-right">
-                          <div className="text-2xl font-bold text-primary">₹{villa.pricePerNight?.toLocaleString()}</div>
-                          <div className="text-sm text-slate-600">per night</div>
+                          <PriceDisplay price={villa.pricePerNight} originalPrice={villa.originalPrice} size="md" align="right" />
                         </div>
                       </div>
                     </CardHeader>
