@@ -27,11 +27,22 @@ export default function Footer() {
             
             {/* ISO Certification Badge */}
             <div className="mb-6">
-              <img 
-                src="https://customer-assets-m6fa6gv7.emergentagent.net/job_635c75da-4d51-46de-b07f-a30b74c9f7e0/artifacts/1q7c82gc_WhatsApp%20Image%202026-09-12%20at%2011.50.03%20PM.jpeg"
-                alt="ISO 9001:2015 Certified"
-                className="w-32 h-auto"
-              />
+              <a 
+                href="https://www.iafcertsearch.org/certification/D4IXym52G4fIJNhoUlZOLWkW" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block group"
+                title="Verify ISO Certification"
+              >
+                <img 
+                  src="https://customer-assets-m6fa6gv7.emergentagent.net/job_635c75da-4d51-46de-b07f-a30b74c9f7e0/artifacts/1q7c82gc_WhatsApp%20Image%202026-09-12%20at%2011.50.03%20PM.jpeg"
+                  alt="ISO 9001:2015 Certified - Click to Verify"
+                  className="w-32 h-auto hover:opacity-80 transition-opacity cursor-pointer"
+                />
+                <p className="text-xs text-slate-400 mt-2 group-hover:text-yellow-600 transition-colors">
+                  🔍 Click to verify certification
+                </p>
+              </a>
             </div>
             
             <div className="flex space-x-4">

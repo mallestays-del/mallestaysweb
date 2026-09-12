@@ -43,15 +43,28 @@ export default function AboutPage() {
             {/* Right Column - ISO Certification */}
             <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl bg-slate-900 flex items-center justify-center p-8">
               <div className="text-center">
-                <img
-                  src="https://customer-assets-m6fa6gv7.emergentagent.net/job_635c75da-4d51-46de-b07f-a30b74c9f7e0/artifacts/1q7c82gc_WhatsApp%20Image%202026-09-12%20at%2011.50.03%20PM.jpeg"
-                  alt="ISO 9001:2015 Certified"
-                  className="w-80 h-auto mx-auto drop-shadow-2xl"
-                />
-                <div className="mt-6 text-white">
-                  <h3 className="text-2xl font-bold mb-2">Quality Certified</h3>
-                  <p className="text-slate-300">ISO 9001:2015 Certified Organization</p>
-                </div>
+                <a 
+                  href="https://www.iafcertsearch.org/certification/D4IXym52G4fIJNhoUlZOLWkW" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="block group"
+                >
+                  <img
+                    src="https://customer-assets-m6fa6gv7.emergentagent.net/job_635c75da-4d51-46de-b07f-a30b74c9f7e0/artifacts/1q7c82gc_WhatsApp%20Image%202026-09-12%20at%2011.50.03%20PM.jpeg"
+                    alt="ISO 9001:2015 Certified"
+                    className="w-80 h-auto mx-auto drop-shadow-2xl group-hover:scale-105 transition-transform duration-300 cursor-pointer"
+                  />
+                  <div className="mt-6 text-white">
+                    <h3 className="text-2xl font-bold mb-2 group-hover:text-yellow-400 transition-colors">Quality Certified</h3>
+                    <p className="text-slate-300 mb-3">ISO 9001:2015 Certified Organization</p>
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-sm group-hover:bg-white/20 transition-all">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>Click to Verify on IAF</span>
+                    </div>
+                  </div>
+                </a>
               </div>
             </div>
           </div>
