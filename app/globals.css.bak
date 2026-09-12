@@ -1,0 +1,354 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 210 17% 18%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 210 17% 18%;
+    --radius: 0.5rem;
+    --gold: 43 74% 49%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+  }
+}
+
+.luxury-text {
+  background: linear-gradient(135deg, #D4AF37 0%, #F4E4C1 50%, #D4AF37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gold-accent {
+  color: #D4AF37;
+}
+
+.elegant-shadow {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+.elegant-shadow-hover {
+  transition: all 0.3s ease;
+}
+
+.elegant-shadow-hover:hover {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+  transform: translateY(-5px);
+}
+
+/* Mobile Responsive Fixes */
+@media (max-width: 768px) {
+  /* Prevent text overflow */
+  * {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Fix container padding on mobile */
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Responsive typography */
+  h1 {
+    font-size: 2rem !important;
+    line-height: 1.2 !important;
+  }
+
+  h2 {
+    font-size: 1.75rem !important;
+    line-height: 1.3 !important;
+  }
+
+  h3 {
+    font-size: 1.5rem !important;
+    line-height: 1.4 !important;
+  }
+
+  h4 {
+    font-size: 1.25rem !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Fix button sizes on mobile */
+  button, .button {
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+  }
+
+  /* Ensure images are responsive */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Fix card spacing on mobile */
+  .card {
+    margin-bottom: 1rem;
+  }
+
+  /* Adjust grid layouts for mobile */
+  .grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  /* Touch-friendly navigation */
+  nav a, nav button {
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Mobile search form adjustments */
+  .search-form select,
+  .search-form input {
+    font-size: 16px !important;
+    min-height: 48px;
+  }
+
+  /* Hero section mobile adjustments */
+  .hero-section {
+    min-height: 60vh !important;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  /* Villa cards mobile */
+  .villa-card {
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  /* ISO badge mobile sizing */
+  .iso-badge {
+    max-width: 200px !important;
+    margin: 0 auto;
+  }
+
+  /* Footer columns stack on mobile */
+  footer .grid {
+    grid-template-columns: 1fr !important;
+    text-align: center;
+  }
+
+  /* Mobile-specific padding adjustments */
+  section {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+  }
+
+  /* Improve touch targets */
+  a, button, input, select {
+    min-height: 44px;
+  }
+
+  /* Fix sticky search bar on mobile */
+  .sticky-search {
+    position: static !important;
+    padding: 1rem;
+  }
+
+  /* Responsive table on mobile */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* Adjust modal/dialog on mobile */
+  .dialog-content {
+    max-width: 95vw !important;
+    margin: 1rem;
+  }
+
+  /* Mobile-specific text sizing */
+  p, li, span {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  /* Improve mobile input fields */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="date"],
+  input[type="number"],
+  select,
+  textarea {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+  }
+
+  /* WhatsApp and Chat buttons mobile positioning */
+  .whatsapp-button,
+  .chat-button {
+    bottom: 20px !important;
+    right: 16px !important;
+    width: 56px !important;
+    height: 56px !important;
+  }
+
+  /* Ensure proper spacing for mobile nav */
+  .mobile-nav-open {
+    overflow: hidden;
+  }
+
+  /* Fix offer banners on mobile */
+  .offer-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem 1rem;
+  }
+
+  /* Mobile-friendly pricing display */
+  .price-display {
+    font-size: 1.75rem !important;
+  }
+
+  /* Responsive location cards */
+  .location-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Mobile booking form */
+  .booking-form {
+    padding: 1rem;
+  }
+
+  /* Improve mobile readability */
+  .text-5xl {
+    font-size: 2.25rem !important;
+  }
+
+  .text-4xl {
+    font-size: 2rem !important;
+  }
+
+  .text-3xl {
+    font-size: 1.875rem !important;
+  }
+
+  .text-2xl {
+    font-size: 1.5rem !important;
+  }
+}
+
+/* Tablet-specific adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  h1 {
+    font-size: 2.5rem !important;
+  }
+
+  h2 {
+    font-size: 2rem !important;
+  }
+
+  /* Tablet grid layouts */
+  .grid-cols-3,
+  .grid-cols-4,
+  .grid-cols-6 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+  /* Fix card spacing */
+  .space-y-6 > * + * {
+    margin-top: 1rem !important;
+  }
+
+  /* Fix grid layouts */
+  .grid {
+    gap: 1rem !important;
+  }
+
+  /* Ensure images don't overflow */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Fix text truncation */
+  .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Hide text that's too long on mobile */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* Touch-friendly spacing for mobile */
+@media (max-width: 640px) {
+  /* Increase touch targets */
+  a, button, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Stack flex items on mobile */
+  .flex-mobile-stack {
+    flex-direction: column !important;
+  }
+
+  /* Full width on mobile */
+  .mobile-full-width {
+    width: 100% !important;
+  }
+}
