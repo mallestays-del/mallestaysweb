@@ -21,14 +21,14 @@ export default function HomePage() {
   });
   const [featuredVillas, setFeaturedVillas] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [offers, setOffers] = useState([]);
   const [isSearchSticky, setIsSearchSticky] = useState(false);
   const heroSearchRef = useRef(null);
 
   useEffect(() => {
     fetchFeaturedVillas();
-    
-    // Fetch guest reviews initially
     fetchGuestReviews();
+    fetchActiveOffers();
 
     // Check for hash in URL to scroll to section
     if (window.location.hash === '#reviews' || window.location.hash === '#guest-reviews') {
@@ -81,11 +81,32 @@ export default function HomePage() {
     }
   };
 
+  const fetchActiveOffers = async () => {
+    try {
+      const response = await fetch('/api/offers');
+      const data = await response.json();
+      setOffers((data.offers || []).filter(o => o.showOnHomepage));
+    } catch (error) {
+      console.error('Error fetching offers:', error);
+    }
+  };
+
   const handleSearch = () => {
     const params = new URLSearchParams();
     if (searchData.location) params.append('location', searchData.location);
     if (searchData.guests) params.append('guests', searchData.guests);
     window.location.href = `/villas?${params.toString()}`;
+  };
+
+  const getOfferBannerColor = (color) => {
+    const colors = {
+      blue: 'bg-gradient-to-r from-blue-500 to-blue-600',
+      green: 'bg-gradient-to-r from-green-500 to-green-600',
+      yellow: 'bg-gradient-to-r from-yellow-500 to-orange-500',
+      red: 'bg-gradient-to-r from-red-500 to-red-600',
+      purple: 'bg-gradient-to-r from-purple-500 to-purple-600'
+    };
+    return colors[color] || colors.blue;
   };
 
   const popularLocations = [
@@ -253,6 +274,37 @@ export default function HomePage() {
           </Card>
         </div>
       </section>
+
+      {/* Active Offers Banner */}
+      {offers.length > 0 && (
+        <section className="py-4 bg-slate-50">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {offers.slice(0, 3).map((offer, idx) => (
+                <div 
+                  key={idx}
+                  className={`${getOfferBannerColor(offer.bannerColor)} text-white rounded-lg p-4 shadow-lg transform hover:scale-105 transition-transform cursor-pointer`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-bold text-lg mb-1">{offer.title}</h3>
+                      <p className="text-sm opacity-90">{offer.description}</p>
+                      {offer.couponCode && (
+                        <div className="mt-2 inline-block bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
+                          <span className="text-xs font-mono font-bold">Code: {offer.couponCode}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-3xl font-bold">
+                      {offer.discountType === 'percentage' ? `${offer.discountValue}%` : `₹${offer.discountValue}`}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Villa Categories */}
       <section className="py-20 bg-white" data-testid="villa-categories">

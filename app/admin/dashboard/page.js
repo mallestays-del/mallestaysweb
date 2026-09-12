@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Building2, Users, Calendar, MapPin, Plus, Eye, Edit, Trash2, Settings, MessageCircle, DollarSign, CalendarDays } from 'lucide-react';
+import { Building2, Users, Calendar, MapPin, Plus, Eye, Edit, Trash2, Settings, MessageCircle, DollarSign, CalendarDays, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
@@ -152,7 +152,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           {/* Booking Calendar Card */}
           <Card className="border-2 border-blue-300 bg-blue-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/admin/bookings')}>
             <CardHeader>
@@ -206,6 +206,25 @@ export default function AdminDashboard() {
               <Button className="w-full bg-yellow-600 hover:bg-yellow-700">
                 <MessageCircle className="h-4 w-4 mr-2" />
                 Manage Reviews
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Offers Manager Card */}
+          <Card className="border-2 border-orange-300 bg-orange-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/admin/offers')}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3 text-orange-900 text-lg">
+                <Tag className="h-6 w-6 text-orange-600" />
+                Offers Manager
+              </CardTitle>
+              <CardDescription className="text-orange-800">
+                Create special offers & discounts
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button className="w-full bg-orange-600 hover:bg-orange-700">
+                <Tag className="h-4 w-4 mr-2" />
+                Manage Offers
               </Button>
             </CardContent>
           </Card>
