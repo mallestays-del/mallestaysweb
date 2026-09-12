@@ -481,75 +481,56 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Email is required' }, { status: 400 });
       }
 
-      // Find admin
-      const admin = await db.collection('admins').findOne({ email });
-      if (!admin) {
-        // Don't reveal if email exists or not for security
-        return NextResponse.json({ message: 'If this email exists, a reset link has been sent.' });
-      }
-
-      // Generate reset token
-      const resetToken = uuidv4();
-      const resetExpiry = new Date(Date.now() + 3600000).toISOString(); // 1 hour from now
-
-      // Store reset token in database
-      await db.collection('admins').updateOne(
-        { email },
-        { $set: { resetToken, resetExpiry } }
-      );
-
-      // Send reset email
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://mallestaysweb.vercel.app';
-      const resetLink = `${baseUrl}/admin/reset-password?token=${resetToken}`;
-
       try {
-        const nodemailer = require('nodemailer');
+        // Find admin
+        const admin = await db.collection('admins').findOne({ email: email.toLowerCase() });
         
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: process.env.SMTP_EMAIL,
-            pass: process.env.SMTP_PASSWORD
-          }
+        if (admin) {
+          // Generate reset token
+          const crypto = await import('crypto');
+          const rawToken = crypto.randomBytes(32).toString('hex');
+          const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+          const resetExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+          // Store hashed token
+          await db.collection('passwordResetTokens').insertOne({
+            userId: admin.id,
+            email: admin.email,
+            tokenHash,
+            expiresAt: resetExpiry,
+            usedAt: null,
+            createdAt: new Date()
+          });
+
+          // Send email with Resend
+          const { resend, fromAddress } = await import('@/lib/resend');
+          const { passwordResetEmail } = await import('@/lib/email-templates');
+          
+          const resetUrl = `${process.env.APP_URL || 'http://localhost:3000'}/admin/reset-password?token=${rawToken}`;
+          const emailContent = passwordResetEmail(admin.name || 'Admin', resetUrl);
+
+          await resend.emails.send({
+            from: fromAddress,
+            to: [admin.email],
+            subject: emailContent.subject,
+            html: emailContent.html,
+            text: emailContent.text,
+            tags: [{ name: 'type', value: 'password_reset' }]
+          }, { 
+            idempotencyKey: `password-reset/${admin.id}/${tokenHash}` 
+          });
+        }
+
+        // Always return same response for security
+        return NextResponse.json({ 
+          message: 'If this email exists, a password reset link has been sent.' 
         });
 
-        await transporter.sendMail({
-          from: `"Malle Stays™" <${process.env.SMTP_EMAIL}>`,
-          to: email,
-          subject: 'Password Reset - Malle Stays™ Admin',
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="color: #1e293b; margin: 0;">Malle Stays™</h1>
-                <p style="color: #64748b; margin-top: 5px;">Admin Password Reset</p>
-              </div>
-              <div style="background: #f8fafc; border-radius: 12px; padding: 30px; border: 1px solid #e2e8f0;">
-                <h2 style="color: #1e293b; margin-top: 0;">Reset Your Password</h2>
-                <p style="color: #475569;">Hello ${admin.name || 'Admin'},</p>
-                <p style="color: #475569;">You requested to reset your password. Click the button below to set a new password:</p>
-                <div style="text-align: center; margin: 30px 0;">
-                  <a href="${resetLink}" style="background: #ca8a04; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">
-                    Reset Password
-                  </a>
-                </div>
-                <p style="color: #94a3b8; font-size: 14px;">This link will expire in <strong>1 hour</strong>.</p>
-                <p style="color: #94a3b8; font-size: 14px;">If you didn't request this reset, please ignore this email. Your password will remain unchanged.</p>
-                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
-                <p style="color: #94a3b8; font-size: 12px;">If the button doesn't work, copy and paste this link into your browser:</p>
-                <p style="color: #ca8a04; font-size: 12px; word-break: break-all;">${resetLink}</p>
-              </div>
-              <div style="text-align: center; margin-top: 20px;">
-                <p style="color: #94a3b8; font-size: 12px;">© ${new Date().getFullYear()} Malle Stays™. All rights reserved.</p>
-              </div>
-            </div>
-          `
+      } catch (error) {
+        console.error('Password reset error:', error);
+        return NextResponse.json({ 
+          message: 'If this email exists, a password reset link has been sent.' 
         });
-
-        return NextResponse.json({ message: 'Reset link sent to your email' });
-      } catch (emailError) {
-        console.error('Email sending error:', emailError);
-        // Still return success to not reveal email existence, but log the error
-        return NextResponse.json({ error: 'Failed to send email. Please contact support.' }, { status: 500 });
       }
     }
 
@@ -566,24 +547,33 @@ export async function POST(request) {
       }
 
       // Find admin with this token
-      const admin = await db.collection('admins').findOne({ resetToken: token });
-      if (!admin) {
+      const crypto = await import('crypto');
+      const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+      
+      const resetToken = await db.collection('passwordResetTokens').findOne({
+        tokenHash,
+        expiresAt: { $gt: new Date() },
+        usedAt: null
+      });
+      
+      if (!resetToken) {
         return NextResponse.json({ error: 'Invalid or expired reset link' }, { status: 400 });
-      }
-
-      // Check if token has expired
-      if (new Date(admin.resetExpiry) < new Date()) {
-        return NextResponse.json({ error: 'Reset link has expired. Please request a new one.' }, { status: 400 });
       }
 
       // Hash new password and update
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       await db.collection('admins').updateOne(
-        { resetToken: token },
+        { email: resetToken.email },
         { 
           $set: { password: hashedPassword, updatedAt: new Date().toISOString() },
           $unset: { resetToken: '', resetExpiry: '' }
         }
+      );
+      
+      // Mark token as used
+      await db.collection('passwordResetTokens').updateOne(
+        { tokenHash },
+        { $set: { usedAt: new Date() } }
       );
 
       return NextResponse.json({ message: 'Password reset successfully' });
