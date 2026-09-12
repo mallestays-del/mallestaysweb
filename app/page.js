@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Search, MapPin, ArrowRight, Waves, UtensilsCrossed, Wifi, Car, Star, Award } from 'lucide-react';
@@ -21,6 +21,8 @@ export default function HomePage() {
   });
   const [featuredVillas, setFeaturedVillas] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [isSearchSticky, setIsSearchSticky] = useState(false);
+  const heroSearchRef = useRef(null);
 
   useEffect(() => {
     fetchFeaturedVillas();
@@ -38,12 +40,25 @@ export default function HomePage() {
       }, 500);
     }
 
+    // Sticky search bar on scroll
+    const handleScroll = () => {
+      if (heroSearchRef.current) {
+        const heroRect = heroSearchRef.current.getBoundingClientRect();
+        setIsSearchSticky(heroRect.bottom < 0);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
     // Poll for new reviews every 30 seconds (real-time updates)
     const reviewInterval = setInterval(() => {
       fetchGuestReviews();
     }, 30000);
 
-    return () => clearInterval(reviewInterval);
+    return () => {
+      clearInterval(reviewInterval);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   const fetchGuestReviews = async () => {
@@ -98,8 +113,61 @@ export default function HomePage() {
       <SchemaMarkup schema={generateLocalBusinessSchema()} />
       {reviews.length > 0 && <SchemaMarkup schema={generateReviewSchema(reviews)} />}
 
+      {/* Sticky Search Bar - appears on scroll */}
+      {isSearchSticky && (
+        <div className="fixed top-0 left-0 right-0 bg-white shadow-lg z-50 py-3 animate-in slide-in-from-top">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center gap-3">
+              <div className="flex-1 grid grid-cols-4 gap-3">
+                <Select value={searchData.location} onValueChange={(val) => setSearchData({...searchData, location: val})}>
+                  <SelectTrigger className="h-10 text-sm">
+                    <SelectValue placeholder="Location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Destinations</SelectItem>
+                    {popularLocations.map(loc => (
+                      <SelectItem key={loc.name} value={loc.name}>{loc.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Input 
+                  type="date" 
+                  value={searchData.checkIn}
+                  onChange={(e) => setSearchData({...searchData, checkIn: e.target.value})}
+                  className="h-10 text-sm"
+                  placeholder="Check-in"
+                />
+                <Input 
+                  type="date" 
+                  value={searchData.checkOut}
+                  onChange={(e) => setSearchData({...searchData, checkOut: e.target.value})}
+                  className="h-10 text-sm"
+                  placeholder="Check-out"
+                />
+                <Input 
+                  type="number" 
+                  min="1" 
+                  placeholder="Guests"
+                  value={searchData.guests}
+                  onChange={(e) => setSearchData({...searchData, guests: e.target.value})}
+                  className="h-10 text-sm"
+                />
+              </div>
+              <Button 
+                className="bg-slate-900 hover:bg-slate-800 h-10 px-6" 
+                onClick={handleSearch}
+              >
+                <Search className="h-4 w-4 mr-2" />
+                Search
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
       <section 
+        ref={heroSearchRef}
         className="relative h-[500px] md:h-[700px] bg-cover bg-center flex items-center"
         style={{ 
           backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)), url('https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1600')`,
@@ -330,18 +398,11 @@ export default function HomePage() {
                       <span>•</span>
                       <span>Up to {villa.maxGuests} Guests</span>
                     </div>
-                    <Button 
-                      onClick={() => {
-                        const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '918446620191';
-                        const message = `Hi! I'm interested in booking ${villa.name} in ${villa.location}. Could you please provide more details?`;
-                        const encodedMessage = encodeURIComponent(message);
-                        window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
-                      }}
-                      className="w-full bg-green-600 hover:bg-green-700 text-white"
-                      data-testid={`book-now-${villa.slug}`}
-                    >
-                      Book Now
-                    </Button>
+                    <Link href={`/villa/${villa.slug}`} className="w-full">
+                      <Button className="w-full bg-yellow-700 hover:bg-yellow-800 text-white">
+                        View & Book →
+                      </Button>
+                    </Link>
                   </CardContent>
                 </Card>
               ))}
@@ -566,6 +627,98 @@ export default function HomePage() {
               <p className="text-slate-500 text-lg">No reviews yet. Check back soon!</p>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Curated Collections - StayVista Style */}
+      <section className="py-20 bg-white" data-testid="curated-collections">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <p className="text-yellow-600 font-semibold tracking-wider uppercase text-sm mb-3">Curated For You</p>
+            <h2 className="text-5xl font-bold mb-4 text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Explore By Experience
+            </h2>
+            <p className="text-slate-600 text-lg max-w-2xl mx-auto">
+              Find the perfect villa for every occasion and mood
+            </p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { title: 'Pool Villas', emoji: '🏊', desc: 'Private pools for ultimate relaxation', query: 'pool' },
+              { title: 'Pet-Friendly', emoji: '🐾', desc: 'Bring your furry friends along', query: 'pet' },
+              { title: 'Celebrations', emoji: '🎉', desc: 'Birthdays, anniversaries & parties', query: 'celebration' },
+              { title: 'Weekend Getaways', emoji: '🌄', desc: 'Quick escapes from the city', query: 'weekend' },
+              { title: 'Family Retreats', emoji: '👨‍👩‍👧‍👦', desc: 'Spacious villas for families', query: 'family' },
+              { title: 'Couple Stays', emoji: '💑', desc: 'Romantic and private', query: 'couple' },
+              { title: 'Corporate Offsites', emoji: '💼', desc: 'Team building & work retreats', query: 'corporate' },
+              { title: 'Luxury Escapes', emoji: '✨', desc: 'Premium & exclusive properties', query: 'luxury' },
+            ].map((collection, idx) => (
+              <Link href={`/villas?tag=${collection.query}`} key={idx}>
+                <Card className="border border-slate-200 hover:border-yellow-400 hover:shadow-lg transition-all duration-300 cursor-pointer group h-full">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-4xl mb-3">{collection.emoji}</div>
+                    <h3 className="font-bold text-slate-900 mb-1 group-hover:text-yellow-700 transition-colors">{collection.title}</h3>
+                    <p className="text-xs text-slate-500">{collection.desc}</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Quick Contact Bar */}
+      <section className="py-8 bg-slate-900 text-white">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="text-center md:text-left">
+              <h3 className="text-xl font-bold">Need Help Planning Your Stay?</h3>
+              <p className="text-slate-400 text-sm">Our concierge team is available 9 AM - 10 PM, all days</p>
+            </div>
+            <div className="flex gap-4">
+              <a href="tel:+918446620191" className="flex items-center gap-2 bg-yellow-600 hover:bg-yellow-700 px-6 py-3 rounded-lg font-semibold transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                +91 8446620191
+              </a>
+              <a href="mailto:connect@mallestays.com" className="flex items-center gap-2 border border-white/30 hover:bg-white/10 px-6 py-3 rounded-lg font-semibold transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                connect@mallestays.com
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-20 bg-slate-50" data-testid="faq-section">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <div className="text-center mb-16">
+            <p className="text-yellow-600 font-semibold tracking-wider uppercase text-sm mb-3">FAQs</p>
+            <h2 className="text-5xl font-bold mb-4 text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Frequently Asked Questions
+            </h2>
+          </div>
+          <div className="space-y-4">
+            {[
+              { q: 'How do I book a villa?', a: 'Simply browse our villas, select your dates and guests, and proceed to checkout. You can pay 20% advance to lock your booking or pay the full amount.' },
+              { q: 'What is the cancellation policy?', a: 'Free cancellation up to 7 days before check-in for a full refund. Cancellations within 7 days may attract charges. Please refer to our Terms & Conditions.' },
+              { q: 'Is there a security deposit?', a: 'Yes, a refundable security deposit of ₹2,000-₹5,000 is collected at check-in and returned at checkout after property inspection.' },
+              { q: 'What time is check-in and check-out?', a: 'Standard check-in is at 2:00 PM and check-out is at 11:00 AM. Early check-in or late checkout may be available on request.' },
+              { q: 'Are pets allowed?', a: 'Some of our properties are pet-friendly. Please check the villa details or contact us to confirm before booking.' },
+              { q: 'Do you provide food/catering?', a: 'Most villas have fully equipped kitchens. Some properties offer cook services at additional cost. BBQ setups are available at select villas.' },
+              { q: 'Can I book for a party or event?', a: 'Yes! Many of our villas are perfect for birthdays, anniversaries, and small gatherings. Please inform us in advance for party bookings.' },
+            ].map((faq, idx) => (
+              <details key={idx} className="bg-white rounded-xl border border-slate-200 overflow-hidden group">
+                <summary className="p-6 cursor-pointer font-semibold text-slate-900 hover:text-yellow-700 transition-colors flex items-center justify-between">
+                  {faq.q}
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400 group-open:rotate-180 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </summary>
+                <div className="px-6 pb-6 text-slate-600 leading-relaxed border-t border-slate-100 pt-4">
+                  {faq.a}
+                </div>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 
