@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import SchemaMarkup from '@/components/SchemaMarkup';
 import { generateVillaSchema, generateAccommodationSchema, generateBreadcrumbSchema } from '@/lib/schema';
+import AvailabilityCalendar from '@/components/AvailabilityCalendar';
 
 export default function VillaDetailsPage() {
   const params = useParams();
