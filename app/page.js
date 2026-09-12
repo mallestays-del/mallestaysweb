@@ -512,6 +512,69 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ISO Certification & Trust Section */}
+      <section className="py-16 bg-gradient-to-br from-slate-50 to-slate-100">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+              <div className="order-2 md:order-1 text-left">
+                <div className="inline-block mb-4 px-4 py-2 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold">
+                  ✓ Certified Excellence
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold mb-6 text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  Quality You Can Trust
+                </h2>
+                <p className="text-slate-600 text-lg mb-6 leading-relaxed">
+                  Malle Stays™ is proud to be <strong>ISO 9001:2015 Certified</strong>, demonstrating our unwavering commitment to maintaining the highest quality standards in travel and accommodation services.
+                </p>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-4 bg-white p-4 rounded-lg shadow-sm">
+                    <div className="flex-shrink-0 w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                      <Award className="h-5 w-5 text-yellow-700" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-slate-900 mb-1">Certified Quality Management</h4>
+                      <p className="text-slate-600 text-sm">Rigorous processes ensure excellence in every stay</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4 bg-white p-4 rounded-lg shadow-sm">
+                    <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                      <Star className="h-5 w-5 text-green-700" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-slate-900 mb-1">Guest Satisfaction Guaranteed</h4>
+                      <p className="text-slate-600 text-sm">Continuous improvement in service delivery</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4 bg-white p-4 rounded-lg shadow-sm">
+                    <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <svg className="h-5 w-5 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-slate-900 mb-1">Safety & Security Standards</h4>
+                      <p className="text-slate-600 text-sm">Compliant with international best practices</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="order-1 md:order-2 flex justify-center">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                  <img 
+                    src="https://customer-assets-m6fa6gv7.emergentagent.net/job_635c75da-4d51-46de-b07f-a30b74c9f7e0/artifacts/1q7c82gc_WhatsApp%20Image%202026-09-12%20at%2011.50.03%20PM.jpeg"
+                    alt="ISO 9001:2015 Certified - Quality Management System for Travel & Accommodation Services"
+                    className="relative w-64 md:w-80 h-auto drop-shadow-2xl transform hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute -bottom-4 -right-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-6 py-3 rounded-lg shadow-lg transform rotate-3 hover:rotate-6 transition-transform">
+                    <p className="font-bold text-sm">Certified 2026</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Featured Villas */}
       {featuredVillas.length > 0 && (
         <section className="py-20 bg-white" data-testid="featured-villas">

@@ -24,6 +24,16 @@ export default function Footer() {
             <p className="text-slate-400 mb-6 leading-relaxed">
               Curated luxury villas and estates for discerning travelers seeking exceptional experiences.
             </p>
+            
+            {/* ISO Certification Badge */}
+            <div className="mb-6">
+              <img 
+                src="https://customer-assets-m6fa6gv7.emergentagent.net/job_635c75da-4d51-46de-b07f-a30b74c9f7e0/artifacts/1q7c82gc_WhatsApp%20Image%202026-09-12%20at%2011.50.03%20PM.jpeg"
+                alt="ISO 9001:2015 Certified"
+                className="w-32 h-auto"
+              />
+            </div>
+            
             <div className="flex space-x-4">
               <a href="https://www.facebook.com/profile.php?id=61580271326579" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-yellow-600 transition-colors duration-300" data-testid="social-facebook">
                 <Facebook className="h-5 w-5" />
