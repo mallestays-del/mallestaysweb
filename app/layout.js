@@ -5,9 +5,17 @@ import Footer from '@/components/Footer';
 import ChatBot from '@/components/ChatBot';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import { Toaster } from '@/components/ui/sonner';
-import { seoConfig, generateStructuredData } from '@/lib/seo';
+import { seoConfig } from '@/lib/seo';
+import { generateOrganizationSchema } from '@/lib/schema';
 
 const inter = Inter({ subsets: ['latin'] });
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#0f172a',
+};
 
 export const metadata = {
   metadataBase: new URL(seoConfig.siteUrl),
@@ -17,18 +25,20 @@ export const metadata = {
   },
   description: seoConfig.defaultDescription,
   keywords: seoConfig.keywords.join(', '),
-  authors: [{ name: 'Malle Stays' }],
+  applicationName: 'Malle Stays',
+  authors: [{ name: 'Malle Stays', url: seoConfig.siteUrl }],
   creator: 'Malle Stays',
   publisher: 'Malle Stays',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-  },
+  category: 'travel',
+  referrer: 'origin-when-cross-origin',
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
+  },
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
   },
   openGraph: {
     type: 'website',
@@ -37,14 +47,7 @@ export const metadata = {
     title: seoConfig.defaultTitle,
     description: seoConfig.defaultDescription,
     siteName: seoConfig.siteName,
-    images: [
-      {
-        url: '/og-image.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'Malle Stays - Luxury Villa Rentals',
-      }
-    ],
+    images: [{ url: `${seoConfig.siteUrl}/api/og`, width: 1200, height: 630, alt: 'Malle Stays - Luxury Villa Rentals in India' }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -52,11 +55,12 @@ export const metadata = {
     description: seoConfig.defaultDescription,
     site: '@MalleStays',
     creator: '@MalleStays',
-    images: ['/og-image.jpg'],
+    images: [`${seoConfig.siteUrl}/api/og`],
   },
   robots: {
     index: true,
     follow: true,
+    nocache: false,
     googleBot: {
       index: true,
       follow: true,
@@ -65,27 +69,29 @@ export const metadata = {
       'max-snippet': -1,
     },
   },
-  verification: {
-    google: 'your-google-verification-code',
-  },
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+    ? {
+        verification: {
+          ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION } : {}),
+          ...(process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION ? { other: { 'msvalidate.01': process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION } } : {}),
+        },
+      }
+    : {}),
   alternates: {
     canonical: seoConfig.siteUrl,
   },
 };
 
 export default function RootLayout({ children }) {
-  const organizationSchema = generateStructuredData('organization');
+  const organizationSchema = generateOrganizationSchema();
 
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/logo.png" />
-        <link rel="apple-touch-icon" href="/logo.png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
-        <link rel="canonical" href={seoConfig.siteUrl} />
       </head>
       <body className={inter.className}>
         <Navbar />

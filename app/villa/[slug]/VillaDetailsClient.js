@@ -1,0 +1,823 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { MapPin, Users, Bed, ArrowLeft, Calendar, Bath, Car, Star, Wifi, Waves, UtensilsCrossed, Music, Gamepad2, ShieldCheck, Wind } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
+import AvailabilityCalendar from '@/components/AvailabilityCalendar';
+import PriceDisplay from '@/components/PriceDisplay';
+
+export default function VillaDetailsClient({ initialVilla = null }) {
+  const params = useParams();
+  const router = useRouter();
+  const [villa, setVilla] = useState(initialVilla);
+  const [loading, setLoading] = useState(!initialVilla);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [imageLoading, setImageLoading] = useState(false);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false);
+
+  // Auto-play slideshow
+  useEffect(() => {
+    if (!isAutoPlaying || !villa?.images || villa.images.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => 
+        prev === villa.images.length - 1 ? 0 : prev + 1
+      );
+    }, 3000); // Change image every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, villa?.images]);
+  
+  const [bookingData, setBookingData] = useState({
+    guests: '2',
+    checkIn: '',
+    checkOut: ''
+  });
+  const [bookingLoading, setBookingLoading] = useState(false);
+  const [pricingData, setPricingData] = useState(null);
+  const [pricingLoading, setPricingLoading] = useState(false);
+  const [unavailableDates, setUnavailableDates] = useState([]);
+  
+  // Review state
+  const [reviews, setReviews] = useState([]);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewData, setReviewData] = useState({
+    name: '',
+    rating: 5,
+    comment: '',
+    imageUrl: ''
+  });
+  const [reviewImageFile, setReviewImageFile] = useState(null);
+  const [uploadingReviewImage, setUploadingReviewImage] = useState(false);
+  const [submittingReview, setSubmittingReview] = useState(false);
+
+  useEffect(() => {
+    if (params.slug) {
+      fetchVilla();
+      fetchReviews();
+    }
+    
+    // Poll for new reviews every 30 seconds (real-time updates)
+    const reviewInterval = setInterval(() => {
+      fetchReviews();
+    }, 30000);
+
+    return () => clearInterval(reviewInterval);
+  }, [params.slug]);
+
+  const fetchVilla = async () => {
+    try {
+      const response = await fetch(`/api/villas/${params.slug}`);
+      const data = await response.json();
+      if (response.ok) {
+        setVilla(data.villa);
+        // Fetch availability
+        fetchAvailability(data.villa);
+      } else {
+        toast.error('Villa not found');
+        router.push('/villas');
+      }
+    } catch (error) {
+      console.error('Error fetching villa:', error);
+      toast.error('Failed to load villa');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAvailability = async (villaData) => {
+    try {
+      const villaId = villaData?.slug || villaData?.id || params.slug;
+      const res = await fetch(`/api/v1/availability?villaId=${villaId}`);
+      const data = await res.json();
+      setUnavailableDates(data.allUnavailable || []);
+    } catch (err) {
+      console.error('Error fetching availability:', err);
+    }
+  };
+
+  const fetchPricing = async (checkIn, checkOut, guests) => {
+    if (!checkIn || !checkOut || !villa) return;
+    setPricingLoading(true);
+    try {
+      const villaId = villa?.slug || villa?.id;
+      const res = await fetch(`/api/v1/pricing?villaId=${villaId}&checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests || 2}`);
+      const data = await res.json();
+      setPricingData(data);
+    } catch (err) {
+      console.error('Pricing error:', err);
+    } finally {
+      setPricingLoading(false);
+    }
+  };
+
+  // Fetch pricing when dates change
+  useEffect(() => {
+    if (bookingData.checkIn && bookingData.checkOut && villa) {
+      fetchPricing(bookingData.checkIn, bookingData.checkOut, bookingData.guests);
+    }
+  }, [bookingData.checkIn, bookingData.checkOut, bookingData.guests, villa]);
+
+  const fetchReviews = async () => {
+    if (!villa?.id) return;
+    
+    try {
+      const response = await fetch(`/api/villas/${villa.id}/reviews`);
+      if (response.ok) {
+        const data = await response.json();
+        setReviews(data.reviews || []);
+      }
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+    }
+  };
+
+  const handleReviewImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size must be less than 5MB');
+      return;
+    }
+
+    setReviewImageFile(file);
+    setUploadingReviewImage(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.url) {
+        setReviewData({ ...reviewData, imageUrl: data.url });
+        toast.success('Image uploaded successfully!');
+      } else {
+        toast.error('Upload failed: ' + (data.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Error uploading image');
+    } finally {
+      setUploadingReviewImage(false);
+    }
+  };
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    
+    if (!reviewData.name || !reviewData.comment) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    setSubmittingReview(true);
+
+    try {
+      const response = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          villaId: villa.id,
+          villaName: villa.name,
+          name: reviewData.name,
+          rating: reviewData.rating,
+          comment: reviewData.comment,
+          imageUrl: reviewData.imageUrl
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success('Review submitted successfully! It will be visible after approval.');
+        setShowReviewForm(false);
+        setReviewData({
+          name: '',
+          rating: 5,
+          comment: '',
+          imageUrl: ''
+        });
+        setReviewImageFile(null);
+        // Refresh reviews
+        fetchReviews();
+      } else {
+        toast.error(data.error || 'Failed to submit review');
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      toast.error('An error occurred while submitting review');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
+  const handleBooking = async (e) => {
+    e.preventDefault();
+    if (!bookingData.checkIn || !bookingData.checkOut) {
+      toast.error('Please select check-in and check-out dates');
+      return;
+    }
+    const villaSlug = villa?.slug || params.slug;
+    router.push(`/checkout?villa=${villaSlug}&checkIn=${bookingData.checkIn}&checkOut=${bookingData.checkOut}&guests=${bookingData.guests || 2}`);
+  };
+
+  // Amenity icons mapping
+  const amenityIcons = {
+    'AC': <Wind className="h-5 w-5 text-blue-600" />,
+    'Pool': <Waves className="h-5 w-5 text-blue-600" />,
+    'Swimming Pool': <Waves className="h-5 w-5 text-blue-600" />,
+    'Private Pool': <Waves className="h-5 w-5 text-blue-600" />,
+    'WiFi': <Wifi className="h-5 w-5 text-blue-600" />,
+    'Wifi': <Wifi className="h-5 w-5 text-blue-600" />,
+    'Parking': <Car className="h-5 w-5 text-blue-600" />,
+    'Private Parking': <Car className="h-5 w-5 text-blue-600" />,
+    'Kitchen': <UtensilsCrossed className="h-5 w-5 text-blue-600" />,
+    'Dining': <UtensilsCrossed className="h-5 w-5 text-blue-600" />,
+    'Music': <Music className="h-5 w-5 text-blue-600" />,
+    'Games': <Gamepad2 className="h-5 w-5 text-blue-600" />,
+    'Caretaker': <ShieldCheck className="h-5 w-5 text-blue-600" />,
+    'TV': <Star className="h-5 w-5 text-blue-600" />
+  };
+
+  const getAmenityIcon = (amenity) => {
+    for (const [key, icon] of Object.entries(amenityIcons)) {
+      if (amenity.toLowerCase().includes(key.toLowerCase())) {
+        return icon;
+      }
+    }
+    return <Star className="h-5 w-5 text-blue-600" />;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-slate-600">Loading villa details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!villa) {
+    return null;
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      {/* Back Button */}
+      <div className="container mx-auto px-4 py-6">
+        <Button variant="ghost" onClick={() => router.push('/villas')} className="mb-4">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Villas
+        </Button>
+        {/* Page heading (H1 for SEO) */}
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900" style={{ fontFamily: "'Playfair Display', serif" }} data-testid="villa-title">
+              {villa.name}
+            </h1>
+            <p className="flex items-center gap-2 text-slate-600 mt-2">
+              <MapPin className="h-4 w-4 text-yellow-700" />
+              <span>{villa.location}, Maharashtra</span>
+              {villa.category && <span className="text-slate-400">• {villa.category}</span>}
+            </p>
+          </div>
+          <div className="flex items-center gap-4 text-sm text-slate-600">
+            <span className="flex items-center gap-1"><Bed className="h-4 w-4" /> {villa.bedrooms || 4} Bedrooms</span>
+            <span className="flex items-center gap-1"><Bath className="h-4 w-4" /> {villa.bathrooms || 5} Baths</span>
+            <span className="flex items-center gap-1"><Users className="h-4 w-4" /> Up to {villa.maxGuests || 12} Guests</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Image Gallery Section with Slideshow */}
+      <div className="container mx-auto px-4 mb-8">
+        {/* Main Image Slideshow */}
+        <div className="relative h-[300px] md:h-[500px] rounded-xl overflow-hidden mb-4 group">
+          {/* Current Image with Fade Animation */}
+          <div className="relative w-full h-full">
+            <img
+              key={currentImageIndex}
+              src={villa.images?.[currentImageIndex] || 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200'}
+              alt={villa.name}
+              className="w-full h-full object-cover animate-fade-in"
+              style={{
+                animation: 'fadeIn 0.5s ease-in-out'
+              }}
+            />
+            
+            {/* Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+            
+            {/* Image Counter and Auto-play Toggle */}
+            <div className="absolute bottom-2 md:bottom-4 right-2 md:right-4 flex items-center gap-2">
+              <button
+                onClick={() => setIsAutoPlaying(!isAutoPlaying)}
+                className="bg-black/70 hover:bg-black/90 text-white px-2 md:px-3 py-1 md:py-2 rounded-full text-xs md:text-sm transition-colors flex items-center gap-1 md:gap-2"
+                aria-label={isAutoPlaying ? "Pause slideshow" : "Play slideshow"}
+              >
+                {isAutoPlaying ? (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="md:w-[14px] md:h-[14px]">
+                      <rect x="6" y="4" width="4" height="16"></rect>
+                      <rect x="14" y="4" width="4" height="16"></rect>
+                    </svg>
+                    <span className="hidden md:inline">Pause</span>
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="md:w-[14px] md:h-[14px]">
+                      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    <span className="hidden md:inline">Play</span>
+                  </>
+                )}
+              </button>
+              <div className="bg-black/70 text-white px-2 md:px-4 py-1 md:py-2 rounded-full text-xs md:text-sm">
+                {currentImageIndex + 1} / {villa.images?.length || 1}
+              </div>
+            </div>
+          </div>
+
+          {/* Navigation Arrows */}
+          {villa.images && villa.images.length > 1 && (
+            <>
+              <button
+                onClick={() => setCurrentImageIndex((prev) => (prev === 0 ? villa.images.length - 1 : prev - 1))}
+                className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 p-2 md:p-3 rounded-full shadow-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300"
+                aria-label="Previous image"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="md:w-[24px] md:h-[24px]">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+              
+              <button
+                onClick={() => setCurrentImageIndex((prev) => (prev === villa.images.length - 1 ? 0 : prev + 1))}
+                className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 p-2 md:p-3 rounded-full shadow-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300"
+                aria-label="Next image"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="md:w-[24px] md:h-[24px]">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </>
+          )}
+        </div>
+
+        {/* Thumbnail Gallery with Hover Effects */}
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-4">
+          {villa.images?.slice(0, 6).map((image, index) => (
+            <div
+              key={index}
+              onClick={() => {
+                setImageLoading(true);
+                setCurrentImageIndex(index);
+                setTimeout(() => setImageLoading(false), 300);
+              }}
+              className={`relative h-24 rounded-lg overflow-hidden cursor-pointer border-2 transition-all duration-300 transform hover:scale-105 hover:shadow-xl ${
+                currentImageIndex === index 
+                  ? 'border-yellow-600 ring-2 ring-yellow-400 scale-105 shadow-lg' 
+                  : 'border-transparent hover:border-yellow-400'
+              }`}
+            >
+              <img
+                src={image}
+                alt={`${villa.name} ${index + 1}`}
+                className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+              />
+              {currentImageIndex === index && (
+                <div className="absolute inset-0 bg-yellow-600/20 flex items-center justify-center">
+                  <div className="bg-white rounded-full p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-600">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* CSS Animations */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: scale(1.05);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        
+        @keyframes slideInFromRight {
+          from {
+            opacity: 0;
+            transform: translateX(100px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        
+        @keyframes slideInFromLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-100px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        
+        .animate-fade-in {
+          animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .animate-slide-in-right {
+          animation: slideInFromRight 0.6s ease-out;
+        }
+        
+        .animate-slide-in-left {
+          animation: slideInFromLeft 0.6s ease-out;
+        }
+      `}</style>
+
+      {/* Main Content */}
+      <div className="container mx-auto px-4 pb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+          {/* Left Column - Property Details */}
+          <div className="lg:col-span-2 space-y-4 md:space-y-6">
+            {/* Property Overview */}
+            <Card>
+              <CardContent className="pt-4 md:pt-6">
+                <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 border-b-2 border-slate-200 pb-2">Property Overview</h2>
+                
+                {/* Quick Stats */}
+                <div className="grid grid-cols-2 gap-3 md:gap-4 mb-4 md:mb-6">
+                  <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-slate-50 rounded-lg">
+                    <Bed className="h-5 w-5 md:h-6 md:w-6 text-blue-600 flex-shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-xs md:text-sm text-slate-600">Bedrooms</p>
+                      <p className="font-semibold text-xs md:text-base truncate">{villa.bedrooms || 4} Bedrooms</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                    <Bath className="h-6 w-6 text-blue-600" />
+                    <div>
+                      <p className="text-sm text-slate-600">Bathrooms</p>
+                      <p className="font-semibold">{villa.bathrooms || 5} Bathrooms</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                    <Users className="h-6 w-6 text-blue-600" />
+                    <div>
+                      <p className="text-sm text-slate-600">Capacity</p>
+                      <p className="font-semibold">Up to {villa.maxGuests || 12} Guests</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                    <Car className="h-6 w-6 text-blue-600" />
+                    <div>
+                      <p className="text-sm text-slate-600">Parking</p>
+                      <p className="font-semibold">{villa.parking || 3} Cars</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="space-y-4">
+                  <p className="text-slate-700 leading-relaxed">
+                    {villa.description || `Welcome to ${villa.name}, a luxurious retreat in the heart of ${villa.location}. Perfect for family gatherings, group celebrations, and weekend getaways.`}
+                  </p>
+                  
+                  <p className="text-slate-700 leading-relaxed">
+                    The villa features {villa.bedrooms || 4} beautifully appointed AC bedrooms with comfortable beds and modern amenities. 
+                    With {villa.bathrooms || 5} well-maintained bathrooms equipped with geysers for hot water, your comfort is our priority.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Exclusive Amenities */}
+            <Card>
+              <CardContent className="pt-6">
+                <h2 className="text-2xl font-bold mb-6 border-b-2 border-slate-200 pb-2">Exclusive Amenities</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {villa.amenities?.map((amenity, index) => (
+                    <div key={index} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                      {getAmenityIcon(amenity)}
+                      <span className="text-slate-700">{amenity}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Availability Calendar */}
+            <AvailabilityCalendar villaId={villa.slug || villa.id} villaName={villa.name} />
+          </div>
+
+          {/* Right Column - Booking Form */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24">
+              <Card className="shadow-lg">
+                <CardContent className="pt-6">
+                  <h2 className="text-2xl font-bold mb-2 text-center">Book Your Stay</h2>
+                  <div className="flex justify-center mb-6">
+                    <PriceDisplay price={villa.pricePerNight} originalPrice={villa.originalPrice} size="lg" align="center" />
+                  </div>
+                  
+                  <form onSubmit={handleBooking} className="space-y-4">
+                    {/* Check-in Date */}
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Check-in <span className="text-red-500">*</span>
+                      </label>
+                      <Input
+                        type="date"
+                        value={bookingData.checkIn}
+                        onChange={(e) => setBookingData({ ...bookingData, checkIn: e.target.value })}
+                        required
+                        min={new Date().toISOString().split('T')[0]}
+                        className="w-full"
+                      />
+                    </div>
+
+                    {/* Check-out Date */}
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Check-out <span className="text-red-500">*</span>
+                      </label>
+                      <Input
+                        type="date"
+                        value={bookingData.checkOut}
+                        onChange={(e) => setBookingData({ ...bookingData, checkOut: e.target.value })}
+                        required
+                        min={bookingData.checkIn || new Date().toISOString().split('T')[0]}
+                        className="w-full"
+                      />
+                    </div>
+
+                    {/* Number of Guests */}
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Guests
+                      </label>
+                      <Input
+                        type="number"
+                        placeholder="2"
+                        min="1"
+                        max={villa.maxGuests || 20}
+                        value={bookingData.guests}
+                        onChange={(e) => setBookingData({ ...bookingData, guests: e.target.value })}
+                        className="w-full"
+                      />
+                    </div>
+
+                    {/* Dynamic Pricing Display */}
+                    {pricingLoading && (
+                      <div className="text-center py-3">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-600 mx-auto"></div>
+                        <p className="text-xs text-slate-400 mt-1">Calculating price...</p>
+                      </div>
+                    )}
+
+                    {pricingData && !pricingLoading && bookingData.checkIn && bookingData.checkOut && (
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>{pricingData.nightCount} night{pricingData.nightCount > 1 ? 's' : ''}</span>
+                          <span>₹{pricingData.breakdown?.baseTotal?.toLocaleString('en-IN')}</span>
+                        </div>
+                        {pricingData.breakdown?.extraGuestTotal > 0 && (
+                          <div className="flex justify-between text-sm text-slate-500">
+                            <span>Extra guests ({pricingData.breakdown.extraGuests})</span>
+                            <span>₹{pricingData.breakdown.extraGuestTotal?.toLocaleString('en-IN')}</span>
+                          </div>
+                        )}
+                        {pricingData.breakdown?.cleaningFee > 0 && (
+                          <div className="flex justify-between text-sm text-slate-500">
+                            <span>Cleaning fee</span>
+                            <span>₹{pricingData.breakdown.cleaningFee?.toLocaleString('en-IN')}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between text-sm text-slate-500">
+                          <span>GST ({pricingData.breakdown?.gstPercent}%)</span>
+                          <span>₹{pricingData.breakdown?.gstAmount?.toLocaleString('en-IN')}</span>
+                        </div>
+                        <div className="border-t border-yellow-300 pt-2 flex justify-between font-bold text-lg">
+                          <span>Total</span>
+                          <span className="text-yellow-700">₹{pricingData.breakdown?.totalAmount?.toLocaleString('en-IN')}</span>
+                        </div>
+                        <p className="text-xs text-yellow-600 text-center">Book now with just 20% advance!</p>
+                      </div>
+                    )}
+
+                    {/* Submit Button */}
+                    <Button
+                      type="submit"
+                      disabled={bookingLoading || !bookingData.checkIn || !bookingData.checkOut}
+                      className="w-full bg-yellow-700 hover:bg-yellow-800 text-white font-bold py-3 text-lg h-14"
+                    >
+                      {bookingLoading ? 'Processing...' : 'BOOK NOW'}
+                    </Button>
+
+                    <p className="text-xs text-center text-slate-500 mt-2">
+                      Secure checkout via Razorpay • Pay 20% advance or full amount
+                    </p>
+                  </form>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="mt-12">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold">Guest Reviews</h2>
+                <Button
+                  onClick={() => setShowReviewForm(!showReviewForm)}
+                  className="bg-yellow-700 hover:bg-yellow-800"
+                >
+                  {showReviewForm ? 'Cancel' : 'Write a Review'}
+                </Button>
+              </div>
+
+              {/* Review Submission Form */}
+              {showReviewForm && (
+                <Card className="mb-6 bg-slate-50">
+                  <CardContent className="pt-6">
+                    <form onSubmit={handleSubmitReview} className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Your Name <span className="text-red-500">*</span>
+                        </label>
+                        <Input
+                          type="text"
+                          placeholder="John Doe"
+                          value={reviewData.name}
+                          onChange={(e) => setReviewData({ ...reviewData, name: e.target.value })}
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Rating <span className="text-red-500">*</span>
+                        </label>
+                        <div className="flex gap-2">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                              key={star}
+                              type="button"
+                              onClick={() => setReviewData({ ...reviewData, rating: star })}
+                              className="focus:outline-none"
+                            >
+                              <Star
+                                className={`h-8 w-8 ${
+                                  star <= reviewData.rating
+                                    ? 'fill-yellow-500 text-yellow-500'
+                                    : 'text-slate-300'
+                                }`}
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Your Review <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                          className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-600"
+                          rows={4}
+                          placeholder="Share your experience..."
+                          value={reviewData.comment}
+                          onChange={(e) => setReviewData({ ...reviewData, comment: e.target.value })}
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Upload Photo (Optional)
+                        </label>
+                        <div className="flex items-center gap-4">
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleReviewImageUpload}
+                            disabled={uploadingReviewImage}
+                            className="flex-1"
+                          />
+                          {uploadingReviewImage && (
+                            <span className="text-sm text-slate-500">Uploading...</span>
+                          )}
+                        </div>
+                        {reviewData.imageUrl && (
+                          <div className="mt-2">
+                            <img
+                              src={reviewData.imageUrl}
+                              alt="Review preview"
+                              className="h-24 w-24 object-cover rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <Button
+                        type="submit"
+                        disabled={submittingReview || uploadingReviewImage}
+                        className="w-full bg-yellow-700 hover:bg-yellow-800"
+                      >
+                        {submittingReview ? 'Submitting...' : 'Submit Review'}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Reviews List */}
+              <div className="space-y-4">
+                {reviews.length > 0 ? (
+                  reviews.filter(r => r.approved).map((review) => (
+                    <Card key={review.id} className="border-slate-200">
+                      <CardContent className="pt-6">
+                        <div className="flex gap-4">
+                          {review.imageUrl && (
+                            <img
+                              src={review.imageUrl}
+                              alt={`Review by ${review.name}`}
+                              className="h-20 w-20 object-cover rounded"
+                            />
+                          )}
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h3 className="font-semibold">{review.name}</h3>
+                              <div className="flex">
+                                {[...Array(review.rating || 5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className="h-4 w-4 fill-yellow-500 text-yellow-500"
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <p className="text-slate-600">{review.comment}</p>
+                            <p className="text-xs text-slate-400 mt-2">
+                              {new Date(review.createdAt).toLocaleDateString('en-IN', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  <p className="text-center text-slate-500 py-8">
+                    No reviews yet. Be the first to share your experience!
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}

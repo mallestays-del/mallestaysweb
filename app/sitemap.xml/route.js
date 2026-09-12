@@ -1,135 +1,101 @@
 import { getDatabase } from '@/lib/mongodb';
+import { seoConfig } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 
+const escapeXml = (str = '') =>
+  String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+
+const toDate = (v) => {
+  if (!v) return null;
+  const d = new Date(v);
+  return isNaN(d.getTime()) ? null : d.toISOString().split('T')[0];
+};
+
+const urlEntry = ({ loc, lastmod, changefreq, priority, images = [] }) => `
+  <url>
+    <loc>${escapeXml(loc)}</loc>${lastmod ? `
+    <lastmod>${lastmod}</lastmod>` : ''}
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>${images
+      .filter(Boolean)
+      .slice(0, 5)
+      .map(
+        (img) => `
+    <image:image>
+      <image:loc>${escapeXml(img.loc)}</image:loc>${img.title ? `
+      <image:title>${escapeXml(img.title)}</image:title>` : ''}${img.caption ? `
+      <image:caption>${escapeXml(img.caption)}</image:caption>` : ''}
+    </image:image>`
+      )
+      .join('')}
+  </url>`;
+
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://mallestaysweb.vercel.app';
-  
+  const baseUrl = seoConfig.siteUrl.replace(/\/$/, '');
+
   let villas = [];
-  let locations = [];
-  
+  let latestVillaUpdate = null;
+
   try {
     const db = await getDatabase();
-    villas = await db.collection('villas').find({}).toArray();
-    locations = await db.collection('locations').find({}).toArray();
+    villas = await db
+      .collection('villas')
+      .find({}, { projection: { slug: 1, name: 1, description: 1, images: 1, updatedAt: 1, createdAt: 1, location: 1 } })
+      .sort({ createdAt: -1 })
+      .toArray();
+    latestVillaUpdate = villas.reduce((acc, v) => {
+      const d = toDate(v.updatedAt || v.createdAt);
+      return !acc || (d && d > acc) ? d : acc;
+    }, null);
   } catch (error) {
-    console.error('Sitemap DB error (using static sitemap):', error.message);
+    console.error('Sitemap DB error:', error.message);
   }
-    
-    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+
+  const staticPages = [
+    { path: '', changefreq: 'daily', priority: '1.0', lastmod: latestVillaUpdate },
+    { path: '/villas', changefreq: 'daily', priority: '0.9', lastmod: latestVillaUpdate },
+    { path: '/gallery', changefreq: 'weekly', priority: '0.7' },
+    { path: '/about', changefreq: 'monthly', priority: '0.6' },
+    { path: '/contact', changefreq: 'monthly', priority: '0.6' },
+    { path: '/partner', changefreq: 'monthly', priority: '0.5' },
+    { path: '/privacy', changefreq: 'yearly', priority: '0.3' },
+    { path: '/terms', changefreq: 'yearly', priority: '0.3' },
+  ];
+
+  const entries = [
+    ...staticPages.map((p) => urlEntry({ loc: `${baseUrl}${p.path}`, ...p })),
+    ...villas
+      .filter((v) => v.slug)
+      .map((villa) =>
+        urlEntry({
+          loc: `${baseUrl}/villa/${villa.slug}`,
+          lastmod: toDate(villa.updatedAt || villa.createdAt),
+          changefreq: 'weekly',
+          priority: '0.8',
+          images: (villa.images || []).filter((img) => /^https?:\/\//i.test(img)).map((img, i) => ({
+            loc: img,
+            title: i === 0 ? `${villa.name} - Luxury Villa in ${villa.location}` : `${villa.name} - Photo ${i + 1}`,
+            caption: i === 0 ? villa.description?.substring(0, 160) : undefined,
+          })),
+        })
+      ),
+  ];
+
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
-        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-  
-  <!-- Home Page -->
-  <url>
-    <loc>${baseUrl}</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  
-  <!-- Static Pages -->
-  <url>
-    <loc>${baseUrl}/villas</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  
-  <url>
-    <loc>${baseUrl}/gallery</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>${baseUrl}/reviews</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>${baseUrl}/contact</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>${baseUrl}/partner</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <!-- Villa Pages -->
-  ${villas.map(villa => `
-  <url>
-    <loc>${baseUrl}/villa/${villa.slug}</loc>
-    <lastmod>${villa.updatedAt || villa.createdAt}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-    ${villa.images && villa.images.length > 0 ? `
-    <image:image>
-      <image:loc>${villa.images[0]}</image:loc>
-      <image:title>${villa.name}</image:title>
-      <image:caption>${villa.description?.substring(0, 100)}</image:caption>
-    </image:image>
-    ` : ''}
-  </url>
-  `).join('')}
-  
-  <!-- Location Pages -->
-  ${locations.map(location => `
-  <url>
-    <loc>${baseUrl}/villas?location=${encodeURIComponent(location.name)}</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  `).join('')}
-  
-  <!-- Category Pages -->
-  <url>
-    <loc>${baseUrl}/villas?category=Poolside%20Villa</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>${baseUrl}/villas?category=Beach%20Villa</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>${baseUrl}/villas?category=Mountain%20Villa</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>${baseUrl}/villas?category=Farmhouse%20Villa</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">${entries.join('')}
 </urlset>`;
 
-    return new Response(sitemap, {
-      headers: {
-        'Content-Type': 'application/xml',
-        'Cache-Control': 'public, max-age=3600, s-maxage=3600'
-      }
-    });
+  return new Response(sitemap, {
+    headers: {
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
+    },
+  });
 }

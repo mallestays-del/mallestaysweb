@@ -614,3 +614,12 @@ agent_communication:
 - Quick-links toolbar added on /admin (Locations, Offers, Pricing, Bookings, Guest Reviews, Settings, Full Dashboard); Locations card added on /admin/dashboard.
 - Homepage "Prestigious Locations" + search dropdowns, /villas location filter, and admin villa add/edit location field (datalist) now driven by /api/locations.
 - Known pre-existing issue (untouched): DELETE /api/admin/guest-reviews/:id returns 403 (session.user.role undefined).
+
+## Session: SEO Overhaul - Sitemap / Schema / Robots (Feb 2026)
+- robots.txt was returning HTTP 500 (conflict between public/robots.txt and app/robots.txt/route.js). Both removed; new app/robots.js (Next convention) -> 200, dynamic host, disallows /api, /admin, /checkout, /booking, /test-reviews, date-param URLs; Sitemap directive.
+- Sitemap rewritten (app/sitemap.xml/route.js): XML-escaped, real lastmod dates, image sitemap for villas (http-only, data URIs filtered), removed duplicate query-string URLs, added /about /privacy /terms, removed /reviews (client redirect).
+- Fixed critical canonical bug: root layout hard-coded <link rel=canonical> to homepage on EVERY page. Removed; per-page canonicals via layout.js metadata for /villas /about /contact /gallery /partner /privacy /terms; noindex for /checkout /booking /test-reviews /reviews.
+- Villa detail: app/villa/[slug]/page.js is now a server component with generateMetadata (dynamic title w/ price, description, canonical, OG images) + server-rendered JSON-LD (Product+Offer w/ aggregateRating from approved reviews, VacationRental, BreadcrumbList). Client UI moved to VillaDetailsClient.js (receives initialVilla). Added H1 header. Unknown slug -> 404.
+- lib/schema.js rewritten: Organization (@id, real address/phone/email), LodgingBusiness (geo, areaServed, aggregateRating), WebSite SearchAction, Product, VacationRental, FAQPage, ItemList. Homepage: removed duplicate Organization, added FAQPage (lib/faqs.js shared) + ItemList.
+- layout.js: viewport moved to export const viewport (Next 14), verification from env (NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION / NEXT_PUBLIC_BING_SITE_VERIFICATION), OG/Twitter image now real: /api/og (ImageResponse) replacing missing /og-image.jpg.
+- Verified via curl: robots 200, sitemap valid, villa <title>/<meta>/canonical/JSON-LD parse OK, /api/og 200 PNG, checkout noindex.
