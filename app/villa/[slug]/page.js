@@ -34,14 +34,14 @@ export default function VillaDetailsPage() {
   }, [isAutoPlaying, villa?.images]);
   
   const [bookingData, setBookingData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    guests: '',
+    guests: '2',
     checkIn: '',
     checkOut: ''
   });
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [pricingData, setPricingData] = useState(null);
+  const [pricingLoading, setPricingLoading] = useState(false);
+  const [unavailableDates, setUnavailableDates] = useState([]);
   
   // Review state
   const [reviews, setReviews] = useState([]);
@@ -76,6 +76,8 @@ export default function VillaDetailsPage() {
       const data = await response.json();
       if (response.ok) {
         setVilla(data.villa);
+        // Fetch availability
+        fetchAvailability(data.villa);
       } else {
         toast.error('Villa not found');
         router.push('/villas');
@@ -87,6 +89,39 @@ export default function VillaDetailsPage() {
       setLoading(false);
     }
   };
+
+  const fetchAvailability = async (villaData) => {
+    try {
+      const villaId = villaData?.slug || villaData?.id || params.slug;
+      const res = await fetch(`/api/v1/availability?villaId=${villaId}`);
+      const data = await res.json();
+      setUnavailableDates(data.allUnavailable || []);
+    } catch (err) {
+      console.error('Error fetching availability:', err);
+    }
+  };
+
+  const fetchPricing = async (checkIn, checkOut, guests) => {
+    if (!checkIn || !checkOut || !villa) return;
+    setPricingLoading(true);
+    try {
+      const villaId = villa?.slug || villa?.id;
+      const res = await fetch(`/api/v1/pricing?villaId=${villaId}&checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests || 2}`);
+      const data = await res.json();
+      setPricingData(data);
+    } catch (err) {
+      console.error('Pricing error:', err);
+    } finally {
+      setPricingLoading(false);
+    }
+  };
+
+  // Fetch pricing when dates change
+  useEffect(() => {
+    if (bookingData.checkIn && bookingData.checkOut && villa) {
+      fetchPricing(bookingData.checkIn, bookingData.checkOut, bookingData.guests);
+    }
+  }, [bookingData.checkIn, bookingData.checkOut, bookingData.guests, villa]);
 
   const fetchReviews = async () => {
     if (!villa?.id) return;
@@ -196,86 +231,12 @@ export default function VillaDetailsPage() {
 
   const handleBooking = async (e) => {
     e.preventDefault();
-    
-    // Validation
-    if (!bookingData.name || !bookingData.phone || !bookingData.email || !bookingData.guests || !bookingData.checkIn || !bookingData.checkOut) {
-      toast.error('Please fill all required fields');
+    if (!bookingData.checkIn || !bookingData.checkOut) {
+      toast.error('Please select check-in and check-out dates');
       return;
     }
-
-    if (bookingData.guests > (villa.maxGuests || 12)) {
-      toast.error(`Maximum ${villa.maxGuests || 12} guests allowed`);
-      return;
-    }
-
-    setBookingLoading(true);
-
-    try {
-      const checkIn = new Date(bookingData.checkIn);
-      const checkOut = new Date(bookingData.checkOut);
-      const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
-      
-      if (nights <= 0) {
-        toast.error('Check-out date must be after check-in date');
-        setBookingLoading(false);
-        return;
-      }
-
-      const totalPrice = nights * (villa.pricePerNight || 0);
-      
-      // Format the message for WhatsApp
-      const whatsappMessage = `*New Villa Booking Enquiry*
-
-🏠 *Property:* ${villa.name}
-📍 *Location:* ${villa.location}
-
-📅 *Check-in:* ${checkIn.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
-📅 *Check-out:* ${checkOut.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
-🌙 *Nights:* ${nights}
-👥 *Guests:* ${bookingData.guests}
-
-💰 *Estimated Price:* ₹${totalPrice.toLocaleString('en-IN')}
-
-👤 *Guest Details:*
-Name: ${bookingData.name}
-Phone: ${bookingData.phone}
-Email: ${bookingData.email}
-
----
-Sent via Malle Stays`;
-
-      // Encode the message for URL
-      const encodedMessage = encodeURIComponent(whatsappMessage);
-      
-      // Your WhatsApp number
-      const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '918446620191';
-      
-      // Construct WhatsApp URL
-      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-      
-      // Open WhatsApp in a new tab
-      window.open(whatsappUrl, '_blank');
-      
-      // Show success message
-      toast.success('Redirecting to WhatsApp... Please send the enquiry from there.');
-      
-      // Reset form after a short delay
-      setTimeout(() => {
-        setBookingData({
-          name: '',
-          phone: '',
-          email: '',
-          guests: '',
-          checkIn: '',
-          checkOut: ''
-        });
-      }, 1000);
-      
-    } catch (error) {
-      toast.error('Failed to process booking. Please try again.');
-    } finally {
-      setBookingLoading(false);
-    }
+    const villaSlug = villa?.slug || params.slug;
+    router.push(`/checkout?villa=${villaSlug}&checkIn=${bookingData.checkIn}&checkOut=${bookingData.checkOut}&guests=${bookingData.guests || 2}`);
   };
 
   // Amenity icons mapping
@@ -578,75 +539,14 @@ Sent via Malle Stays`;
             <div className="sticky top-24">
               <Card className="shadow-lg">
                 <CardContent className="pt-6">
-                  <h2 className="text-2xl font-bold mb-6 text-center border-b-2 border-yellow-600 pb-2">Book Your Stay</h2>
+                  <h2 className="text-2xl font-bold mb-2 text-center">Book Your Stay</h2>
+                  <p className="text-center text-slate-500 text-sm mb-6">₹{villa.pricePerNight?.toLocaleString('en-IN')} / night</p>
                   
                   <form onSubmit={handleBooking} className="space-y-4">
-                    {/* Full Name */}
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Full Name <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="text"
-                        placeholder="John Doe"
-                        value={bookingData.name}
-                        onChange={(e) => setBookingData({ ...bookingData, name: e.target.value })}
-                        required
-                        className="w-full"
-                      />
-                    </div>
-
-                    {/* Mobile Number */}
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Mobile Number <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="tel"
-                        placeholder="+91-9876543210"
-                        value={bookingData.phone}
-                        onChange={(e) => setBookingData({ ...bookingData, phone: e.target.value })}
-                        required
-                        className="w-full"
-                      />
-                    </div>
-
-                    {/* Email Address */}
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Email Address <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="email"
-                        placeholder="email@example.com"
-                        value={bookingData.email}
-                        onChange={(e) => setBookingData({ ...bookingData, email: e.target.value })}
-                        required
-                        className="w-full"
-                      />
-                    </div>
-
-                    {/* Number of Guests */}
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Number of Guests (Max {villa.maxGuests || 12}) <span className="text-red-500">*</span>
-                      </label>
-                      <Input
-                        type="number"
-                        placeholder="2"
-                        min="1"
-                        max={villa.maxGuests || 12}
-                        value={bookingData.guests}
-                        onChange={(e) => setBookingData({ ...bookingData, guests: e.target.value })}
-                        required
-                        className="w-full"
-                      />
-                    </div>
-
                     {/* Check-in Date */}
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Check-in Date <span className="text-red-500">*</span>
+                        Check-in <span className="text-red-500">*</span>
                       </label>
                       <Input
                         type="date"
@@ -661,7 +561,7 @@ Sent via Malle Stays`;
                     {/* Check-out Date */}
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Check-out Date <span className="text-red-500">*</span>
+                        Check-out <span className="text-red-500">*</span>
                       </label>
                       <Input
                         type="date"
@@ -673,39 +573,71 @@ Sent via Malle Stays`;
                       />
                     </div>
 
-                    {/* Price Display */}
-                    {bookingData.checkIn && bookingData.checkOut && (
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                        <div className="flex justify-between items-center">
-                          <span className="text-slate-700">Price per night:</span>
-                          <span className="font-semibold">₹{villa.pricePerNight?.toLocaleString('en-IN')}</span>
+                    {/* Number of Guests */}
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Guests
+                      </label>
+                      <Input
+                        type="number"
+                        placeholder="2"
+                        min="1"
+                        max={villa.maxGuests || 20}
+                        value={bookingData.guests}
+                        onChange={(e) => setBookingData({ ...bookingData, guests: e.target.value })}
+                        className="w-full"
+                      />
+                    </div>
+
+                    {/* Dynamic Pricing Display */}
+                    {pricingLoading && (
+                      <div className="text-center py-3">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-600 mx-auto"></div>
+                        <p className="text-xs text-slate-400 mt-1">Calculating price...</p>
+                      </div>
+                    )}
+
+                    {pricingData && !pricingLoading && bookingData.checkIn && bookingData.checkOut && (
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>{pricingData.nightCount} night{pricingData.nightCount > 1 ? 's' : ''}</span>
+                          <span>₹{pricingData.breakdown?.baseTotal?.toLocaleString('en-IN')}</span>
                         </div>
-                        <div className="flex justify-between items-center mt-2">
-                          <span className="text-slate-700">Total nights:</span>
-                          <span className="font-semibold">
-                            {Math.ceil((new Date(bookingData.checkOut) - new Date(bookingData.checkIn)) / (1000 * 60 * 60 * 24))}
-                          </span>
+                        {pricingData.breakdown?.extraGuestTotal > 0 && (
+                          <div className="flex justify-between text-sm text-slate-500">
+                            <span>Extra guests ({pricingData.breakdown.extraGuests})</span>
+                            <span>₹{pricingData.breakdown.extraGuestTotal?.toLocaleString('en-IN')}</span>
+                          </div>
+                        )}
+                        {pricingData.breakdown?.cleaningFee > 0 && (
+                          <div className="flex justify-between text-sm text-slate-500">
+                            <span>Cleaning fee</span>
+                            <span>₹{pricingData.breakdown.cleaningFee?.toLocaleString('en-IN')}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between text-sm text-slate-500">
+                          <span>GST ({pricingData.breakdown?.gstPercent}%)</span>
+                          <span>₹{pricingData.breakdown?.gstAmount?.toLocaleString('en-IN')}</span>
                         </div>
-                        <div className="border-t border-yellow-300 mt-2 pt-2 flex justify-between items-center">
-                          <span className="font-bold text-lg">Estimated Total:</span>
-                          <span className="font-bold text-lg text-yellow-700">
-                            ₹{(Math.ceil((new Date(bookingData.checkOut) - new Date(bookingData.checkIn)) / (1000 * 60 * 60 * 24)) * villa.pricePerNight).toLocaleString('en-IN')}
-                          </span>
+                        <div className="border-t border-yellow-300 pt-2 flex justify-between font-bold text-lg">
+                          <span>Total</span>
+                          <span className="text-yellow-700">₹{pricingData.breakdown?.totalAmount?.toLocaleString('en-IN')}</span>
                         </div>
+                        <p className="text-xs text-yellow-600 text-center">Book now with just 20% advance!</p>
                       </div>
                     )}
 
                     {/* Submit Button */}
                     <Button
                       type="submit"
-                      disabled={bookingLoading}
-                      className="w-full bg-yellow-700 hover:bg-yellow-800 text-white font-bold py-3 text-lg"
+                      disabled={bookingLoading || !bookingData.checkIn || !bookingData.checkOut}
+                      className="w-full bg-yellow-700 hover:bg-yellow-800 text-white font-bold py-3 text-lg h-14"
                     >
-                      {bookingLoading ? 'Processing...' : 'SEND ENQUIRY'}
+                      {bookingLoading ? 'Processing...' : 'BOOK NOW'}
                     </Button>
 
                     <p className="text-xs text-center text-slate-500 mt-2">
-                      Your enquiry will be sent via WhatsApp
+                      Secure checkout via Razorpay • Pay 20% advance or full amount
                     </p>
                   </form>
                 </CardContent>
