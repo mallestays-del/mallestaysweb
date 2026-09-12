@@ -475,6 +475,82 @@ backend:
         agent: "testing"
         comment: "✅ PASS - Public GET endpoint working correctly, returns reviews for public display"
 
+
+  - task: "Locations API - GET public endpoint"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "GET /api/locations endpoint implemented with auto-seeding of 7 default locations, sorted by order, returns only active locations (isActive != false)"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - GET /api/locations working perfectly: Returns 7 seeded locations (Lonavala, Alibaug, Karjat, Igatpuri, Neral, Khopoli, Badlapur), proper structure with all required fields (id, name, image, order, isActive, createdAt), sorted by order ascending, only active locations returned. GET ?all=true includes inactive locations."
+
+  - task: "Locations API - POST create location"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "POST /api/admin/locations endpoint implemented with authentication, name validation, duplicate checking (case-insensitive), auto-incrementing order"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - POST /api/admin/locations working perfectly: Requires authentication (401 without session), validates required name field (400 if missing), checks for duplicate names case-insensitively (409 Conflict), creates location with proper structure, auto-assigns next order number, returns created location with ID."
+
+  - task: "Locations API - PUT update location"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "PUT /api/admin/locations/:id endpoint implemented with authentication, supports updating name, image, order (number), isActive (boolean), duplicate name checking"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - PUT /api/admin/locations/:id working perfectly: Updates name with duplicate checking (409 if duplicate), updates order field, updates isActive flag, returns 404 for non-existent location IDs, returns updated location object. isActive=false correctly hides location from public GET but shows in ?all=true."
+
+  - task: "Locations API - DELETE location"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "DELETE /api/admin/locations/:id endpoint implemented with authentication (super_admin or sub_admin only), returns 404 for non-existent IDs"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - DELETE /api/admin/locations/:id working perfectly: Requires authentication (401 without session), requires admin role (super_admin or sub_admin), deletes location successfully, returns 404 for non-existent IDs, deletion verified in database."
+
+  - task: "Villas API - originalPrice field"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "GET /api/villas endpoint includes originalPrice field in projection for OTA-style pricing display"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - GET /api/villas originalPrice field working correctly: Field included in response, rudra-villa has correct values (originalPrice=24000, pricePerNight=20000), 3/4 villas have originalPrice set."
+
 frontend:
   - task: "Frontend Integration Testing"
     implemented: false
@@ -490,15 +566,17 @@ frontend:
 
 metadata:
   created_by: "testing_agent"
-  version: "1.0"
-  test_sequence: 1
+  version: "1.2"
+  test_sequence: 3
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Villa Update API - Authentication"
-    - "Villa Update API - PUT endpoint"
-    - "Villa Update API - Error handling"
+    - "Locations API - GET public endpoint"
+    - "Locations API - POST create location"
+    - "Locations API - PUT update location"
+    - "Locations API - DELETE location"
+    - "Villas API - originalPrice field"
   stuck_tasks:
     - "Guest Reviews API - DELETE review"
   test_all: false
@@ -511,6 +589,9 @@ agent_communication:
     message: "✅ TESTING COMPLETE - Cloudinary upload integration working excellently. All upload validations work correctly, files upload to Cloudinary successfully with proper URLs. Guest reviews CRUD mostly working - only DELETE endpoint has session role issue (403 error). Made minor fix to handle undefined role gracefully. Core functionality is solid."
   - agent: "testing"
     message: "🔄 VILLA UPDATE TESTING COMPLETE - All villa update functionality working perfectly! Authentication fixed: NextAuth session properly established, checkAuth function returns correct user object with role. PUT endpoint working flawlessly: updates all villa fields correctly (name, description, numeric fields like bathrooms/parking), proper data type parsing, database persistence verified. Error handling working: 404 for non-existent villas. The checkAuth fix resolved the authentication issues completely."
+  - agent: "testing"
+    message: "🎯 LOCATIONS CRUD API TESTING COMPLETE - All endpoints working perfectly! GET /api/locations returns 7 seeded locations sorted by order, GET ?all=true includes inactive locations, POST creates with auth/validation/duplicate checking (409), PUT updates name/order/isActive with duplicate checking, DELETE requires auth and returns proper 404. isActive=false correctly hides from public GET but shows in ?all=true. Villa originalPrice field confirmed working (rudra-villa: originalPrice=24000, pricePerNight=20000). All 27 test cases passed. Test data cleaned up successfully."
+
 ## Session: Premium OTA-style Price Display (Feb 2026)
 - Created shared `/app/components/PriceDisplay.js` (bold current price, inline strikethrough original, "per night" below).
 - Applied to: homepage carousel + property grid (`app/page.js`), listings (`app/villas/page.js`), villa detail booking card (`app/villa/[slug]/page.js`).
@@ -518,3 +599,18 @@ agent_communication:
 - Added `originalPrice` field support: API projection/create/update in `app/api/[[...path]]/route.js`; admin add/edit villa forms have new "Original Price" input.
 - Seeded originalPrice on azure-villa/rudra-villa/serenity-villa for demo.
 - Verified via screenshots on /, /villas, /villa/rudra-villa. Backend/frontend testing agents not run (small UI change).
+
+## Session: Locations CRUD API Testing (Current)
+- Tested complete Locations CRUD API implementation
+- All endpoints working: GET /api/locations (public), GET ?all=true, POST /api/admin/locations, PUT /api/admin/locations/:id, DELETE /api/admin/locations/:id
+- Authentication, validation, duplicate checking, error handling all working correctly
+- isActive flag properly controls visibility (hidden from public, visible in ?all=true)
+- Villa originalPrice field confirmed working in GET /api/villas
+- 27/27 test cases passed, test data cleaned up
+
+## Session: Admin Locations Manager (Feb 2026)
+- New API: GET /api/locations (public, ?all=true for hidden), POST /api/admin/locations, PUT/DELETE /api/admin/locations/:id in app/api/[[...path]]/route.js. Backend tested: 27/27 passed.
+- New admin page /app/app/admin/locations/page.js: add (Cloudinary upload or URL), edit, delete, reorder (up/down), show/hide.
+- Quick-links toolbar added on /admin (Locations, Offers, Pricing, Bookings, Guest Reviews, Settings, Full Dashboard); Locations card added on /admin/dashboard.
+- Homepage "Prestigious Locations" + search dropdowns, /villas location filter, and admin villa add/edit location field (datalist) now driven by /api/locations.
+- Known pre-existing issue (untouched): DELETE /api/admin/guest-reviews/:id returns 403 (session.user.role undefined).

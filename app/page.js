@@ -110,15 +110,14 @@ export default function HomePage() {
     return colors[color] || colors.blue;
   };
 
-  const popularLocations = [
-    { name: 'Lonavala', image: 'https://images.unsplash.com/photo-1613977257365-aaae5a9817ff?w=400' },
-    { name: 'Alibaug', image: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400' },
-    { name: 'Karjat', image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=400' },
-    { name: 'Igatpuri', image: 'https://images.unsplash.com/photo-1664876080601-acf03b40c5e3?w=400' },
-    { name: 'Neral', image: 'https://images.unsplash.com/photo-1613977257592-4871e5fcd7c4?w=400' },
-    { name: 'Khopoli', image: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400' },
-    { name: 'Badlapur', image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=400' },
-  ];
+  const [popularLocations, setPopularLocations] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/locations')
+      .then((r) => r.json())
+      .then((d) => setPopularLocations(d.locations || []))
+      .catch((e) => console.error('Error fetching locations:', e));
+  }, []);
 
   const amenitiesHighlight = [
     { icon: Waves, title: 'Private Pools', description: 'Exclusive infinity pools with stunning views' },
@@ -493,11 +492,11 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
             {popularLocations.map((location) => (
-              <Link href={`/villas?location=${location.name}`} key={location.name}>
-                <Card className="overflow-hidden elegant-shadow-hover border-0 group cursor-pointer" data-testid={`location-card-${location.name.toLowerCase()}`}>
+              <Link href={`/villas?location=${encodeURIComponent(location.name)}`} key={location.id || location.name}>
+                <Card className="overflow-hidden elegant-shadow-hover border-0 group cursor-pointer" data-testid={`location-card-${location.name.toLowerCase().replace(/\s+/g, '-')}`}>
                   <div className="relative h-48">
                     <img 
-                      src={location.image} 
+                      src={location.image || 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400'} 
                       alt={location.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />

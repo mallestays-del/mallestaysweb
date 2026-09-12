@@ -35,6 +35,30 @@ export async function GET(request) {
   const db = await getDatabase();
 
   try {
+    // Public: Get all locations (auto-seed defaults on first run)
+    if (pathname === '/api/locations') {
+      const count = await db.collection('locations').countDocuments();
+      if (count === 0) {
+        const defaults = [
+          { name: 'Lonavala', image: 'https://images.unsplash.com/photo-1613977257365-aaae5a9817ff?w=400' },
+          { name: 'Alibaug', image: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400' },
+          { name: 'Karjat', image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=400' },
+          { name: 'Igatpuri', image: 'https://images.unsplash.com/photo-1664876080601-acf03b40c5e3?w=400' },
+          { name: 'Neral', image: 'https://images.unsplash.com/photo-1613977257592-4871e5fcd7c4?w=400' },
+          { name: 'Khopoli', image: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400' },
+          { name: 'Badlapur', image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=400' },
+        ].map((l, i) => ({ id: uuidv4(), ...l, order: i, isActive: true, createdAt: new Date().toISOString() }));
+        await db.collection('locations').insertMany(defaults);
+      }
+      const includeInactive = searchParams.get('all') === 'true';
+      const query = includeInactive ? {} : { isActive: { $ne: false } };
+      const locations = await db.collection('locations')
+        .find(query, { projection: { _id: 0 } })
+        .sort({ order: 1, createdAt: 1 })
+        .toArray();
+      return NextResponse.json({ locations });
+    }
+
     // Get all villas
     if (pathname === '/api/villas') {
       const location = searchParams.get('location');
@@ -364,21 +388,32 @@ export async function POST(request) {
       const authResult = await checkAuth(request);
       if (authResult.error) return authResult.response;
 
-      const { name, image } = body;
+      const { name, image, order, isActive } = body;
 
-      if (!name) {
+      if (!name || !name.trim()) {
         return NextResponse.json({ error: 'Name is required' }, { status: 400 });
       }
 
+      const existing = await db.collection('locations').findOne({ name: { $regex: `^${name.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } });
+      if (existing) {
+        return NextResponse.json({ error: 'A location with this name already exists' }, { status: 409 });
+      }
+
+      const maxOrderDoc = await db.collection('locations').find().sort({ order: -1 }).limit(1).toArray();
+      const nextOrder = maxOrderDoc.length ? (maxOrderDoc[0].order ?? 0) + 1 : 0;
+
       const location = {
         id: uuidv4(),
-        name,
+        name: name.trim(),
         image: image || '',
+        order: typeof order === 'number' ? order : nextOrder,
+        isActive: isActive !== false,
         createdAt: new Date().toISOString()
       };
 
       await db.collection('locations').insertOne(location);
-      return NextResponse.json({ location, message: 'Location added successfully' });
+      const { _id, ...clean } = location;
+      return NextResponse.json({ location: clean, message: 'Location added successfully' });
     }
 
     // Chat with AI (mocked for now)
@@ -655,6 +690,29 @@ export async function PUT(request) {
       return NextResponse.json({ message: 'Villa updated successfully' });
     }
 
+    // Update location
+    if (pathname.startsWith('/api/admin/locations/')) {
+      const id = pathname.split('/api/admin/locations/')[1];
+      const { name, image, order, isActive } = body;
+      const updateData = { updatedAt: new Date().toISOString() };
+      if (name !== undefined) {
+        if (!name.trim()) return NextResponse.json({ error: 'Name cannot be empty' }, { status: 400 });
+        const dup = await db.collection('locations').findOne({ id: { $ne: id }, name: { $regex: `^${name.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } });
+        if (dup) return NextResponse.json({ error: 'A location with this name already exists' }, { status: 409 });
+        updateData.name = name.trim();
+      }
+      if (image !== undefined) updateData.image = image;
+      if (typeof order === 'number') updateData.order = order;
+      if (typeof isActive === 'boolean') updateData.isActive = isActive;
+
+      const result = await db.collection('locations').updateOne({ id }, { $set: updateData });
+      if (result.matchedCount === 0) {
+        return NextResponse.json({ error: 'Location not found' }, { status: 404 });
+      }
+      const location = await db.collection('locations').findOne({ id }, { projection: { _id: 0 } });
+      return NextResponse.json({ location, message: 'Location updated successfully' });
+    }
+
     // Update guest review
     if (pathname.startsWith('/api/admin/guest-reviews/')) {
       const id = pathname.split('/api/admin/guest-reviews/')[1];
@@ -731,6 +789,16 @@ export async function DELETE(request) {
     const userRole = authResult.user?.role;
     if (userRole !== 'sub_admin' && userRole !== 'super_admin') {
       return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
+    }
+
+    // Delete location
+    if (pathname.startsWith('/api/admin/locations/')) {
+      const id = pathname.split('/api/admin/locations/')[1];
+      const result = await db.collection('locations').deleteOne({ id });
+      if (result.deletedCount === 0) {
+        return NextResponse.json({ error: 'Location not found' }, { status: 404 });
+      }
+      return NextResponse.json({ message: 'Location deleted successfully' });
     }
 
     // Delete villa

@@ -181,6 +181,33 @@ export default function AdminDashboard() {
       </header>
 
       <div className="container mx-auto px-4 py-8">
+        {/* Quick Links to admin tools */}
+        <div className="flex flex-wrap gap-2 mb-6" data-testid="admin-quick-links">
+          <Link href="/admin/locations">
+            <Button variant="outline" className="border-teal-300 text-teal-800 hover:bg-teal-50" data-testid="quick-link-locations">
+              <MapPin className="h-4 w-4 mr-2" /> Locations
+            </Button>
+          </Link>
+          <Link href="/admin/offers">
+            <Button variant="outline" data-testid="quick-link-offers"><Star className="h-4 w-4 mr-2" /> Offers</Button>
+          </Link>
+          <Link href="/admin/pricing">
+            <Button variant="outline" data-testid="quick-link-pricing"><Calendar className="h-4 w-4 mr-2" /> Pricing</Button>
+          </Link>
+          <Link href="/admin/bookings">
+            <Button variant="outline" data-testid="quick-link-bookings"><Users className="h-4 w-4 mr-2" /> Bookings Calendar</Button>
+          </Link>
+          <Link href="/admin/guest-reviews">
+            <Button variant="outline" data-testid="quick-link-guest-reviews"><Star className="h-4 w-4 mr-2" /> Guest Reviews</Button>
+          </Link>
+          <Link href="/admin/settings">
+            <Button variant="outline" data-testid="quick-link-settings"><Settings className="h-4 w-4 mr-2" /> Settings</Button>
+          </Link>
+          <Link href="/admin/dashboard">
+            <Button variant="outline" data-testid="quick-link-dashboard"><LayoutDashboard className="h-4 w-4 mr-2" /> Full Dashboard</Button>
+          </Link>
+        </div>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8" data-testid="stats-cards">
           <Card>

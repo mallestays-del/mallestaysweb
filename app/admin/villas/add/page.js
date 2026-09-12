@@ -18,6 +18,14 @@ export default function AddVilla() {
   const [imageUrls, setImageUrls] = useState(['']);
   const [amenities, setAmenities] = useState(['']);
   
+  const [locationOptions, setLocationOptions] = useState([]);
+  useEffect(() => {
+    fetch('/api/locations')
+      .then((r) => r.json())
+      .then((d) => setLocationOptions((d.locations || []).map((l) => l.name)))
+      .catch(() => {});
+  }, []);
+
   const [formData, setFormData] = useState({
     name: '',
     location: '',
@@ -176,11 +184,15 @@ export default function AddVilla() {
                 <div>
                   <label className="text-sm font-medium mb-2 block">Location *</label>
                   <Input
+                    list="location-options"
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                     placeholder="e.g., Lonavala, Alibaug, Karjat"
                     required
                   />
+                  <datalist id="location-options">
+                    {locationOptions.map((loc) => <option key={loc} value={loc} />)}
+                  </datalist>
                   <p className="text-xs text-slate-500 mt-1">Enter the city or area name</p>
                 </div>
 

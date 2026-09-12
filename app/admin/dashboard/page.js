@@ -229,6 +229,25 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
+          {/* Locations Manager Card */}
+          <Card className="border-2 border-teal-300 bg-teal-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/admin/locations')} data-testid="locations-manager-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3 text-teal-900 text-lg">
+                <MapPin className="h-6 w-6 text-teal-600" />
+                Locations Manager
+              </CardTitle>
+              <CardDescription className="text-teal-800">
+                Add, edit or remove homepage destinations
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button className="w-full bg-teal-600 hover:bg-teal-700">
+                <MapPin className="h-4 w-4 mr-2" />
+                Manage Locations
+              </Button>
+            </CardContent>
+          </Card>
+
           {/* Add New Villa Card */}
           <Card className="border-2 border-purple-200 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/admin/villas/add')}>
             <CardHeader>

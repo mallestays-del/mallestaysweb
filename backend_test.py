@@ -1,642 +1,558 @@
 #!/usr/bin/env python3
 """
-Backend API Testing Script for Villa Creation and Update Functionality
-Tests the POST /api/admin/villas and PUT /api/admin/villas/{id} endpoints with authentication
+Backend API Testing for Malle Stays - Locations CRUD API
+Tests all location endpoints and villa originalPrice field
 """
 
 import requests
 import json
 import sys
-from datetime import datetime
+from typing import Dict, Any, Optional
 
 # Configuration
 BASE_URL = "https://stays-checkout-flow.preview.emergentagent.com"
-API_BASE = f"{BASE_URL}/api"
-
-# Test credentials
 ADMIN_EMAIL = "admin@mallestays.com"
 ADMIN_PASSWORD = "admin123"
 
-class VillaUpdateTester:
-    def __init__(self):
-        self.session = requests.Session()
-        self.session.headers.update({
-            'Content-Type': 'application/json',
-            'User-Agent': 'Backend-Test-Script/1.0'
-        })
-        
-    def log(self, message, level="INFO"):
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        print(f"[{timestamp}] {level}: {message}")
-        
-    def login(self):
-        """Login to get session authentication"""
-        try:
-            self.log("🔐 Attempting admin login...")
-            
-            # First get the CSRF token
-            csrf_response = self.session.get(f"{BASE_URL}/api/auth/csrf")
-            if csrf_response.status_code == 200:
-                csrf_token = csrf_response.json().get('csrfToken')
-                self.log(f"Got CSRF token: {csrf_token[:20]}...")
-            else:
-                self.log("Failed to get CSRF token, proceeding without it")
-                csrf_token = None
-            
-            # Prepare login data
-            login_data = {
-                "email": ADMIN_EMAIL,
-                "password": ADMIN_PASSWORD,
-                "redirect": "false",
-                "json": "true"
-            }
-            
-            if csrf_token:
-                login_data["csrfToken"] = csrf_token
-            
-            # Try NextAuth signin endpoint with form data
-            auth_response = self.session.post(
-                f"{BASE_URL}/api/auth/callback/credentials",
-                data=login_data,
-                headers={'Content-Type': 'application/x-www-form-urlencoded'}
-            )
-            
-            self.log(f"Auth response status: {auth_response.status_code}")
-            self.log(f"Auth response text: {auth_response.text[:200]}...")
-            
-            # Check if we have session cookies
-            cookies = self.session.cookies.get_dict()
-            self.log(f"Session cookies: {list(cookies.keys())}")
-            
-            # Check for NextAuth session token
-            has_session = any('next-auth.session-token' in cookie for cookie in cookies.keys())
-            
-            if has_session or auth_response.status_code == 200:
-                self.log("✅ Login successful - session established")
-                return True
-            else:
-                self.log("❌ Login failed - no session token found")
-                return False
-                
-        except Exception as e:
-            self.log(f"❌ Login error: {str(e)}", "ERROR")
-            return False
-    
-    def test_auth_check(self):
-        """Test authentication by calling a protected endpoint"""
-        try:
-            self.log("🔍 Testing authentication with admin stats endpoint...")
-            
-            response = self.session.get(f"{API_BASE}/admin/stats")
-            self.log(f"Auth test response status: {response.status_code}")
-            
-            if response.status_code == 200:
-                data = response.json()
-                self.log(f"✅ Authentication working - got stats: {data}")
-                return True
-            elif response.status_code == 401:
-                self.log("❌ Authentication failed - 401 Unauthorized")
-                return False
-            else:
-                self.log(f"❌ Unexpected auth response: {response.status_code} - {response.text}")
-                return False
-                
-        except Exception as e:
-            self.log(f"❌ Auth test error: {str(e)}", "ERROR")
-            return False
-    
-    def get_villa_for_testing(self):
-        """Get a villa to test updates on"""
-        try:
-            self.log("🏠 Getting villa for testing...")
-            
-            # First try to get all villas (public endpoint)
-            response = self.session.get(f"{API_BASE}/villas")
-            
-            if response.status_code == 200:
-                data = response.json()
-                villas = data.get('villas', [])
-                
-                if villas:
-                    villa = villas[0]  # Get first villa
-                    villa_id = villa.get('id')
-                    self.log(f"✅ Found villa for testing: {villa.get('name')} (ID: {villa_id})")
-                    
-                    # Now get full villa details using admin endpoint
-                    admin_response = self.session.get(f"{API_BASE}/admin/villas/{villa_id}")
-                    
-                    if admin_response.status_code == 200:
-                        full_villa = admin_response.json().get('villa')
-                        self.log(f"✅ Got full villa details for testing")
-                        return full_villa
-                    else:
-                        self.log(f"❌ Failed to get full villa details: {admin_response.status_code}")
-                        return None
-                else:
-                    self.log("❌ No villas found in database")
-                    return None
-            else:
-                self.log(f"❌ Failed to get villas: {response.status_code}")
-                return None
-                
-        except Exception as e:
-            self.log(f"❌ Error getting villa: {str(e)}", "ERROR")
-            return None
-    
-    def test_villa_update(self, villa):
-        """Test villa update functionality"""
-        try:
-            villa_id = villa.get('id')
-            original_name = villa.get('name')
-            original_description = villa.get('description')
-            original_bathrooms = villa.get('bathrooms', 1)
-            original_parking = villa.get('parking', 1)
-            
-            self.log(f"🔄 Testing villa update for: {original_name}")
-            self.log(f"Original bathrooms: {original_bathrooms}, parking: {original_parking}")
-            
-            # Prepare update data with modified values
-            update_data = {
-                "name": f"{original_name} - Updated Test",
-                "location": villa.get('location'),
-                "description": f"{original_description} - Updated for testing",
-                "category": villa.get('category'),
-                "pricePerNight": villa.get('pricePerNight', 10000),
-                "bedrooms": villa.get('bedrooms', 2),
-                "bathrooms": original_bathrooms + 1,  # Increment bathrooms
-                "maxGuests": villa.get('maxGuests', 4),
-                "parking": original_parking + 1,  # Increment parking
-                "amenities": villa.get('amenities', []),
-                "images": villa.get('images', []),
-                "mapLocation": villa.get('mapLocation', ''),
-                "seoTitle": f"{original_name} - Updated Test",
-                "seoDescription": "Updated SEO description for testing",
-                "seoKeywords": "updated, test, villa"
-            }
-            
-            self.log(f"Update data - bathrooms: {update_data['bathrooms']}, parking: {update_data['parking']}")
-            
-            # Make PUT request
-            response = self.session.put(
-                f"{API_BASE}/admin/villas/{villa_id}",
-                json=update_data
-            )
-            
-            self.log(f"PUT response status: {response.status_code}")
-            self.log(f"PUT response body: {response.text}")
-            
-            if response.status_code == 200:
-                response_data = response.json()
-                self.log(f"✅ Villa update successful: {response_data.get('message')}")
-                
-                # Verify the update by fetching the villa again
-                verify_response = self.session.get(f"{API_BASE}/admin/villas/{villa_id}")
-                
-                if verify_response.status_code == 200:
-                    updated_villa = verify_response.json().get('villa')
-                    
-                    # Check if updates were saved correctly
-                    checks = [
-                        ("name", update_data['name'], updated_villa.get('name')),
-                        ("description", update_data['description'], updated_villa.get('description')),
-                        ("bathrooms", update_data['bathrooms'], updated_villa.get('bathrooms')),
-                        ("parking", update_data['parking'], updated_villa.get('parking')),
-                        ("seoTitle", update_data['seoTitle'], updated_villa.get('seoTitle')),
-                    ]
-                    
-                    all_correct = True
-                    for field, expected, actual in checks:
-                        if expected == actual:
-                            self.log(f"✅ {field}: {actual} (correct)")
-                        else:
-                            self.log(f"❌ {field}: expected {expected}, got {actual}")
-                            all_correct = False
-                    
-                    if all_correct:
-                        self.log("✅ All villa fields updated correctly!")
-                        
-                        # Restore original values
-                        restore_data = {
-                            "name": original_name,
-                            "location": villa.get('location'),
-                            "description": original_description,
-                            "category": villa.get('category'),
-                            "pricePerNight": villa.get('pricePerNight'),
-                            "bedrooms": villa.get('bedrooms'),
-                            "bathrooms": original_bathrooms,
-                            "maxGuests": villa.get('maxGuests'),
-                            "parking": original_parking,
-                            "amenities": villa.get('amenities', []),
-                            "images": villa.get('images', []),
-                            "mapLocation": villa.get('mapLocation', ''),
-                            "seoTitle": villa.get('seoTitle', original_name),
-                            "seoDescription": villa.get('seoDescription', ''),
-                            "seoKeywords": villa.get('seoKeywords', '')
-                        }
-                        
-                        restore_response = self.session.put(
-                            f"{API_BASE}/admin/villas/{villa_id}",
-                            json=restore_data
-                        )
-                        
-                        if restore_response.status_code == 200:
-                            self.log("✅ Villa data restored to original values")
-                        else:
-                            self.log(f"⚠️ Failed to restore original data: {restore_response.status_code}")
-                        
-                        return True
-                    else:
-                        self.log("❌ Some villa fields were not updated correctly")
-                        return False
-                else:
-                    self.log(f"❌ Failed to verify update: {verify_response.status_code}")
-                    return False
-            else:
-                self.log(f"❌ Villa update failed: {response.status_code} - {response.text}")
-                return False
-                
-        except Exception as e:
-            self.log(f"❌ Villa update test error: {str(e)}", "ERROR")
-            return False
-    
-    def test_update_nonexistent_villa(self):
-        """Test updating a non-existent villa"""
-        try:
-            self.log("🔍 Testing update of non-existent villa...")
-            
-            fake_id = "non-existent-villa-id"
-            update_data = {
-                "name": "Test Villa",
-                "location": "Test Location",
-                "description": "Test Description",
-                "category": "luxury",
-                "pricePerNight": 10000,
-                "bedrooms": 2,
-                "bathrooms": 2,
-                "maxGuests": 4,
-                "parking": 1,
-                "amenities": [],
-                "images": []
-            }
-            
-            response = self.session.put(
-                f"{API_BASE}/admin/villas/{fake_id}",
-                json=update_data
-            )
-            
-            self.log(f"Non-existent villa update status: {response.status_code}")
-            
-            if response.status_code == 404:
-                self.log("✅ Correctly returned 404 for non-existent villa")
-                return True
-            else:
-                self.log(f"❌ Expected 404, got {response.status_code}")
-                return False
-                
-        except Exception as e:
-            self.log(f"❌ Non-existent villa test error: {str(e)}", "ERROR")
-            return False
-    
-    def run_all_tests(self):
-        """Run all villa update tests"""
-        self.log("🚀 Starting Villa Update API Tests")
-        self.log("=" * 50)
-        
-        results = {
-            'login': False,
-            'auth_check': False,
-            'villa_update': False,
-            'nonexistent_villa': False
-        }
-        
-        # Test 1: Login
-        results['login'] = self.login()
-        if not results['login']:
-            self.log("❌ Cannot proceed without login")
-            return results
-        
-        # Test 2: Authentication check
-        results['auth_check'] = self.test_auth_check()
-        if not results['auth_check']:
-            self.log("❌ Cannot proceed without authentication")
-            return results
-        
-        # Test 3: Get villa and test update
-        villa = self.get_villa_for_testing()
-        if villa:
-            results['villa_update'] = self.test_villa_update(villa)
-        else:
-            self.log("❌ Cannot test villa update without a villa")
-        
-        # Test 4: Test non-existent villa
-        results['nonexistent_villa'] = self.test_update_nonexistent_villa()
-        
-        # Summary
-        self.log("=" * 50)
-        self.log("📊 TEST RESULTS SUMMARY:")
-        for test_name, passed in results.items():
-            status = "✅ PASS" if passed else "❌ FAIL"
-            self.log(f"  {test_name}: {status}")
-        
-        total_tests = len(results)
-        passed_tests = sum(results.values())
-        self.log(f"📈 Overall: {passed_tests}/{total_tests} tests passed")
-        
-        return results
+class Colors:
+    GREEN = '\033[92m'
+    RED = '\033[91m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    END = '\033[0m'
 
-class VillaCreationTester:
-    def __init__(self):
-        self.session = requests.Session()
-        self.session.headers.update({
-            'Content-Type': 'application/json',
-            'User-Agent': 'Backend-Tester/1.0'
-        })
-        
-    def log(self, message, level="INFO"):
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        print(f"[{timestamp}] {level}: {message}")
-        
-    def login_admin(self):
-        """Login as admin to get session - using proper NextAuth flow"""
-        self.log("🔐 Attempting admin login...")
-        
-        try:
-            # First get the CSRF token
-            csrf_response = self.session.get(f"{BASE_URL}/api/auth/csrf")
-            if csrf_response.status_code == 200:
-                csrf_token = csrf_response.json().get('csrfToken')
-                self.log(f"Got CSRF token: {csrf_token[:20]}...")
-            else:
-                self.log("Failed to get CSRF token, proceeding without it")
-                csrf_token = None
-            
-            # Prepare login data
-            login_data = {
-                "email": ADMIN_EMAIL,
-                "password": ADMIN_PASSWORD,
-                "redirect": "false",
-                "json": "true"
-            }
-            
-            if csrf_token:
-                login_data["csrfToken"] = csrf_token
-            
-            # Attempt login
-            auth_response = self.session.post(
-                f"{BASE_URL}/api/auth/callback/credentials",
-                data=login_data,
-                headers={'Content-Type': 'application/x-www-form-urlencoded'}
-            )
-            
-            self.log(f"Auth response status: {auth_response.status_code}")
-            self.log(f"Auth response text: {auth_response.text[:100]}...")
-            
-            # Check session cookies
-            cookies = [cookie.name for cookie in self.session.cookies]
-            self.log(f"Session cookies: {cookies}")
-            
-            if auth_response.status_code == 200 and any('session' in cookie for cookie in cookies):
-                self.log("✅ Login successful - session established", "SUCCESS")
-                
-                # Verify authentication with admin stats
-                self.log("🔍 Testing authentication with admin stats endpoint...")
-                stats_response = self.session.get(f"{API_BASE}/admin/stats")
-                self.log(f"Auth test response status: {stats_response.status_code}")
-                
-                if stats_response.status_code == 200:
-                    stats = stats_response.json()
-                    self.log(f"✅ Authentication working - got stats: {stats}", "SUCCESS")
-                    return True
-                else:
-                    self.log(f"❌ Authentication verification failed: {stats_response.status_code}", "ERROR")
-                    return False
-            else:
-                self.log("❌ Login failed - no session established", "ERROR")
-                return False
-                
-        except Exception as e:
-            self.log(f"❌ Login error: {str(e)}", "ERROR")
+def print_test(name: str, passed: bool, details: str = ""):
+    """Print test result with color"""
+    status = f"{Colors.GREEN}✅ PASS{Colors.END}" if passed else f"{Colors.RED}❌ FAIL{Colors.END}"
+    print(f"{status} - {name}")
+    if details:
+        print(f"  {details}")
+
+def print_section(title: str):
+    """Print section header"""
+    print(f"\n{Colors.BLUE}{'='*60}{Colors.END}")
+    print(f"{Colors.BLUE}{title}{Colors.END}")
+    print(f"{Colors.BLUE}{'='*60}{Colors.END}")
+
+def get_csrf_token(session: requests.Session) -> Optional[str]:
+    """Get CSRF token from NextAuth"""
+    try:
+        response = session.get(f"{BASE_URL}/api/auth/csrf")
+        if response.status_code == 200:
+            data = response.json()
+            return data.get('csrfToken')
+    except Exception as e:
+        print(f"Error getting CSRF token: {e}")
+    return None
+
+def login_admin(session: requests.Session) -> bool:
+    """Login as admin using NextAuth credentials provider"""
+    try:
+        # Get CSRF token
+        csrf_token = get_csrf_token(session)
+        if not csrf_token:
+            print_test("Get CSRF Token", False, "Failed to get CSRF token")
             return False
-    
-    def test_villa_creation_with_valid_data(self):
-        """Test villa creation with valid data"""
-        self.log("🏠 Testing Villa Creation with Valid Data...")
         
-        villa_data = {
-            "name": "Test Luxury Villa",
-            "location": "Lonavala", 
-            "category": "Luxury Villa",
-            "description": "Beautiful luxury villa for testing with amazing amenities and stunning views",
-            "pricePerNight": 25000,
-            "bedrooms": 4,
-            "bathrooms": 3,
-            "maxGuests": 8,
-            "parking": 2,
-            "amenities": ["pool", "wifi", "gym"],
-            "images": ["https://example.com/image1.jpg", "https://example.com/image2.jpg"],
-            "mapLocation": "Lonavala, Maharashtra"
+        print_test("Get CSRF Token", True, f"Token: {csrf_token[:20]}...")
+        
+        # Login with credentials
+        login_data = {
+            'email': ADMIN_EMAIL,
+            'password': ADMIN_PASSWORD,
+            'csrfToken': csrf_token,
+            'callbackUrl': f"{BASE_URL}/admin",
+            'json': 'true'
         }
         
-        try:
-            response = self.session.post(f"{API_BASE}/admin/villas", json=villa_data)
-            self.log(f"Response Status: {response.status_code}")
-            self.log(f"Response Headers: {dict(response.headers)}")
-            
-            if response.status_code == 200:
-                result = response.json()
-                self.log("✅ Villa created successfully!", "SUCCESS")
-                self.log(f"Villa ID: {result.get('villa', {}).get('id', 'N/A')}")
-                self.log(f"Villa Name: {result.get('villa', {}).get('name', 'N/A')}")
-                self.log(f"Message: {result.get('message', 'N/A')}")
-                return True, result.get('villa', {}).get('id')
-            else:
-                self.log(f"❌ Villa creation failed!", "ERROR")
-                try:
-                    error_data = response.json()
-                    self.log(f"Error: {error_data}", "ERROR")
-                except:
-                    self.log(f"Raw response: {response.text}", "ERROR")
-                return False, None
-                
-        except Exception as e:
-            self.log(f"❌ Request error: {str(e)}", "ERROR")
-            return False, None
-    
-    def test_villa_creation_missing_fields(self):
-        """Test villa creation with missing required fields"""
-        self.log("🚫 Testing Villa Creation with Missing Required Fields...")
+        response = session.post(
+            f"{BASE_URL}/api/auth/callback/credentials",
+            data=login_data,
+            headers={
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            allow_redirects=False
+        )
         
-        # Missing name field
-        incomplete_data = {
-            "location": "Lonavala",
-            "category": "Luxury Villa", 
-            "description": "Test villa",
-            "pricePerNight": 15000
-        }
-        
-        try:
-            response = self.session.post(f"{API_BASE}/admin/villas", json=incomplete_data)
-            self.log(f"Response Status: {response.status_code}")
-            
-            if response.status_code == 400:
-                result = response.json()
-                self.log("✅ Validation working - Missing fields detected", "SUCCESS")
-                self.log(f"Error message: {result.get('error', 'N/A')}")
+        # Check if login was successful (NextAuth returns redirect or JSON)
+        if response.status_code in [200, 302]:
+            # Verify session by calling an authenticated endpoint
+            verify_response = session.get(f"{BASE_URL}/api/admin/stats")
+            if verify_response.status_code == 200:
+                print_test("Admin Login", True, f"Logged in as {ADMIN_EMAIL}")
                 return True
             else:
-                self.log(f"❌ Validation failed - Expected 400, got {response.status_code}", "ERROR")
-                try:
-                    self.log(f"Response: {response.json()}")
-                except:
-                    self.log(f"Raw response: {response.text}")
+                print_test("Admin Login", False, f"Session verification failed: {verify_response.status_code}")
                 return False
-                
-        except Exception as e:
-            self.log(f"❌ Request error: {str(e)}", "ERROR")
-            return False
-    
-    def test_villa_creation_without_auth(self):
-        """Test villa creation without authentication"""
-        self.log("🔒 Testing Villa Creation without Authentication...")
-        
-        # Create a new session without authentication
-        unauth_session = requests.Session()
-        unauth_session.headers.update({
-            'Content-Type': 'application/json'
-        })
-        
-        villa_data = {
-            "name": "Unauthorized Villa",
-            "location": "Test Location",
-            "category": "Test Category",
-            "description": "This should fail",
-            "pricePerNight": 10000
-        }
-        
-        try:
-            response = unauth_session.post(f"{API_BASE}/admin/villas", json=villa_data)
-            self.log(f"Response Status: {response.status_code}")
-            
-            if response.status_code == 401:
-                result = response.json()
-                self.log("✅ Authentication protection working", "SUCCESS")
-                self.log(f"Error message: {result.get('error', 'N/A')}")
-                return True
-            else:
-                self.log(f"❌ Authentication bypass detected! Status: {response.status_code}", "ERROR")
-                try:
-                    self.log(f"Response: {response.json()}")
-                except:
-                    self.log(f"Raw response: {response.text}")
-                return False
-                
-        except Exception as e:
-            self.log(f"❌ Request error: {str(e)}", "ERROR")
-            return False
-    
-    def test_database_connection(self):
-        """Test if database operations are working"""
-        self.log("💾 Testing Database Connection...")
-        
-        try:
-            # Try to get admin stats which requires DB access
-            response = self.session.get(f"{API_BASE}/admin/stats")
-            self.log(f"Stats endpoint status: {response.status_code}")
-            
-            if response.status_code == 200:
-                stats = response.json()
-                self.log("✅ Database connection working", "SUCCESS")
-                self.log(f"Total villas in DB: {stats.get('totalVillas', 'N/A')}")
-                self.log(f"Total bookings: {stats.get('totalBookings', 'N/A')}")
-                return True
-            else:
-                self.log(f"❌ Database connection issue: {response.status_code}", "ERROR")
-                return False
-                
-        except Exception as e:
-            self.log(f"❌ Database error: {str(e)}", "ERROR")
-            return False
-    
-    def run_all_tests(self):
-        """Run all villa creation tests"""
-        print("=" * 60)
-        print("🧪 VILLA CREATION API TESTING")
-        print("=" * 60)
-        
-        results = {}
-        
-        # Test authentication first
-        results['auth'] = self.login_admin()
-        
-        if not results['auth']:
-            self.log("❌ CRITICAL: Authentication failed - Cannot proceed with villa creation tests", "ERROR")
-            self.log("This explains why users see 'An error occurred' in admin panel", "ERROR")
-            return results
-        
-        # Test database connection
-        results['database'] = self.test_database_connection()
-        
-        # Test villa creation scenarios
-        results['valid_creation'], villa_id = self.test_villa_creation_with_valid_data()
-        results['missing_fields'] = self.test_villa_creation_missing_fields()
-        results['no_auth'] = self.test_villa_creation_without_auth()
-        
-        # Summary
-        print("\n" + "=" * 60)
-        print("📊 VILLA CREATION TEST RESULTS")
-        print("=" * 60)
-        
-        for test_name, result in results.items():
-            status = "✅ PASS" if result else "❌ FAIL"
-            print(f"   {test_name.replace('_', ' ').title()}: {status}")
-        
-        # Identify the root cause
-        print("\n🔍 ROOT CAUSE ANALYSIS:")
-        if not results['auth']:
-            print("   🚨 CRITICAL ISSUE: Authentication system not working properly")
-            print("   - Users cannot authenticate to create villas")
-            print("   - This causes 'An error occurred' message in admin panel")
-        elif not results['database']:
-            print("   🚨 CRITICAL ISSUE: Database connection problems")
-        elif not results['valid_creation']:
-            print("   🚨 CRITICAL ISSUE: Villa creation endpoint has bugs")
         else:
-            print("   ✅ All systems working - Issue might be frontend-related")
+            print_test("Admin Login", False, f"Login failed: {response.status_code}")
+            return False
+            
+    except Exception as e:
+        print_test("Admin Login", False, f"Exception: {str(e)}")
+        return False
+
+def test_get_locations_public(session: requests.Session) -> Dict[str, Any]:
+    """Test GET /api/locations (public endpoint)"""
+    print_section("TEST 1: GET /api/locations (Public)")
+    
+    try:
+        response = session.get(f"{BASE_URL}/api/locations")
         
-        return results
+        if response.status_code != 200:
+            print_test("GET /api/locations", False, f"Status: {response.status_code}")
+            return {"passed": False, "locations": []}
+        
+        data = response.json()
+        locations = data.get('locations', [])
+        
+        # Check structure
+        if not isinstance(locations, list):
+            print_test("GET /api/locations", False, "Response is not a list")
+            return {"passed": False, "locations": []}
+        
+        print_test("GET /api/locations", True, f"Returned {len(locations)} locations")
+        
+        # Verify seeded locations
+        expected_names = ['Lonavala', 'Alibaug', 'Karjat', 'Igatpuri', 'Neral', 'Khopoli', 'Badlapur']
+        found_names = [loc.get('name') for loc in locations]
+        
+        seeded_found = [name for name in expected_names if name in found_names]
+        print_test("Seeded Locations Present", len(seeded_found) >= 7, 
+                  f"Found {len(seeded_found)}/7 seeded locations: {', '.join(seeded_found)}")
+        
+        # Check for Mahabaleshwar
+        has_mahabaleshwar = 'Mahabaleshwar' in found_names
+        if has_mahabaleshwar:
+            print(f"  {Colors.YELLOW}ℹ️  Found 'Mahabaleshwar' location (will be deleted){Colors.END}")
+        
+        # Verify structure of first location
+        if locations:
+            first = locations[0]
+            required_fields = ['id', 'name', 'image', 'order', 'isActive', 'createdAt']
+            has_all_fields = all(field in first for field in required_fields)
+            print_test("Location Structure", has_all_fields, 
+                      f"Fields: {', '.join(first.keys())}")
+            
+            # Verify sorted by order
+            orders = [loc.get('order', 999) for loc in locations]
+            is_sorted = orders == sorted(orders)
+            print_test("Sorted by Order", is_sorted, f"Orders: {orders[:5]}...")
+            
+            # Verify only active locations (isActive != false)
+            inactive_count = sum(1 for loc in locations if loc.get('isActive') == False)
+            print_test("Only Active Locations", inactive_count == 0, 
+                      f"Inactive count: {inactive_count}")
+        
+        return {"passed": True, "locations": locations}
+        
+    except Exception as e:
+        print_test("GET /api/locations", False, f"Exception: {str(e)}")
+        return {"passed": False, "locations": []}
+
+def test_get_locations_all(session: requests.Session) -> Dict[str, Any]:
+    """Test GET /api/locations?all=true"""
+    print_section("TEST 2: GET /api/locations?all=true")
+    
+    try:
+        response = session.get(f"{BASE_URL}/api/locations?all=true")
+        
+        if response.status_code != 200:
+            print_test("GET /api/locations?all=true", False, f"Status: {response.status_code}")
+            return {"passed": False, "locations": []}
+        
+        data = response.json()
+        locations = data.get('locations', [])
+        
+        print_test("GET /api/locations?all=true", True, f"Returned {len(locations)} locations (including inactive)")
+        
+        # Check if it includes inactive locations
+        inactive_count = sum(1 for loc in locations if loc.get('isActive') == False)
+        print(f"  {Colors.YELLOW}ℹ️  Inactive locations: {inactive_count}{Colors.END}")
+        
+        return {"passed": True, "locations": locations}
+        
+    except Exception as e:
+        print_test("GET /api/locations?all=true", False, f"Exception: {str(e)}")
+        return {"passed": False, "locations": []}
+
+def test_create_location(session: requests.Session) -> Optional[str]:
+    """Test POST /api/admin/locations"""
+    print_section("TEST 3: POST /api/admin/locations (Create)")
+    
+    # Test 1: Create without auth (should fail)
+    try:
+        no_auth_session = requests.Session()
+        response = no_auth_session.post(
+            f"{BASE_URL}/api/admin/locations",
+            json={"name": "Test Location", "image": "https://example.com/test.jpg"}
+        )
+        
+        print_test("Create Without Auth", response.status_code == 401, 
+                  f"Status: {response.status_code} (expected 401)")
+    except Exception as e:
+        print_test("Create Without Auth", False, f"Exception: {str(e)}")
+    
+    # Test 2: Create with missing name (should fail)
+    try:
+        response = session.post(
+            f"{BASE_URL}/api/admin/locations",
+            json={"image": "https://example.com/test.jpg"}
+        )
+        
+        print_test("Create Without Name", response.status_code == 400, 
+                  f"Status: {response.status_code} (expected 400)")
+    except Exception as e:
+        print_test("Create Without Name", False, f"Exception: {str(e)}")
+    
+    # Test 3: Create valid location
+    try:
+        test_location = {
+            "name": "Test Location Mumbai",
+            "image": "https://images.unsplash.com/photo-1566552881560-0be862a7c445?w=400"
+        }
+        
+        response = session.post(
+            f"{BASE_URL}/api/admin/locations",
+            json=test_location
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            location = data.get('location', {})
+            location_id = location.get('id')
+            
+            print_test("Create Valid Location", True, 
+                      f"Created location ID: {location_id}")
+            print(f"  Location: {location.get('name')}, Order: {location.get('order')}, Active: {location.get('isActive')}")
+            
+            return location_id
+        else:
+            print_test("Create Valid Location", False, 
+                      f"Status: {response.status_code}, Response: {response.text}")
+            return None
+            
+    except Exception as e:
+        print_test("Create Valid Location", False, f"Exception: {str(e)}")
+        return None
+
+def test_create_duplicate_location(session: requests.Session):
+    """Test POST /api/admin/locations with duplicate name"""
+    print_section("TEST 4: POST /api/admin/locations (Duplicate)")
+    
+    try:
+        # Try to create duplicate "Lonavala"
+        response = session.post(
+            f"{BASE_URL}/api/admin/locations",
+            json={"name": "Lonavala", "image": "https://example.com/test.jpg"}
+        )
+        
+        print_test("Create Duplicate Location", response.status_code == 409, 
+                  f"Status: {response.status_code} (expected 409 Conflict)")
+        
+        if response.status_code == 409:
+            data = response.json()
+            print(f"  Error message: {data.get('error')}")
+            
+    except Exception as e:
+        print_test("Create Duplicate Location", False, f"Exception: {str(e)}")
+
+def test_update_location(session: requests.Session, location_id: str) -> bool:
+    """Test PUT /api/admin/locations/:id"""
+    print_section("TEST 5: PUT /api/admin/locations/:id (Update)")
+    
+    if not location_id:
+        print_test("Update Location", False, "No location ID provided")
+        return False
+    
+    # Test 1: Update name
+    try:
+        response = session.put(
+            f"{BASE_URL}/api/admin/locations/{location_id}",
+            json={"name": "Test Location Mumbai Updated"}
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            location = data.get('location', {})
+            print_test("Update Location Name", True, 
+                      f"Updated name: {location.get('name')}")
+        else:
+            print_test("Update Location Name", False, 
+                      f"Status: {response.status_code}")
+            return False
+            
+    except Exception as e:
+        print_test("Update Location Name", False, f"Exception: {str(e)}")
+        return False
+    
+    # Test 2: Update order
+    try:
+        response = session.put(
+            f"{BASE_URL}/api/admin/locations/{location_id}",
+            json={"order": 999}
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            location = data.get('location', {})
+            print_test("Update Location Order", True, 
+                      f"Updated order: {location.get('order')}")
+        else:
+            print_test("Update Location Order", False, 
+                      f"Status: {response.status_code}")
+            
+    except Exception as e:
+        print_test("Update Location Order", False, f"Exception: {str(e)}")
+    
+    # Test 3: Set isActive to false (hide location)
+    try:
+        response = session.put(
+            f"{BASE_URL}/api/admin/locations/{location_id}",
+            json={"isActive": False}
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            location = data.get('location', {})
+            print_test("Set Location Inactive", True, 
+                      f"isActive: {location.get('isActive')}")
+            return True
+        else:
+            print_test("Set Location Inactive", False, 
+                      f"Status: {response.status_code}")
+            return False
+            
+    except Exception as e:
+        print_test("Set Location Inactive", False, f"Exception: {str(e)}")
+        return False
+
+def test_inactive_location_visibility(session: requests.Session, location_id: str):
+    """Test that isActive=false hides location from public GET but shows in ?all=true"""
+    print_section("TEST 6: Inactive Location Visibility")
+    
+    if not location_id:
+        print_test("Inactive Location Visibility", False, "No location ID provided")
+        return
+    
+    # Test 1: Should NOT appear in public GET
+    try:
+        response = session.get(f"{BASE_URL}/api/locations")
+        data = response.json()
+        locations = data.get('locations', [])
+        
+        found = any(loc.get('id') == location_id for loc in locations)
+        print_test("Hidden from Public GET", not found, 
+                  f"Location {'found' if found else 'not found'} in public list")
+        
+    except Exception as e:
+        print_test("Hidden from Public GET", False, f"Exception: {str(e)}")
+    
+    # Test 2: SHOULD appear in GET ?all=true
+    try:
+        response = session.get(f"{BASE_URL}/api/locations?all=true")
+        data = response.json()
+        locations = data.get('locations', [])
+        
+        found = any(loc.get('id') == location_id for loc in locations)
+        print_test("Visible in GET ?all=true", found, 
+                  f"Location {'found' if found else 'not found'} in ?all=true list")
+        
+    except Exception as e:
+        print_test("Visible in GET ?all=true", False, f"Exception: {str(e)}")
+
+def test_update_nonexistent_location(session: requests.Session):
+    """Test PUT /api/admin/locations/:id with non-existent ID"""
+    print_section("TEST 7: PUT Non-existent Location")
+    
+    try:
+        fake_id = "00000000-0000-0000-0000-000000000000"
+        response = session.put(
+            f"{BASE_URL}/api/admin/locations/{fake_id}",
+            json={"name": "Should Not Work"}
+        )
+        
+        print_test("Update Non-existent Location", response.status_code == 404, 
+                  f"Status: {response.status_code} (expected 404)")
+        
+    except Exception as e:
+        print_test("Update Non-existent Location", False, f"Exception: {str(e)}")
+
+def test_delete_location(session: requests.Session, location_id: str) -> bool:
+    """Test DELETE /api/admin/locations/:id"""
+    print_section("TEST 8: DELETE /api/admin/locations/:id")
+    
+    if not location_id:
+        print_test("Delete Location", False, "No location ID provided")
+        return False
+    
+    # Test 1: Delete without auth (should fail)
+    try:
+        no_auth_session = requests.Session()
+        response = no_auth_session.delete(f"{BASE_URL}/api/admin/locations/{location_id}")
+        
+        print_test("Delete Without Auth", response.status_code == 401, 
+                  f"Status: {response.status_code} (expected 401)")
+    except Exception as e:
+        print_test("Delete Without Auth", False, f"Exception: {str(e)}")
+    
+    # Test 2: Delete with auth
+    try:
+        response = session.delete(f"{BASE_URL}/api/admin/locations/{location_id}")
+        
+        if response.status_code == 200:
+            print_test("Delete Location", True, f"Deleted location ID: {location_id}")
+            
+            # Verify deletion
+            verify_response = session.get(f"{BASE_URL}/api/locations?all=true")
+            data = verify_response.json()
+            locations = data.get('locations', [])
+            still_exists = any(loc.get('id') == location_id for loc in locations)
+            
+            print_test("Verify Deletion", not still_exists, 
+                      f"Location {'still exists' if still_exists else 'successfully deleted'}")
+            return True
+        else:
+            print_test("Delete Location", False, 
+                      f"Status: {response.status_code}, Response: {response.text}")
+            return False
+            
+    except Exception as e:
+        print_test("Delete Location", False, f"Exception: {str(e)}")
+        return False
+
+def test_delete_nonexistent_location(session: requests.Session):
+    """Test DELETE /api/admin/locations/:id with non-existent ID"""
+    print_section("TEST 9: DELETE Non-existent Location")
+    
+    try:
+        fake_id = "00000000-0000-0000-0000-000000000000"
+        response = session.delete(f"{BASE_URL}/api/admin/locations/{fake_id}")
+        
+        print_test("Delete Non-existent Location", response.status_code == 404, 
+                  f"Status: {response.status_code} (expected 404)")
+        
+    except Exception as e:
+        print_test("Delete Non-existent Location", False, f"Exception: {str(e)}")
+
+def cleanup_mahabaleshwar(session: requests.Session):
+    """Delete Mahabaleshwar location if it exists"""
+    print_section("CLEANUP: Delete Mahabaleshwar Location")
+    
+    try:
+        # Get all locations
+        response = session.get(f"{BASE_URL}/api/locations?all=true")
+        data = response.json()
+        locations = data.get('locations', [])
+        
+        # Find Mahabaleshwar
+        mahabaleshwar = next((loc for loc in locations if loc.get('name') == 'Mahabaleshwar'), None)
+        
+        if mahabaleshwar:
+            location_id = mahabaleshwar.get('id')
+            delete_response = session.delete(f"{BASE_URL}/api/admin/locations/{location_id}")
+            
+            if delete_response.status_code == 200:
+                print_test("Delete Mahabaleshwar", True, f"Deleted location ID: {location_id}")
+            else:
+                print_test("Delete Mahabaleshwar", False, 
+                          f"Status: {delete_response.status_code}")
+        else:
+            print(f"  {Colors.YELLOW}ℹ️  Mahabaleshwar location not found (nothing to clean up){Colors.END}")
+            
+    except Exception as e:
+        print_test("Delete Mahabaleshwar", False, f"Exception: {str(e)}")
+
+def test_villas_original_price(session: requests.Session):
+    """Test GET /api/villas returns originalPrice field"""
+    print_section("TEST 10: GET /api/villas - originalPrice Field")
+    
+    try:
+        response = session.get(f"{BASE_URL}/api/villas")
+        
+        if response.status_code != 200:
+            print_test("GET /api/villas", False, f"Status: {response.status_code}")
+            return
+        
+        data = response.json()
+        villas = data.get('villas', [])
+        
+        print_test("GET /api/villas", True, f"Returned {len(villas)} villas")
+        
+        # Check for rudra-villa specifically
+        rudra = next((v for v in villas if v.get('slug') == 'rudra-villa'), None)
+        
+        if rudra:
+            has_original_price = 'originalPrice' in rudra
+            original_price = rudra.get('originalPrice')
+            price_per_night = rudra.get('pricePerNight')
+            
+            print_test("Rudra Villa Has originalPrice Field", has_original_price, 
+                      f"originalPrice: {original_price}, pricePerNight: {price_per_night}")
+            
+            if original_price == 24000 and price_per_night == 20000:
+                print_test("Rudra Villa Price Values", True, 
+                          "originalPrice=24000, pricePerNight=20000 ✓")
+            else:
+                print_test("Rudra Villa Price Values", False, 
+                          f"Expected originalPrice=24000, pricePerNight=20000, got {original_price}, {price_per_night}")
+        else:
+            print(f"  {Colors.YELLOW}ℹ️  Rudra Villa not found in results{Colors.END}")
+        
+        # Check if any villa has originalPrice
+        villas_with_original = [v for v in villas if v.get('originalPrice') is not None]
+        print(f"  {Colors.YELLOW}ℹ️  {len(villas_with_original)}/{len(villas)} villas have originalPrice set{Colors.END}")
+        
+    except Exception as e:
+        print_test("GET /api/villas", False, f"Exception: {str(e)}")
 
 def main():
-    """Main test execution - Focus on Villa Creation"""
-    print("🧪 Starting Villa Creation API Tests...")
-    print("=" * 80)
+    """Main test execution"""
+    print(f"\n{Colors.BLUE}{'='*60}{Colors.END}")
+    print(f"{Colors.BLUE}Malle Stays - Locations CRUD API Testing{Colors.END}")
+    print(f"{Colors.BLUE}Base URL: {BASE_URL}{Colors.END}")
+    print(f"{Colors.BLUE}{'='*60}{Colors.END}")
     
-    # Test villa creation first (the main focus)
-    creation_tester = VillaCreationTester()
-    creation_results = creation_tester.run_all_tests()
+    # Create session with cookies
+    session = requests.Session()
     
-    # Only run update tests if creation tests pass or if requested
-    print("\n" + "=" * 80)
-    print("🔄 Running Villa Update Tests for completeness...")
-    
-    update_tester = VillaUpdateTester()
-    update_results = update_tester.run_all_tests()
-    
-    # Combined results
-    all_creation_passed = all(creation_results.values())
-    all_update_passed = all(update_results.values())
-    
-    print("\n" + "=" * 80)
-    print("📋 FINAL SUMMARY")
-    print("=" * 80)
-    print(f"Villa Creation Tests: {'✅ PASS' if all_creation_passed else '❌ FAIL'}")
-    print(f"Villa Update Tests: {'✅ PASS' if all_update_passed else '❌ FAIL'}")
-    
-    if all_creation_passed and all_update_passed:
-        print("\n🎉 All tests passed!")
-        sys.exit(0)
-    else:
-        print("\n💥 Some tests failed!")
+    # Step 1: Login
+    print_section("AUTHENTICATION")
+    if not login_admin(session):
+        print(f"\n{Colors.RED}❌ Authentication failed. Cannot proceed with tests.{Colors.END}")
         sys.exit(1)
+    
+    # Step 2: Test public GET endpoints
+    test_get_locations_public(session)
+    test_get_locations_all(session)
+    
+    # Step 3: Test CREATE
+    location_id = test_create_location(session)
+    test_create_duplicate_location(session)
+    
+    # Step 4: Test UPDATE
+    if location_id:
+        test_update_location(session, location_id)
+        test_inactive_location_visibility(session, location_id)
+    
+    test_update_nonexistent_location(session)
+    
+    # Step 5: Test DELETE
+    if location_id:
+        test_delete_location(session, location_id)
+    
+    test_delete_nonexistent_location(session)
+    
+    # Step 6: Cleanup Mahabaleshwar
+    cleanup_mahabaleshwar(session)
+    
+    # Step 7: Test villas originalPrice
+    test_villas_original_price(session)
+    
+    # Summary
+    print(f"\n{Colors.BLUE}{'='*60}{Colors.END}")
+    print(f"{Colors.GREEN}✅ Testing Complete!{Colors.END}")
+    print(f"{Colors.BLUE}{'='*60}{Colors.END}\n")
 
 if __name__ == "__main__":
     main()

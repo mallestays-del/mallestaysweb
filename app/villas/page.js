@@ -58,7 +58,13 @@ function VillasContent() {
     }
   };
 
-  const locations = ['Lonavala', 'Alibaug', 'Karjat', 'Igatpuri', 'Neral', 'Khopoli', 'Badlapur'];
+  const [locations, setLocations] = useState([]);
+  useEffect(() => {
+    fetch('/api/locations')
+      .then((r) => r.json())
+      .then((d) => setLocations((d.locations || []).map((l) => l.name)))
+      .catch((e) => console.error('Error fetching locations:', e));
+  }, []);
   const categories = ['Poolside Villa', 'Beach Villa', 'Mountain Villa', 'Farmhouse Villa'];
 
   const FilterContent = () => (
