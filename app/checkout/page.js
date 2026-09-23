@@ -90,14 +90,24 @@ function CheckoutContent() {
         }),
       });
 
-      const bookingData = await bookingRes.json();
+      let bookingData;
+      try {
+        bookingData = await bookingRes.json();
+      } catch (_) {
+        bookingData = {};
+      }
       if (!bookingRes.ok) {
-        setError(bookingData.error || 'Failed to create booking');
+        setError(bookingData.error || `Failed to create booking (HTTP ${bookingRes.status})`);
         setSubmitting(false);
         return;
       }
 
-      const { booking } = bookingData;
+      const booking = bookingData?.booking;
+      if (!booking?.bookingId) {
+        setError('Failed to create booking. Please try again.');
+        setSubmitting(false);
+        return;
+      }
 
       // Step 2: Create Razorpay order
       const orderRes = await fetch('/api/v1/payments/create-order', {
@@ -109,9 +119,20 @@ function CheckoutContent() {
         }),
       });
 
-      const orderData = await orderRes.json();
+      let orderData;
+      try {
+        orderData = await orderRes.json();
+      } catch (_) {
+        orderData = {};
+      }
       if (!orderRes.ok) {
-        setError(orderData.error || 'Failed to create payment order');
+        const detail = orderData.error || `HTTP ${orderRes.status}`;
+        setError(`Failed to create payment order: ${detail}. Booking ID: ${booking.bookingId}`);
+        setSubmitting(false);
+        return;
+      }
+      if (!orderData?.orderId || !orderData?.keyId) {
+        setError('Payment gateway not configured. Please contact support.');
         setSubmitting(false);
         return;
       }
