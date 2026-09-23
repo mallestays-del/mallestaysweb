@@ -82,3 +82,9 @@ node_modules/@next/swc-linux-arm64-gnu/next-swc.linux-arm64-gnu.node
 
 # Test credentials (never deploy)
 memory/test_credentials.md
+.env
+.env.*
+*.env
+credentials.json
+*.key
+.credentials
