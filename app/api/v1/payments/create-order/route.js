@@ -49,9 +49,17 @@ export async function POST(request) {
     });
     
     if (!razorpayResponse.ok) {
-      const err = await razorpayResponse.text();
-      console.error('Razorpay order creation failed:', err);
-      return NextResponse.json({ error: 'Failed to create payment order' }, { status: 502 });
+      const errText = await razorpayResponse.text();
+      console.error('Razorpay order creation failed:', razorpayResponse.status, errText);
+      let description = 'Failed to create payment order';
+      try {
+        const parsed = JSON.parse(errText);
+        if (parsed?.error?.description) description = parsed.error.description;
+      } catch (_) {}
+      if (razorpayResponse.status === 401) {
+        description = 'Payment gateway authentication failed - Razorpay Key ID/Secret are invalid. Please contact support.';
+      }
+      return NextResponse.json({ error: description, code: 'RAZORPAY_ORDER_FAILED' }, { status: 502 });
     }
     
     const rzpOrder = await razorpayResponse.json();

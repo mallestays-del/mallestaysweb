@@ -1,558 +1,324 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for Malle Stays - Locations CRUD API
-Tests all location endpoints and villa originalPrice field
+Backend API Testing Script for Razorpay Payment Integration
+Tests the complete payment flow from villa selection to order creation
 """
 
 import requests
 import json
+from datetime import datetime, timedelta
 import sys
-from typing import Dict, Any, Optional
 
-# Configuration
+# Base URL from environment
 BASE_URL = "https://stays-checkout-flow.preview.emergentagent.com"
-ADMIN_EMAIL = "admin@mallestays.com"
-ADMIN_PASSWORD = "admin123"
 
-class Colors:
-    GREEN = '\033[92m'
-    RED = '\033[91m'
-    YELLOW = '\033[93m'
-    BLUE = '\033[94m'
-    END = '\033[0m'
+def log_test(test_name, status, message=""):
+    """Log test results"""
+    symbol = "✅" if status == "PASS" else "❌"
+    print(f"\n{symbol} {test_name}: {status}")
+    if message:
+        print(f"   {message}")
 
-def print_test(name: str, passed: bool, details: str = ""):
-    """Print test result with color"""
-    status = f"{Colors.GREEN}✅ PASS{Colors.END}" if passed else f"{Colors.RED}❌ FAIL{Colors.END}"
-    print(f"{status} - {name}")
-    if details:
-        print(f"  {details}")
-
-def print_section(title: str):
-    """Print section header"""
-    print(f"\n{Colors.BLUE}{'='*60}{Colors.END}")
-    print(f"{Colors.BLUE}{title}{Colors.END}")
-    print(f"{Colors.BLUE}{'='*60}{Colors.END}")
-
-def get_csrf_token(session: requests.Session) -> Optional[str]:
-    """Get CSRF token from NextAuth"""
-    try:
-        response = session.get(f"{BASE_URL}/api/auth/csrf")
-        if response.status_code == 200:
-            data = response.json()
-            return data.get('csrfToken')
-    except Exception as e:
-        print(f"Error getting CSRF token: {e}")
-    return None
-
-def login_admin(session: requests.Session) -> bool:
-    """Login as admin using NextAuth credentials provider"""
-    try:
-        # Get CSRF token
-        csrf_token = get_csrf_token(session)
-        if not csrf_token:
-            print_test("Get CSRF Token", False, "Failed to get CSRF token")
-            return False
-        
-        print_test("Get CSRF Token", True, f"Token: {csrf_token[:20]}...")
-        
-        # Login with credentials
-        login_data = {
-            'email': ADMIN_EMAIL,
-            'password': ADMIN_PASSWORD,
-            'csrfToken': csrf_token,
-            'callbackUrl': f"{BASE_URL}/admin",
-            'json': 'true'
-        }
-        
-        response = session.post(
-            f"{BASE_URL}/api/auth/callback/credentials",
-            data=login_data,
-            headers={
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            allow_redirects=False
-        )
-        
-        # Check if login was successful (NextAuth returns redirect or JSON)
-        if response.status_code in [200, 302]:
-            # Verify session by calling an authenticated endpoint
-            verify_response = session.get(f"{BASE_URL}/api/admin/stats")
-            if verify_response.status_code == 200:
-                print_test("Admin Login", True, f"Logged in as {ADMIN_EMAIL}")
-                return True
-            else:
-                print_test("Admin Login", False, f"Session verification failed: {verify_response.status_code}")
-                return False
-        else:
-            print_test("Admin Login", False, f"Login failed: {response.status_code}")
-            return False
-            
-    except Exception as e:
-        print_test("Admin Login", False, f"Exception: {str(e)}")
-        return False
-
-def test_get_locations_public(session: requests.Session) -> Dict[str, Any]:
-    """Test GET /api/locations (public endpoint)"""
-    print_section("TEST 1: GET /api/locations (Public)")
+def test_razorpay_payment_flow():
+    """Test complete Razorpay payment integration flow"""
+    print("\n" + "="*80)
+    print("RAZORPAY PAYMENT INTEGRATION TEST")
+    print("="*80)
+    
+    booking_id = None
+    villa_id = None
     
     try:
-        response = session.get(f"{BASE_URL}/api/locations")
+        # Step 1: GET /api/villas - pick rudra-villa
+        print("\n[Step 1] GET /api/villas - Fetch villas list")
+        response = requests.get(f"{BASE_URL}/api/villas", timeout=10)
+        print(f"Status: {response.status_code}")
         
         if response.status_code != 200:
-            print_test("GET /api/locations", False, f"Status: {response.status_code}")
-            return {"passed": False, "locations": []}
-        
-        data = response.json()
-        locations = data.get('locations', [])
-        
-        # Check structure
-        if not isinstance(locations, list):
-            print_test("GET /api/locations", False, "Response is not a list")
-            return {"passed": False, "locations": []}
-        
-        print_test("GET /api/locations", True, f"Returned {len(locations)} locations")
-        
-        # Verify seeded locations
-        expected_names = ['Lonavala', 'Alibaug', 'Karjat', 'Igatpuri', 'Neral', 'Khopoli', 'Badlapur']
-        found_names = [loc.get('name') for loc in locations]
-        
-        seeded_found = [name for name in expected_names if name in found_names]
-        print_test("Seeded Locations Present", len(seeded_found) >= 7, 
-                  f"Found {len(seeded_found)}/7 seeded locations: {', '.join(seeded_found)}")
-        
-        # Check for Mahabaleshwar
-        has_mahabaleshwar = 'Mahabaleshwar' in found_names
-        if has_mahabaleshwar:
-            print(f"  {Colors.YELLOW}ℹ️  Found 'Mahabaleshwar' location (will be deleted){Colors.END}")
-        
-        # Verify structure of first location
-        if locations:
-            first = locations[0]
-            required_fields = ['id', 'name', 'image', 'order', 'isActive', 'createdAt']
-            has_all_fields = all(field in first for field in required_fields)
-            print_test("Location Structure", has_all_fields, 
-                      f"Fields: {', '.join(first.keys())}")
-            
-            # Verify sorted by order
-            orders = [loc.get('order', 999) for loc in locations]
-            is_sorted = orders == sorted(orders)
-            print_test("Sorted by Order", is_sorted, f"Orders: {orders[:5]}...")
-            
-            # Verify only active locations (isActive != false)
-            inactive_count = sum(1 for loc in locations if loc.get('isActive') == False)
-            print_test("Only Active Locations", inactive_count == 0, 
-                      f"Inactive count: {inactive_count}")
-        
-        return {"passed": True, "locations": locations}
-        
-    except Exception as e:
-        print_test("GET /api/locations", False, f"Exception: {str(e)}")
-        return {"passed": False, "locations": []}
-
-def test_get_locations_all(session: requests.Session) -> Dict[str, Any]:
-    """Test GET /api/locations?all=true"""
-    print_section("TEST 2: GET /api/locations?all=true")
-    
-    try:
-        response = session.get(f"{BASE_URL}/api/locations?all=true")
-        
-        if response.status_code != 200:
-            print_test("GET /api/locations?all=true", False, f"Status: {response.status_code}")
-            return {"passed": False, "locations": []}
-        
-        data = response.json()
-        locations = data.get('locations', [])
-        
-        print_test("GET /api/locations?all=true", True, f"Returned {len(locations)} locations (including inactive)")
-        
-        # Check if it includes inactive locations
-        inactive_count = sum(1 for loc in locations if loc.get('isActive') == False)
-        print(f"  {Colors.YELLOW}ℹ️  Inactive locations: {inactive_count}{Colors.END}")
-        
-        return {"passed": True, "locations": locations}
-        
-    except Exception as e:
-        print_test("GET /api/locations?all=true", False, f"Exception: {str(e)}")
-        return {"passed": False, "locations": []}
-
-def test_create_location(session: requests.Session) -> Optional[str]:
-    """Test POST /api/admin/locations"""
-    print_section("TEST 3: POST /api/admin/locations (Create)")
-    
-    # Test 1: Create without auth (should fail)
-    try:
-        no_auth_session = requests.Session()
-        response = no_auth_session.post(
-            f"{BASE_URL}/api/admin/locations",
-            json={"name": "Test Location", "image": "https://example.com/test.jpg"}
-        )
-        
-        print_test("Create Without Auth", response.status_code == 401, 
-                  f"Status: {response.status_code} (expected 401)")
-    except Exception as e:
-        print_test("Create Without Auth", False, f"Exception: {str(e)}")
-    
-    # Test 2: Create with missing name (should fail)
-    try:
-        response = session.post(
-            f"{BASE_URL}/api/admin/locations",
-            json={"image": "https://example.com/test.jpg"}
-        )
-        
-        print_test("Create Without Name", response.status_code == 400, 
-                  f"Status: {response.status_code} (expected 400)")
-    except Exception as e:
-        print_test("Create Without Name", False, f"Exception: {str(e)}")
-    
-    # Test 3: Create valid location
-    try:
-        test_location = {
-            "name": "Test Location Mumbai",
-            "image": "https://images.unsplash.com/photo-1566552881560-0be862a7c445?w=400"
-        }
-        
-        response = session.post(
-            f"{BASE_URL}/api/admin/locations",
-            json=test_location
-        )
-        
-        if response.status_code == 200:
-            data = response.json()
-            location = data.get('location', {})
-            location_id = location.get('id')
-            
-            print_test("Create Valid Location", True, 
-                      f"Created location ID: {location_id}")
-            print(f"  Location: {location.get('name')}, Order: {location.get('order')}, Active: {location.get('isActive')}")
-            
-            return location_id
-        else:
-            print_test("Create Valid Location", False, 
-                      f"Status: {response.status_code}, Response: {response.text}")
-            return None
-            
-    except Exception as e:
-        print_test("Create Valid Location", False, f"Exception: {str(e)}")
-        return None
-
-def test_create_duplicate_location(session: requests.Session):
-    """Test POST /api/admin/locations with duplicate name"""
-    print_section("TEST 4: POST /api/admin/locations (Duplicate)")
-    
-    try:
-        # Try to create duplicate "Lonavala"
-        response = session.post(
-            f"{BASE_URL}/api/admin/locations",
-            json={"name": "Lonavala", "image": "https://example.com/test.jpg"}
-        )
-        
-        print_test("Create Duplicate Location", response.status_code == 409, 
-                  f"Status: {response.status_code} (expected 409 Conflict)")
-        
-        if response.status_code == 409:
-            data = response.json()
-            print(f"  Error message: {data.get('error')}")
-            
-    except Exception as e:
-        print_test("Create Duplicate Location", False, f"Exception: {str(e)}")
-
-def test_update_location(session: requests.Session, location_id: str) -> bool:
-    """Test PUT /api/admin/locations/:id"""
-    print_section("TEST 5: PUT /api/admin/locations/:id (Update)")
-    
-    if not location_id:
-        print_test("Update Location", False, "No location ID provided")
-        return False
-    
-    # Test 1: Update name
-    try:
-        response = session.put(
-            f"{BASE_URL}/api/admin/locations/{location_id}",
-            json={"name": "Test Location Mumbai Updated"}
-        )
-        
-        if response.status_code == 200:
-            data = response.json()
-            location = data.get('location', {})
-            print_test("Update Location Name", True, 
-                      f"Updated name: {location.get('name')}")
-        else:
-            print_test("Update Location Name", False, 
-                      f"Status: {response.status_code}")
+            log_test("GET /api/villas", "FAIL", f"Expected 200, got {response.status_code}")
             return False
-            
-    except Exception as e:
-        print_test("Update Location Name", False, f"Exception: {str(e)}")
-        return False
-    
-    # Test 2: Update order
-    try:
-        response = session.put(
-            f"{BASE_URL}/api/admin/locations/{location_id}",
-            json={"order": 999}
-        )
-        
-        if response.status_code == 200:
-            data = response.json()
-            location = data.get('location', {})
-            print_test("Update Location Order", True, 
-                      f"Updated order: {location.get('order')}")
-        else:
-            print_test("Update Location Order", False, 
-                      f"Status: {response.status_code}")
-            
-    except Exception as e:
-        print_test("Update Location Order", False, f"Exception: {str(e)}")
-    
-    # Test 3: Set isActive to false (hide location)
-    try:
-        response = session.put(
-            f"{BASE_URL}/api/admin/locations/{location_id}",
-            json={"isActive": False}
-        )
-        
-        if response.status_code == 200:
-            data = response.json()
-            location = data.get('location', {})
-            print_test("Set Location Inactive", True, 
-                      f"isActive: {location.get('isActive')}")
-            return True
-        else:
-            print_test("Set Location Inactive", False, 
-                      f"Status: {response.status_code}")
-            return False
-            
-    except Exception as e:
-        print_test("Set Location Inactive", False, f"Exception: {str(e)}")
-        return False
-
-def test_inactive_location_visibility(session: requests.Session, location_id: str):
-    """Test that isActive=false hides location from public GET but shows in ?all=true"""
-    print_section("TEST 6: Inactive Location Visibility")
-    
-    if not location_id:
-        print_test("Inactive Location Visibility", False, "No location ID provided")
-        return
-    
-    # Test 1: Should NOT appear in public GET
-    try:
-        response = session.get(f"{BASE_URL}/api/locations")
-        data = response.json()
-        locations = data.get('locations', [])
-        
-        found = any(loc.get('id') == location_id for loc in locations)
-        print_test("Hidden from Public GET", not found, 
-                  f"Location {'found' if found else 'not found'} in public list")
-        
-    except Exception as e:
-        print_test("Hidden from Public GET", False, f"Exception: {str(e)}")
-    
-    # Test 2: SHOULD appear in GET ?all=true
-    try:
-        response = session.get(f"{BASE_URL}/api/locations?all=true")
-        data = response.json()
-        locations = data.get('locations', [])
-        
-        found = any(loc.get('id') == location_id for loc in locations)
-        print_test("Visible in GET ?all=true", found, 
-                  f"Location {'found' if found else 'not found'} in ?all=true list")
-        
-    except Exception as e:
-        print_test("Visible in GET ?all=true", False, f"Exception: {str(e)}")
-
-def test_update_nonexistent_location(session: requests.Session):
-    """Test PUT /api/admin/locations/:id with non-existent ID"""
-    print_section("TEST 7: PUT Non-existent Location")
-    
-    try:
-        fake_id = "00000000-0000-0000-0000-000000000000"
-        response = session.put(
-            f"{BASE_URL}/api/admin/locations/{fake_id}",
-            json={"name": "Should Not Work"}
-        )
-        
-        print_test("Update Non-existent Location", response.status_code == 404, 
-                  f"Status: {response.status_code} (expected 404)")
-        
-    except Exception as e:
-        print_test("Update Non-existent Location", False, f"Exception: {str(e)}")
-
-def test_delete_location(session: requests.Session, location_id: str) -> bool:
-    """Test DELETE /api/admin/locations/:id"""
-    print_section("TEST 8: DELETE /api/admin/locations/:id")
-    
-    if not location_id:
-        print_test("Delete Location", False, "No location ID provided")
-        return False
-    
-    # Test 1: Delete without auth (should fail)
-    try:
-        no_auth_session = requests.Session()
-        response = no_auth_session.delete(f"{BASE_URL}/api/admin/locations/{location_id}")
-        
-        print_test("Delete Without Auth", response.status_code == 401, 
-                  f"Status: {response.status_code} (expected 401)")
-    except Exception as e:
-        print_test("Delete Without Auth", False, f"Exception: {str(e)}")
-    
-    # Test 2: Delete with auth
-    try:
-        response = session.delete(f"{BASE_URL}/api/admin/locations/{location_id}")
-        
-        if response.status_code == 200:
-            print_test("Delete Location", True, f"Deleted location ID: {location_id}")
-            
-            # Verify deletion
-            verify_response = session.get(f"{BASE_URL}/api/locations?all=true")
-            data = verify_response.json()
-            locations = data.get('locations', [])
-            still_exists = any(loc.get('id') == location_id for loc in locations)
-            
-            print_test("Verify Deletion", not still_exists, 
-                      f"Location {'still exists' if still_exists else 'successfully deleted'}")
-            return True
-        else:
-            print_test("Delete Location", False, 
-                      f"Status: {response.status_code}, Response: {response.text}")
-            return False
-            
-    except Exception as e:
-        print_test("Delete Location", False, f"Exception: {str(e)}")
-        return False
-
-def test_delete_nonexistent_location(session: requests.Session):
-    """Test DELETE /api/admin/locations/:id with non-existent ID"""
-    print_section("TEST 9: DELETE Non-existent Location")
-    
-    try:
-        fake_id = "00000000-0000-0000-0000-000000000000"
-        response = session.delete(f"{BASE_URL}/api/admin/locations/{fake_id}")
-        
-        print_test("Delete Non-existent Location", response.status_code == 404, 
-                  f"Status: {response.status_code} (expected 404)")
-        
-    except Exception as e:
-        print_test("Delete Non-existent Location", False, f"Exception: {str(e)}")
-
-def cleanup_mahabaleshwar(session: requests.Session):
-    """Delete Mahabaleshwar location if it exists"""
-    print_section("CLEANUP: Delete Mahabaleshwar Location")
-    
-    try:
-        # Get all locations
-        response = session.get(f"{BASE_URL}/api/locations?all=true")
-        data = response.json()
-        locations = data.get('locations', [])
-        
-        # Find Mahabaleshwar
-        mahabaleshwar = next((loc for loc in locations if loc.get('name') == 'Mahabaleshwar'), None)
-        
-        if mahabaleshwar:
-            location_id = mahabaleshwar.get('id')
-            delete_response = session.delete(f"{BASE_URL}/api/admin/locations/{location_id}")
-            
-            if delete_response.status_code == 200:
-                print_test("Delete Mahabaleshwar", True, f"Deleted location ID: {location_id}")
-            else:
-                print_test("Delete Mahabaleshwar", False, 
-                          f"Status: {delete_response.status_code}")
-        else:
-            print(f"  {Colors.YELLOW}ℹ️  Mahabaleshwar location not found (nothing to clean up){Colors.END}")
-            
-    except Exception as e:
-        print_test("Delete Mahabaleshwar", False, f"Exception: {str(e)}")
-
-def test_villas_original_price(session: requests.Session):
-    """Test GET /api/villas returns originalPrice field"""
-    print_section("TEST 10: GET /api/villas - originalPrice Field")
-    
-    try:
-        response = session.get(f"{BASE_URL}/api/villas")
-        
-        if response.status_code != 200:
-            print_test("GET /api/villas", False, f"Status: {response.status_code}")
-            return
         
         data = response.json()
         villas = data.get('villas', [])
         
-        print_test("GET /api/villas", True, f"Returned {len(villas)} villas")
+        # Find rudra-villa
+        rudra_villa = None
+        for villa in villas:
+            if villa.get('slug') == 'rudra-villa':
+                rudra_villa = villa
+                villa_id = villa.get('id') or villa.get('slug')
+                break
         
-        # Check for rudra-villa specifically
-        rudra = next((v for v in villas if v.get('slug') == 'rudra-villa'), None)
+        if not rudra_villa:
+            log_test("GET /api/villas", "FAIL", "rudra-villa not found in villas list")
+            return False
         
-        if rudra:
-            has_original_price = 'originalPrice' in rudra
-            original_price = rudra.get('originalPrice')
-            price_per_night = rudra.get('pricePerNight')
-            
-            print_test("Rudra Villa Has originalPrice Field", has_original_price, 
-                      f"originalPrice: {original_price}, pricePerNight: {price_per_night}")
-            
-            if original_price == 24000 and price_per_night == 20000:
-                print_test("Rudra Villa Price Values", True, 
-                          "originalPrice=24000, pricePerNight=20000 ✓")
-            else:
-                print_test("Rudra Villa Price Values", False, 
-                          f"Expected originalPrice=24000, pricePerNight=20000, got {original_price}, {price_per_night}")
+        log_test("GET /api/villas", "PASS", f"Found rudra-villa (id: {villa_id})")
+        
+        # Step 2: GET /api/v1/pricing - Get pricing breakdown
+        print("\n[Step 2] GET /api/v1/pricing - Get pricing for rudra-villa")
+        
+        # Calculate dates: 60 days ahead for check-in, +2 days for check-out
+        check_in_date = (datetime.now() + timedelta(days=60)).strftime('%Y-%m-%d')
+        check_out_date = (datetime.now() + timedelta(days=62)).strftime('%Y-%m-%d')
+        
+        pricing_url = f"{BASE_URL}/api/v1/pricing?villaId=rudra-villa&checkIn={check_in_date}&checkOut={check_out_date}&guests=2"
+        response = requests.get(pricing_url, timeout=10)
+        print(f"Status: {response.status_code}")
+        
+        if response.status_code != 200:
+            log_test("GET /api/v1/pricing", "FAIL", f"Expected 200, got {response.status_code}")
+            return False
+        
+        pricing_data = response.json()
+        breakdown = pricing_data.get('breakdown', {})
+        total_amount = breakdown.get('totalAmount', 0)
+        advance_amount = breakdown.get('advanceAmount', 0)
+        
+        if not total_amount:
+            log_test("GET /api/v1/pricing", "FAIL", "No totalAmount in breakdown")
+            return False
+        
+        log_test("GET /api/v1/pricing", "PASS", 
+                f"Total: ₹{total_amount}, Advance (20%): ₹{advance_amount}")
+        
+        # Step 3: POST /api/v1/bookings - Create booking
+        print("\n[Step 3] POST /api/v1/bookings - Create booking")
+        
+        booking_payload = {
+            "villaId": "rudra-villa",
+            "villaName": "Rudra Villa",
+            "villaSlug": "rudra-villa",
+            "villaLocation": "Karjat",
+            "checkIn": check_in_date,
+            "checkOut": check_out_date,
+            "guests": 2,
+            "guestName": "Rajesh Kumar",
+            "guestEmail": "rajesh.kumar@example.com",
+            "guestPhone": "9876543210",
+            "paymentMode": "advance",
+            "specialRequests": "automated test - razorpay integration",
+            "pricing": breakdown
+        }
+        
+        response = requests.post(
+            f"{BASE_URL}/api/v1/bookings",
+            json=booking_payload,
+            headers={"Content-Type": "application/json"},
+            timeout=10
+        )
+        print(f"Status: {response.status_code}")
+        
+        if response.status_code not in [200, 201]:
+            log_test("POST /api/v1/bookings", "FAIL", 
+                    f"Expected 200/201, got {response.status_code}: {response.text}")
+            return False
+        
+        booking_data = response.json()
+        booking = booking_data.get('booking', {})
+        booking_id = booking.get('bookingId')
+        
+        if not booking_id:
+            log_test("POST /api/v1/bookings", "FAIL", "No bookingId in response")
+            return False
+        
+        log_test("POST /api/v1/bookings", "PASS", 
+                f"Booking created: {booking_id}")
+        
+        # Step 4: POST /api/v1/payments/create-order - Create Razorpay order (KEY TEST)
+        print("\n[Step 4] POST /api/v1/payments/create-order - Create Razorpay order")
+        print("⚠️  This is the critical test - checking Razorpay authentication")
+        
+        order_payload = {
+            "bookingId": booking_id,
+            "paymentMode": "advance"
+        }
+        
+        response = requests.post(
+            f"{BASE_URL}/api/v1/payments/create-order",
+            json=order_payload,
+            headers={"Content-Type": "application/json"},
+            timeout=15
+        )
+        print(f"Status: {response.status_code}")
+        print(f"Response: {response.text[:500]}")
+        
+        if response.status_code == 502:
+            error_data = response.json()
+            error_msg = error_data.get('error', 'Unknown error')
+            log_test("POST /api/v1/payments/create-order", "FAIL", 
+                    f"502 Bad Gateway - Razorpay API error: {error_msg}")
+            print("\n🔍 DIAGNOSIS:")
+            if "authentication failed" in error_msg.lower() or "401" in error_msg:
+                print("   - Razorpay returned 401 Authentication Failed")
+                print("   - This means RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET is invalid")
+                print("   - Check if the keys in /app/.env are correct")
+            return False
+        
+        if response.status_code != 200:
+            log_test("POST /api/v1/payments/create-order", "FAIL", 
+                    f"Expected 200, got {response.status_code}: {response.text}")
+            return False
+        
+        order_data = response.json()
+        order_id = order_data.get('orderId')
+        amount = order_data.get('amount')
+        currency = order_data.get('currency')
+        key_id = order_data.get('keyId')
+        
+        # Validate response structure
+        validation_errors = []
+        
+        if not order_id:
+            validation_errors.append("Missing orderId")
+        elif not order_id.startswith('order_'):
+            validation_errors.append(f"orderId doesn't start with 'order_': {order_id}")
+        
+        if not amount:
+            validation_errors.append("Missing amount")
         else:
-            print(f"  {Colors.YELLOW}ℹ️  Rudra Villa not found in results{Colors.END}")
+            # Amount should be in paise (~20% of total)
+            expected_amount_paise = int(advance_amount * 100)
+            if abs(amount - expected_amount_paise) > 100:  # Allow 1 rupee tolerance
+                validation_errors.append(
+                    f"Amount mismatch: expected ~{expected_amount_paise} paise, got {amount} paise"
+                )
         
-        # Check if any villa has originalPrice
-        villas_with_original = [v for v in villas if v.get('originalPrice') is not None]
-        print(f"  {Colors.YELLOW}ℹ️  {len(villas_with_original)}/{len(villas)} villas have originalPrice set{Colors.END}")
+        if currency != 'INR':
+            validation_errors.append(f"Currency should be 'INR', got '{currency}'")
         
+        if not key_id:
+            validation_errors.append("Missing keyId")
+        elif not key_id.startswith('rzp_live_'):
+            validation_errors.append(f"keyId doesn't start with 'rzp_live_': {key_id}")
+        
+        if validation_errors:
+            log_test("POST /api/v1/payments/create-order", "FAIL", 
+                    "Response validation failed:\n   - " + "\n   - ".join(validation_errors))
+            return False
+        
+        log_test("POST /api/v1/payments/create-order", "PASS", 
+                f"Razorpay order created successfully!\n" +
+                f"   - Order ID: {order_id}\n" +
+                f"   - Amount: {amount} paise (₹{amount/100})\n" +
+                f"   - Currency: {currency}\n" +
+                f"   - Key ID: {key_id}")
+        
+        # Step 5: GET /api/v1/bookings?bookingId=<id> - Verify booking updated
+        print("\n[Step 5] GET /api/v1/bookings?bookingId=<id> - Verify booking updated")
+        
+        response = requests.get(
+            f"{BASE_URL}/api/v1/bookings?bookingId={booking_id}",
+            timeout=10
+        )
+        print(f"Status: {response.status_code}")
+        
+        if response.status_code != 200:
+            log_test("GET /api/v1/bookings (verify update)", "FAIL", 
+                    f"Expected 200, got {response.status_code}")
+            return False
+        
+        booking_data = response.json()
+        booking = booking_data.get('booking', {})
+        razorpay_order_id = booking.get('razorpayOrderId')
+        
+        if razorpay_order_id != order_id:
+            log_test("GET /api/v1/bookings (verify update)", "FAIL", 
+                    f"razorpayOrderId not updated. Expected: {order_id}, Got: {razorpay_order_id}")
+            return False
+        
+        log_test("GET /api/v1/bookings (verify update)", "PASS", 
+                f"Booking updated with razorpayOrderId: {razorpay_order_id}")
+        
+        # Step 6: Negative test - POST /api/v1/payments/verify with fake signature
+        print("\n[Step 6] POST /api/v1/payments/verify - Negative test (fake signature)")
+        
+        verify_payload = {
+            "razorpay_payment_id": "pay_fake123456789",
+            "razorpay_order_id": order_id,
+            "razorpay_signature": "fake_signature_12345678901234567890123456789012",
+            "bookingId": booking_id
+        }
+        
+        response = requests.post(
+            f"{BASE_URL}/api/v1/payments/verify",
+            json=verify_payload,
+            headers={"Content-Type": "application/json"},
+            timeout=10
+        )
+        print(f"Status: {response.status_code}")
+        
+        if response.status_code == 500:
+            log_test("POST /api/v1/payments/verify (negative)", "FAIL", 
+                    "Expected 400 for invalid signature, got 500 (server error)")
+            return False
+        
+        if response.status_code != 400:
+            log_test("POST /api/v1/payments/verify (negative)", "FAIL", 
+                    f"Expected 400 for invalid signature, got {response.status_code}")
+            return False
+        
+        error_data = response.json()
+        error_msg = error_data.get('error', '')
+        
+        if 'signature' not in error_msg.lower():
+            log_test("POST /api/v1/payments/verify (negative)", "FAIL", 
+                    f"Expected signature error message, got: {error_msg}")
+            return False
+        
+        log_test("POST /api/v1/payments/verify (negative)", "PASS", 
+                f"Correctly rejected fake signature with 400: {error_msg}")
+        
+        # Step 7: Negative test - POST /api/v1/payments/create-order without bookingId
+        print("\n[Step 7] POST /api/v1/payments/create-order - Negative test (no bookingId)")
+        
+        response = requests.post(
+            f"{BASE_URL}/api/v1/payments/create-order",
+            json={},
+            headers={"Content-Type": "application/json"},
+            timeout=10
+        )
+        print(f"Status: {response.status_code}")
+        
+        if response.status_code != 400:
+            log_test("POST /api/v1/payments/create-order (negative)", "FAIL", 
+                    f"Expected 400 for missing bookingId, got {response.status_code}")
+            return False
+        
+        log_test("POST /api/v1/payments/create-order (negative)", "PASS", 
+                "Correctly rejected request without bookingId with 400")
+        
+        print("\n" + "="*80)
+        print("✅ ALL TESTS PASSED - RAZORPAY INTEGRATION WORKING!")
+        print("="*80)
+        return True
+        
+    except requests.exceptions.RequestException as e:
+        log_test("Request Error", "FAIL", f"Network error: {str(e)}")
+        return False
     except Exception as e:
-        print_test("GET /api/villas", False, f"Exception: {str(e)}")
-
-def main():
-    """Main test execution"""
-    print(f"\n{Colors.BLUE}{'='*60}{Colors.END}")
-    print(f"{Colors.BLUE}Malle Stays - Locations CRUD API Testing{Colors.END}")
-    print(f"{Colors.BLUE}Base URL: {BASE_URL}{Colors.END}")
-    print(f"{Colors.BLUE}{'='*60}{Colors.END}")
-    
-    # Create session with cookies
-    session = requests.Session()
-    
-    # Step 1: Login
-    print_section("AUTHENTICATION")
-    if not login_admin(session):
-        print(f"\n{Colors.RED}❌ Authentication failed. Cannot proceed with tests.{Colors.END}")
-        sys.exit(1)
-    
-    # Step 2: Test public GET endpoints
-    test_get_locations_public(session)
-    test_get_locations_all(session)
-    
-    # Step 3: Test CREATE
-    location_id = test_create_location(session)
-    test_create_duplicate_location(session)
-    
-    # Step 4: Test UPDATE
-    if location_id:
-        test_update_location(session, location_id)
-        test_inactive_location_visibility(session, location_id)
-    
-    test_update_nonexistent_location(session)
-    
-    # Step 5: Test DELETE
-    if location_id:
-        test_delete_location(session, location_id)
-    
-    test_delete_nonexistent_location(session)
-    
-    # Step 6: Cleanup Mahabaleshwar
-    cleanup_mahabaleshwar(session)
-    
-    # Step 7: Test villas originalPrice
-    test_villas_original_price(session)
-    
-    # Summary
-    print(f"\n{Colors.BLUE}{'='*60}{Colors.END}")
-    print(f"{Colors.GREEN}✅ Testing Complete!{Colors.END}")
-    print(f"{Colors.BLUE}{'='*60}{Colors.END}\n")
+        log_test("Unexpected Error", "FAIL", f"Error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return False
+    finally:
+        # Cleanup: Cancel the test booking
+        if booking_id:
+            print("\n[Cleanup] Cancelling test booking...")
+            try:
+                cleanup_response = requests.put(
+                    f"{BASE_URL}/api/v1/bookings",
+                    json={"bookingId": booking_id, "status": "cancelled"},
+                    headers={"Content-Type": "application/json"},
+                    timeout=10
+                )
+                if cleanup_response.status_code == 200:
+                    print(f"✅ Test booking {booking_id} cancelled successfully")
+                else:
+                    print(f"⚠️  Failed to cancel booking: {cleanup_response.status_code}")
+            except Exception as e:
+                print(f"⚠️  Cleanup error: {str(e)}")
 
 if __name__ == "__main__":
-    main()
+    success = test_razorpay_payment_flow()
+    sys.exit(0 if success else 1)

@@ -551,6 +551,114 @@ backend:
         agent: "testing"
         comment: "✅ PASS - GET /api/villas originalPrice field working correctly: Field included in response, rudra-villa has correct values (originalPrice=24000, pricePerNight=20000), 3/4 villas have originalPrice set."
 
+  - task: "Pricing API - GET endpoint"
+    implemented: true
+    working: true
+    file: "/app/app/api/v1/pricing/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "GET /api/v1/pricing endpoint calculates pricing breakdown with weekday/weekend rates, extra guest charges, GST, cleaning fee, security deposit, and advance amount (20%)"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - GET /api/v1/pricing working correctly: Returns 200 with complete breakdown including totalAmount (₹45,800), advanceAmount (₹9,160 = 20%), night-by-night pricing, GST calculation, all required fields present."
+
+  - task: "Bookings API - POST create booking"
+    implemented: true
+    working: true
+    file: "/app/app/api/v1/bookings/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "POST /api/v1/bookings endpoint creates bookings with availability checking, generates bookingId, validates required fields"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - POST /api/v1/bookings working correctly: Creates booking successfully with all required fields, returns bookingId (format: MS-XXXXXXXX-XXXX), validates required fields, checks availability, returns 200 with booking object."
+
+  - task: "Bookings API - GET endpoint"
+    implemented: true
+    working: true
+    file: "/app/app/api/v1/bookings/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "GET /api/v1/bookings?bookingId=xxx endpoint retrieves booking by bookingId"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - GET /api/v1/bookings working correctly: Returns 200 with booking object, includes razorpayOrderId field when updated, proper error handling (404 for non-existent bookings)."
+
+  - task: "Bookings API - PUT update booking"
+    implemented: true
+    working: true
+    file: "/app/app/api/v1/bookings/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "PUT /api/v1/bookings endpoint updates booking status, payment status, razorpayOrderId, blocks dates when confirmed"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - PUT /api/v1/bookings working correctly: Updates booking status to 'cancelled', returns 200, validates bookingId required (400 if missing)."
+
+  - task: "Razorpay Payment - Create Order API"
+    implemented: true
+    working: true
+    file: "/app/app/api/v1/payments/create-order/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "POST /api/v1/payments/create-order endpoint creates Razorpay order, calculates amount based on payment mode (advance=20%, full=100%), updates booking with razorpayOrderId"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - POST /api/v1/payments/create-order working perfectly after RAZORPAY_KEY_SECRET fix: Returns 200 with orderId starting with 'order_' (order_TfXjyaMU3X74Qv), amount in paise (916000 = ₹9,160 for 20% advance), currency 'INR', keyId 'rzp_live_TbBwyCzbdG4iLy'. Booking document updated with razorpayOrderId. Previously failed with 502 (Razorpay 401 auth error), now working correctly. Validates bookingId required (400 if missing)."
+
+  - task: "Razorpay Payment - Verify Payment API"
+    implemented: true
+    working: true
+    file: "/app/app/api/v1/payments/verify/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "POST /api/v1/payments/verify endpoint verifies Razorpay payment signature using HMAC SHA256, updates booking status to confirmed, blocks dates"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - POST /api/v1/payments/verify working correctly: Properly validates payment signature, returns 400 'Invalid payment signature' for fake signatures (not 500), validates required fields (razorpay_payment_id, razorpay_order_id, razorpay_signature)."
+
+  - task: "Razorpay Integration - Authentication"
+    implemented: true
+    working: true
+    file: "/app/lib/razorpay.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "User reported Razorpay integration failing with 502 error - authentication failed. RAZORPAY_KEY_SECRET was incorrect in .env"
+      - working: "NA"
+        agent: "main"
+        comment: "Fixed RAZORPAY_KEY_SECRET in /app/.env, restarted server. getRazorpayHeaders() function uses Basic Auth with RAZORPAY_KEY_ID:RAZORPAY_KEY_SECRET base64 encoded"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - Razorpay authentication working correctly after fixing RAZORPAY_KEY_SECRET: Successfully creates orders with Razorpay API, returns valid order IDs, no more 502/401 errors. Integration fully functional."
+
 frontend:
   - task: "Frontend Integration Testing"
     implemented: false
@@ -566,17 +674,15 @@ frontend:
 
 metadata:
   created_by: "testing_agent"
-  version: "1.2"
-  test_sequence: 3
+  version: "1.3"
+  test_sequence: 4
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Locations API - GET public endpoint"
-    - "Locations API - POST create location"
-    - "Locations API - PUT update location"
-    - "Locations API - DELETE location"
-    - "Villas API - originalPrice field"
+    - "Razorpay Payment - Create Order API"
+    - "Razorpay Payment - Verify Payment API"
+    - "Razorpay Integration - Authentication"
   stuck_tasks:
     - "Guest Reviews API - DELETE review"
   test_all: false
@@ -591,6 +697,8 @@ agent_communication:
     message: "🔄 VILLA UPDATE TESTING COMPLETE - All villa update functionality working perfectly! Authentication fixed: NextAuth session properly established, checkAuth function returns correct user object with role. PUT endpoint working flawlessly: updates all villa fields correctly (name, description, numeric fields like bathrooms/parking), proper data type parsing, database persistence verified. Error handling working: 404 for non-existent villas. The checkAuth fix resolved the authentication issues completely."
   - agent: "testing"
     message: "🎯 LOCATIONS CRUD API TESTING COMPLETE - All endpoints working perfectly! GET /api/locations returns 7 seeded locations sorted by order, GET ?all=true includes inactive locations, POST creates with auth/validation/duplicate checking (409), PUT updates name/order/isActive with duplicate checking, DELETE requires auth and returns proper 404. isActive=false correctly hides from public GET but shows in ?all=true. Villa originalPrice field confirmed working (rudra-villa: originalPrice=24000, pricePerNight=20000). All 27 test cases passed. Test data cleaned up successfully."
+  - agent: "testing"
+    message: "💳 RAZORPAY PAYMENT INTEGRATION TESTING COMPLETE - All payment endpoints working perfectly! After fixing RAZORPAY_KEY_SECRET in .env, the integration is fully functional. POST /api/v1/payments/create-order successfully creates Razorpay orders (returns orderId starting with 'order_', amount in paise, currency INR, keyId rzp_live_*), booking document updated with razorpayOrderId, payment verification working with proper signature validation (400 for invalid signatures), error handling correct (400 for missing bookingId). Previously failed with 502 (Razorpay 401 auth error), now all 7 test cases passed including negative tests. Test booking cleaned up successfully."
 
 ## Session: Premium OTA-style Price Display (Feb 2026)
 - Created shared `/app/components/PriceDisplay.js` (bold current price, inline strikethrough original, "per night" below).
@@ -628,3 +736,22 @@ agent_communication:
 - Root cause of failed Emergent deploy: "'sharp' is required in standalone mode" -> added `sharp` ^0.35.4 to package.json (next/image used in app/page.js, Navbar, Footer).
 - Second blocker found by deployment_agent: .gitignore had corrupted duplicate lines (82-163) ignoring .env -> removed; .env no longer ignored. Added memory/test_credentials.md to .gitignore.
 - `yarn next build` exit 0; deployment_agent re-scan: PASS.
+
+## Session: Razorpay Payment Integration Testing (Feb 2026)
+- Verified Razorpay payment integration after fixing RAZORPAY_KEY_SECRET in /app/.env
+- Tested complete payment flow: villa selection → pricing → booking creation → Razorpay order creation → booking update → payment verification
+- All 7 test cases passed including negative tests (invalid signature, missing bookingId)
+- Key results:
+  * POST /api/v1/payments/create-order: Successfully creates Razorpay orders (orderId: order_*, amount in paise, currency: INR, keyId: rzp_live_*)
+  * Booking document properly updated with razorpayOrderId
+  * Payment signature verification working correctly (400 for invalid signatures)
+  * Error handling correct (400 for missing required fields)
+- Previously failed with 502 (Razorpay 401 authentication error), now fully functional
+- Test booking cleaned up successfully (cancelled status)
+- Backend APIs: GET /api/villas, GET /api/v1/pricing, POST /api/v1/bookings, GET /api/v1/bookings, PUT /api/v1/bookings, POST /api/v1/payments/create-order, POST /api/v1/payments/verify - all working correctly
+
+## Session: Razorpay Key Fix (Feb 2026)
+- Root cause: RAZORPAY_KEY_SECRET in .env had 2 extra trailing chars -> Razorpay 401 "Authentication failed" -> create-order returned 502.
+- Fixed .env secret (value provided by user), restarted. create-order route now surfaces Razorpay's error description + explicit message on 401.
+- Backend test: 7/7 passed (pricing -> booking -> create-order 200 order_... -> verify negative 400 -> cleanup).
+- User must mirror RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET / NEXT_PUBLIC_RAZORPAY_KEY_ID on the live host env.
