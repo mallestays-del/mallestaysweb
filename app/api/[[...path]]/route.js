@@ -503,12 +503,13 @@ export async function POST(request) {
           });
 
           // Send email with Resend
-          const { resend, fromAddress } = await import('@/lib/resend');
+          const { getResend, fromAddress } = await import('@/lib/resend');
           const { passwordResetEmail } = await import('@/lib/email-templates');
           
           const resetUrl = `${process.env.APP_URL || 'http://localhost:3000'}/admin/reset-password?token=${rawToken}`;
           const emailContent = passwordResetEmail(admin.name || 'Admin', resetUrl);
 
+          const resend = getResend();
           await resend.emails.send({
             from: fromAddress,
             to: [admin.email],

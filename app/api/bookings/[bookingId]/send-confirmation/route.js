@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { resend, fromAddress } from '@/lib/resend';
+import { getResend, fromAddress } from '@/lib/resend';
 import { bookingConfirmationEmail } from '@/lib/email-templates';
 import { getDatabase } from '@/lib/mongodb';
 
@@ -56,6 +56,7 @@ export async function POST(request, { params }) {
     const email = bookingConfirmationEmail(emailData);
 
     // Send email via Resend
+    const resend = getResend();
     const { data, error } = await resend.emails.send({
       from: fromAddress,
       to: [booking.guestEmail],
