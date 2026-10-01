@@ -1,186 +1,156 @@
-<analysis>
+<analysis>Here is the handover summary for the next agent:
 
-**original_problem_statement**:
-The user wants to continue building their comprehensive Luxury Villa Booking Platform, Malle Stays.
+**original_problem_statement**: 
+The user is building **Malle Stays**, a luxury villa booking platform. In this session, the user reported a failure in creating a payment order via Razorpay, requested integration of the WhatsApp Cloud API for notifications, asked about Vercel environment variables, and reported that recent UI changes (ISO 9001:2015 certification badges) were not reflecting on their live production site. PRODUCT REQUIREMENTS include fixing the checkout flow, implementing automated WhatsApp messages (booking confirmation, admin alerts, reminders, recovery), and ensuring the live deployment matches the sandbox state.
 
-**PRODUCT REQUIREMENTS from this session and previous sessions**:
-- Fix a fatal  error that is crashing the application.
-- Re-implement the file upload system to use a persistent cloud storage solution (Cloudinary) instead of the local filesystem.
-- Fix an error that occurs when updating villa details.
-- Fix an error toast (An error occurred) when adding a new villa.
-- Fix a  error when handling property image URLs.
-- Implement a real-time guest review submission system on the villa detail pages, with image support.
-- Fix a recurring Cloudflare 520 error.
-- Fix a recurring Unknown API key error for Cloudinary uploads.
-- Remove the Paste Image URL option from the admin guest review form.
-- Guide the user on how to push code to GitHub securely.
-- Provide guidance on deployment options for the Next.js application.
-- Add Schema.org structured data to the website for SEO.
-- Implement comprehensive SEO features (sitemaps, robots.txt, metadata).
-- Remove any made with Emergent watermarks.
-- Remove hardcoded demo credentials from the admin login page for security.
-- Provide detailed, step-by-step instructions for deploying to Vercel with MongoDB Atlas.
-- (Future) Implement real AI Chat Support.
-- (Future) Implement a real Booking System (currently redirects to WhatsApp).
-- (Future) Make Homepage Locations Dynamic.
-- (Future) Payment Gateway Integration.
+**User's preferred language**: English (Next agent MUST respond in English).
 
-**User's preferred language**: English
+**what currently exists?**: 
+A Next.js 14 full-stack app with a MongoDB database. Features include public villa browsing, detailed villa pages, an availability calendar, dynamic admin-managed locations, checkout flow with Razorpay, and SEO metadata. The WhatsApp Cloud API credentials have been verified and saved to the environment, but the code implementation is pending.
 
-**what currently exists?**
-The Malle Stays platform is a stable, feature-rich, full-stack Next.js application. The critical  error has been resolved. The file upload system has been successfully migrated from an unreliable local storage implementation to a production-ready Cloudinary integration. The frontend features a dynamic guest review section on the homepage, and users can now submit new reviews with images directly from individual villa pages.
-
-The admin panel is fully functional for managing villas and guest reviews. Several critical bugs related to updating/adding villas and authentication have been fixed.
-
-Comprehensive SEO enhancements have been implemented, including dynamic sitemaps, a  file, and Schema.org structured data for  and  (villas), significantly improving its readiness for search engine visibility. The application is now considered stable and ready for deployment, with the user being actively guided through the deployment process.
-
-**Last working item**:
-    - Last item agent was working: Providing the user with a detailed, step-by-step guide on how to deploy the Next.js application to Vercel (Step 3), following a detailed guide on setting up the required MongoDB Atlas database (Step 2).
-    - Status: COMPLETED
-    - Agent Testing Done: N/A
-    - Which testing method agent to use? N/A (This was a guidance task)
-    - User Testing Done: N/A
+**Last working item**: 
+- Last item agent was working: Explaining to the user why their recent UI changes (ISO badges) and Razorpay fixes are not visible on their live Vercel site. The agent identified that the sandbox has ~40 unpushed commits, meaning Vercel is deploying an old version of the GitHub repository. The agent instructed the user to use the Emergent Save to GitHub button.
+- Status: BLOCKED (Waiting for user to click Save to GitHub and to provide phone numbers for WhatsApp).
+- Agent Testing Done: Y (Screenshot tool confirmed UI renders perfectly in sandbox; bash scripts verified Razorpay backend).
+- Which testing method agent to use? screenshot tool / manual backend API check.
+- User Testing Done: N
 
 **All Pending/In progress Issue list**:
-There are no pending bugs or issues. All issues raised by the user during this session have been resolved. The remaining work consists of implementing future features.
+- Issue 1 (P0): Production site is out of sync with sandbox.
+  - Attempted fixes: Agent instructed the user to click Save to GitHub. Agent cannot run  directly.
+  - Next debug checklist: Ask user if they have successfully clicked Save to GitHub and if Vercel has redeployed.
+  - Why fix this issue: The live site will remain broken and missing features until synced.
+  - Status: BLOCKED (User Action Required)
+  - Is recurring issue? Y
+  - Should Test frontend/backend/both after fix? NA (User verification required)
+
+- Issue 2 (P0): Razorpay environment variables missing in Vercel.
+  - Attempted fixes: Agent provided the exact keys to the user to manually add to Vercel.
+  - Next debug checklist: Confirm with the user if they added the variables to Vercel and redeployed.
+  - Why fix this issue: Production checkout will fail until these are added.
+  - Status: BLOCKED (User Action Required)
+  - Is recurring issue? N
+  - Should Test frontend/backend/both after fix? NA (User verification required)
+
+- Issue 3 (P1): Security vulnerabilities.
+  - Attempted fixes: Identified in previous fork but not addressed due to priority of user requests.
+  - Next debug checklist: Check  (unauthenticated) and  (exposes PII).
+  - Why fix this issue: Prevents data leaks and malicious uploads.
+  - Status: NOT STARTED
+  - Is recurring issue? N
+  - Should Test frontend/backend/both after fix? Backend
 
 **In progress Task List**:
-  No tasks are currently in progress.
+- Task 1 (P0): WhatsApp API Integration.
+  - Where to resume: Agent validated the permanent token and checked approved Meta templates. Waiting on the user to provide their Admin/Owner phone number and a personal Test phone number. Once received, implement , create a test endpoint, wire to the checkout flow, and create cron endpoints.
+  - What will be achieved with this: Automated guest and admin messaging.
+  - Status: BLOCKED (Waiting for phone numbers from user).
+  - Should Test frontend/backend/both after fix? Backend
+  - Blocked on something: User providing test/admin phone numbers.
 
-**Upcoming and Future Tasks**
-Upcoming Tasks:
-- **(P0) User-guided Deployment**: The user has chosen to deploy the application to Vercel. The next agent should be prepared to answer follow-up questions or assist with troubleshooting the deployment process based on the detailed guides already provided.
-- **(P1) Implement Real AI Chat Support**: Replace the mock AI chat API with a real integration using an LLM service like OpenAI. The  agent should be used to get the implementation plan.
-- **(P1) Implement a Real Booking System**: The current Book Now buttons redirect to WhatsApp. This needs to be replaced with a proper booking system that creates and stores booking records in the database, manages villa availability, and provides a user interface for managing bookings.
-- **(P2) Make Homepage Locations Dynamic**: The Prestigious Locations section on the homepage is currently hardcoded. This should be refactored to fetch the list of unique locations directly from the  collection in the database.
+**Upcoming and Future Tasks**:
+- P1: Verify live Resend end-to-end delivery (Email confirmation & Password resets).
+- P2: Production database seeding (Atlas might be empty causing No properties on home page).
+- P2: AI Chat integration (Currently mocked,  is present. MUST use ).
+- P2: Search availability logic (Dates submitted on homepage currently don't filter out booked villas).
+- P3: Apply Offers/Coupons to pricing calculation logic.
+- P3: Refactor the monolithic .
 
-Future Tasks:
-- Payment Gateway Integration (e.g., Stripe/Razorpay)
-- A dedicated Mobile App
-- Dynamic pricing models
-- Customer loyalty program
-- Multi-language support
+**Completed work in this session**:
+- Improved error handling in  to show precise failure reasons (e.g., Villa is already booked) instead of generic errors.
+- Cleaned up stale pending bookings in the database that were causing 409 conflicts during checkout.
+- Saved and verified WhatsApp Cloud API permanent tokens to .
 
-**Completed work in this session**
-- **Critical Crash Fix**:
-  - Resolved the  error by increasing the Node.js memory allocation in  and restarting the service.
-- **Cloudinary File Upload Migration**:
-  - Replaced the temporary local file storage system with a robust Cloudinary integration for all image uploads.
-  - Installed and configured the  SDK.
-  - Rewrote the  endpoint to upload files to Cloudinary.
-  - Fixed a recurring Unknown API key error by moving the Cloudinary configuration inside the request handler to ensure environment variables are loaded on every call.
-- **Bug Fixes & Stability Improvements**:
-  - Fixed an error preventing villa details from being updated by refactoring the  function and its usage across all API endpoints ().
-  - Fixed a  crash by adding null/undefined checks in the villa add/edit pages.
-  - Improved error handling on admin forms to display specific server-side errors instead of generic messages.
-- **Feature Enhancements**:
-  - **Guest-Side Review Submission**: Added a complete review submission form to the villa detail pages (), allowing guests to leave ratings, text, and upload images.
-  - **Comprehensive SEO Implementation**:
-    - Added Schema.org structured data (, ) to the homepage and villa detail pages using new files  and .
-    - Generated a dynamic  file via .
-    - Verified and ensured the  is comprehensive.
-    - Added more robust metadata handling.
-- **Security and UI/UX Fixes**:
-  - Removed publicly visible demo credentials from the admin login page ().
-  - Removed the Paste Image URL input field from the admin guest review form as requested by the user.
-- **User Guidance and Support**:
-  - Provided extensive, detailed instructions on how to add reviews.
-  - Correctly guided the user on security best practices for pushing code to GitHub, directing them to the platform's built-in feature instead of handling credentials directly.
-  - Provided a comprehensive guide on deployment options (Emergent, Vercel, Railway, VPS).
-  - Delivered a highly detailed, step-by-step walkthrough for setting up a MongoDB Atlas database and deploying the application to Vercel.
+**Earlier issues found/mentioned but not fixed**:
+- Issue 1:  is unauthenticated and lacks size/type validation.
+- Issue 2:  is public and exposes booking PII.
+- Issue 3: Razorpay webhook can accept requests with no signature header (Webhook secret is not configured in ).
 
-**Earlier issues found/mentioned but not fixed**
-- **Potential Cloudinary Env Var Issue**: A mock-api-key error recurred even after an initial fix. A more robust solution was implemented (configuring Cloudinary inside the POST handler), and multiple server restarts were performed. While it appears stable now, if the issue returns, it's related to the timing of environment variable loading in the Next.js lifecycle. The next agent should be aware of this and first check the logs and consider a server restart if it reappears.
+**Known issue recurrence from previous fork**:
+- Issue recurrence in previous fork: User confusion regarding Sandbox code not reflecting in Vercel production.
+- Recurrence count: 2
+- Status: BLOCKED (Requires user to click Save to GitHub).
 
-**Known issue recurrence from previous fork**
-N/A
+**Code Architecture**:
+- Next.js App Router (, ).
+- Backend routes are primarily monolithic, with modular payment/booking logic in .
+- UI uses Tailwind CSS and shadcn/ui components.
 
-**Code Architecture**
+**Key Technical Concepts**:
+Next.js 14, React Server Components, MongoDB Native Node Driver, Razorpay Node SDK, WhatsApp Cloud Graph API.
 
+**key DB schema**:
+- : {id, slug, name, pricePerNight, originalPrice, location}
+- : {bookingId, villaId, guestName, checkIn, checkOut, status, amount}
+- : {villaId, date, reason, bookingId}
 
-**Key Technical Concepts**
-- **Next.js App Router**: Core framework.
-- **NextAuth.js**: Authentication.
-- **MongoDB**: Primary database.
-- **Cloudinary Integration**: The application now uses the Cloudinary Node.js SDK for persistent, cloud-based image storage. Configuration is handled within the API route to ensure environment variables are loaded correctly at runtime.
-- **SEO**:
-    - **Schema.org (JSON-LD)**: Structured data for  and  (Villas) has been added to improve search engine understanding.
-    - **Dynamic Metadata**:  and  are dynamically generated.
-- **Monolithic API Route**: A single  file continues to handle almost all backend logic. While functional, it is becoming increasingly complex.
+**changes in tech stack**:
+None, but WhatsApp Cloud API keys were successfully validated and added to the environment variables.
 
-**key DB schema**
-- **reviews**: The schema was implicitly updated. New reviews now include  and .
-
-**changes in tech stack**
-- Added  npm package.
-
-**All files of reference**
-- : Heavily modified to fix authentication logic, add a new endpoint for villa-specific reviews, and update the review creation endpoint.
-- : Completely rewritten to use Cloudinary SDK instead of local file system writes. This is a critical production-ready change.
-- : Significantly enhanced with a new guest review submission form and Schema.org structured data.
-- : Modified to remove a security vulnerability (hardcoded demo credentials).
-- : Modified to fix the heap memory crash.
-- , : New files that implement the Schema.org feature.
+**All files of reference**:
+- : Updated to handle and display specific backend error messages for payment initialization.
+- : Handles Razorpay order creation.
+- : Updated with , , .
 
 **Areas that need refactoring**:
-- **Monolithic API (CRITICAL)**: The file  is now even larger and more complex. It handles logic for villas, users, auth, settings, and multiple types of review endpoints. It is a significant technical debt and a source of potential bugs. It should be broken down into resource-specific route files (e.g., , ).
+-  is ~850 lines long and handles too many distinct domains.
 
-**key api endpoints**
-- : (Rewritten) Uploads a file to Cloudinary.
-- : (New) Fetches all reviews for a specific villa.
-- : (Modified) The payload now accepts  and .
-- : (Fixed) The authentication and error handling were repaired.
-
-**Critical Info for New Agent**
-1.  **Deployment Guidance**: The user has been given very detailed instructions on deploying to Vercel using a MongoDB Atlas database. Be prepared to assist with troubleshooting this process, as it involves third-party services. The user chose Option 2 and has received detailed guides for Step 2 (MongoDB) and Step 3 (Vercel).
-2.  **Application is Stable**: All reported bugs and crashes have been fixed. The application is in a healthy, deployable state.
-3.  **Cloudinary is Integrated**: The file upload system is now production-ready. If any mock-api-key errors resurface, the likely cause is environment variable loading issues. The current implementation (configuring the SDK inside the handler) is robust, but a server restart is the first step in debugging.
-4.  **GitHub Credentials**: The user has previously shared credentials in chat. The agent correctly instructed the user on the secure way to push code using the platform's features and advised them to change their password. Do not handle git operations or credentials directly.
-
-**documents created in this job**
+**key api endpoints**:
 - 
 - 
 - 
-- 
-- 
-- 
--  (temporary, deleted)
--  (temporary, deleted)
 
-**Last 10 User Messages and any pending HUMAN messages**
-1.  **Step 3**: PENDING USER ACTION. User asked for details on Vercel deployment, which the agent provided. The user now needs to follow the guide.
-2.  **Step 2 in detail**: COMPLETED. User asked for details on MongoDB Atlas setup. Agent provided a comprehensive guide.
-3.  **2**: COMPLETED. User chose Vercel as their preferred deployment option.
-4.  **i want to deploy tell me the options**: COMPLETED. Agent provided a detailed breakdown of deployment choices.
-5.  **tell me the email and password**: COMPLETED. Agent provided the admin credentials.
-6.  **Demo Credentials: it should be not display on web**: COMPLETED. Agent removed the hardcoded credentials from the login page.
-7.  **remove water mark made with Emergent**: COMPLETED. Agent verified no such watermark exists.
-8.  **my website should support full SEO**: COMPLETED. Agent implemented a comprehensive set of SEO features.
-9.  **add schema in my website**: COMPLETED. Agent implemented Schema.org structured data.
-10. **i want to deploy from github to hostingure**: COMPLETED. Agent clarified the user's needs and provided a detailed guide on suitable hosting options for a Next.js app.
+**Critical Info for New Agent**:
+1. **DO NOT attempt git write operations** (e.g., , On branch main
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	yarn.lock
 
-**Project Health Check:**
-- **Healthy**: The application is stable and all critical bugs are resolved.
-- **Mocked**:
-    - AI Chatbot ().
-    - Booking System (still redirects to WhatsApp).
+nothing added to commit but untracked files present (use "git add" to track)). Continue instructing the user to use the Emergent UI's Save to GitHub button.
+2. The user's production site (Vercel) is currently broken for payments because it lacks the Razorpay  variables, and the UI is missing the ISO badges because they haven't synced GitHub. You must ensure the user resolves this.
+3. The WhatsApp Permanent Access token is successfully validated. Wait for the user to provide the target phone numbers before writing the WhatsApp integration logic. 
 
-**3rd Party Integrations**
-- **MongoDB**: Primary database.
-- **NextAuth.js**: Authentication.
-- **Cloudinary**: **Implemented and working**. Used for all image uploads.
+**documents and test reports created in this job**:
+-  (Maintained)
 
-**Testing status**
-- Testing agent used after significant changes: YES (used to test backend endpoints after bug fixes).
+**Last 10 User Messages and any pending HUMAN messages**:
+1. User reported checkout payment failure. (Agent fixed error swallowing, identified 409 conflict, cleaned DB).
+2. User provided short-lived WhatsApp token. (Agent saved, found it expired).
+3. User clarified 4 WhatsApp features they want.
+4. User asked if Razorpay keys are needed on Vercel. (Agent explicitly said YES and provided them).
+5. User said they don't see Razorpay options on Vercel. (Agent explained they must be manually Added).
+6. User asked for exact Razorpay keys. (Agent provided them).
+7. User provided a new WhatsApp Permanent access token. (Agent successfully validated it).
+8. User complained that the ISO Certificate UI changes aren't reflecting in production.
+- *Pending Human Action*: User needs to click Save to GitHub to sync Vercel, add Razorpay env vars to Vercel, and provide Admin/Test phone numbers for the WhatsApp build.
+
+**Project Health Check**:
+- Broken: Production environment on Vercel (Out of sync with codebase, missing ENV variables).
+- Mocked: AI Chat implementation ().
+
+**3rd Party Integrations**:
+- Razorpay (Payments) — requires User API Key
+- WhatsApp Cloud API (Messaging) — requires User API Key (Permanent token saved in )
+- Resend (Email) — requires User API Key
+- MongoDB Atlas (Database) — requires User API Key/Connection string
+- Cloudinary (Media) — requires User API Key
+- OpenAI (Chat) — requires User API Key (Key is in , but not utilized yet. Use  for implementation).
+
+**Testing status**:
+- Testing agent used after significant changes: NO (No new backend features written, only UI bug fixing/investigation).
 - Troubleshoot agent used after agent stuck in loop: NO
-- Test files created: None for automated testing agents. Temporary manual scripts () were created for debugging and then deleted.
-- Known regressions: None.
+- Test files created: None
+- Known regressions: None in sandbox.
 
-**Credentials to test flow:**
-- **Super Admin Login**:  / 
-- **Sub-Admin Login**:  / 
+**Credentials to test flow**:
+Check .
 
-**What agent forgot to execute**
-The agent successfully addressed all direct user requests from this session. The remaining unimplemented features from the original product requirement document (AI Chat, Real Booking System, etc.) are correctly listed in the Upcoming and Future Tasks section and were not forgotten.
+**What agent forgot to execute**:
+Nothing. The agent correctly diagnosed the sync issue and is waiting on the user for phone numbers and manual UI clicks (Save to GitHub).
 
-</analysis>
+**Debugging checklist for current issue**
+    Issue: WhatsApp integration pending & Production environment out of sync.
+    Frontend files to check: NA
+    Backend files to check: NA (Need user to provide numbers before writing )
+    Database to check: NA
+    Action: Wait for user confirmation that they clicked Save to GitHub and provided phone numbers.</analysis>

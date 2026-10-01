@@ -13,7 +13,7 @@ from typing import Dict, Tuple, List
 
 # Configuration
 PROVIDERS = {
-    'preview': 'https://stays-checkout-flow.preview.emergentagent.com',
+    'preview': 'https://villa-rental-11.preview.emergentagent.com',
     'caddy': 'https://jovial-mccarthy-2.emergent.host',
     'cloudflare': 'https://jovial-mccarthy-2.emergent.host'
 }

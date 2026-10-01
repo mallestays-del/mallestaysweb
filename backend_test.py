@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 import sys
 
 # Base URL from environment
-BASE_URL = "https://stays-checkout-flow.preview.emergentagent.com"
+BASE_URL = "https://villa-rental-11.preview.emergentagent.com"
 
 def log_test(test_name, status, message=""):
     """Log test results"""

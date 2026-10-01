@@ -559,27 +559,29 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="order-1 md:order-2 flex justify-center">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
-                  <a 
-                    href="https://www.iafcertsearch.org/certification/D4IXym52G4fIJNhoUlZOLWkW" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="block relative group"
-                  >
-                    <img 
-                      src="https://customer-assets-m6fa6gv7.emergentagent.net/job_635c75da-4d51-46de-b07f-a30b74c9f7e0/artifacts/1q7c82gc_WhatsApp%20Image%202026-09-12%20at%2011.50.03%20PM.jpeg"
-                      alt="ISO 9001:2015 Certified - Quality Management System for Travel & Accommodation Services"
-                      className="relative w-64 md:w-80 h-auto drop-shadow-2xl transform hover:scale-105 transition-transform duration-300 cursor-pointer"
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 rounded-lg flex items-center justify-center">
-                      <span className="bg-white text-slate-900 px-4 py-2 rounded-lg font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-sm">
-                        🔍 Click to Verify
-                      </span>
+                <div className="flex flex-col items-center">
+                  <div className="relative inline-block">
+                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full blur-3xl opacity-20 animate-pulse pointer-events-none"></div>
+                    <a 
+                      href="https://www.iafcertsearch.org/certification/D4IXym52G4fIJNhoUlZOLWkW" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="block relative group"
+                    >
+                      <img 
+                        src="https://customer-assets-m6fa6gv7.emergentagent.net/job_635c75da-4d51-46de-b07f-a30b74c9f7e0/artifacts/1q7c82gc_WhatsApp%20Image%202026-09-12%20at%2011.50.03%20PM.jpeg"
+                        alt="ISO 9001:2015 Certified - Quality Management System for Travel & Accommodation Services"
+                        className="relative w-64 md:w-80 h-auto drop-shadow-2xl transform hover:scale-105 transition-transform duration-300 cursor-pointer"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 rounded-lg flex items-center justify-center">
+                        <span className="bg-white text-slate-900 px-4 py-2 rounded-lg font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-sm">
+                          🔍 Click to Verify
+                        </span>
+                      </div>
+                    </a>
+                    <div className="absolute -top-3 -right-3 md:-top-4 md:-right-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-4 py-2 md:px-5 md:py-2.5 rounded-lg shadow-lg transform rotate-3 hover:rotate-6 transition-transform z-10">
+                      <p className="font-bold text-xs md:text-sm whitespace-nowrap">Certified 2026</p>
                     </div>
-                  </a>
-                  <div className="absolute -bottom-4 -right-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-6 py-3 rounded-lg shadow-lg transform rotate-3 hover:rotate-6 transition-transform">
-                    <p className="font-bold text-sm">Certified 2026</p>
                   </div>
                   <div className="mt-8 text-center">
                     <a 
