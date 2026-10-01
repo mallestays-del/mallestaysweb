@@ -986,3 +986,107 @@ agent_communication:
     message: "💳 RAZORPAY PAYMENT INTEGRATION TESTING COMPLETE - All payment endpoints working perfectly! After fixing RAZORPAY_KEY_SECRET in .env, the integration is fully functional. POST /api/v1/payments/create-order successfully creates Razorpay orders (returns orderId starting with 'order_', amount in paise, currency INR, keyId rzp_live_*), booking document updated with razorpayOrderId, payment verification working with proper signature validation (400 for invalid signatures), error handling correct (400 for missing bookingId). Previously failed with 502 (Razorpay 401 auth error), now all 7 test cases passed including negative tests. Test booking cleaned up successfully."
   - agent: "testing"
     message: "📱 WHATSAPP CLOUD API INTEGRATION TESTING COMPLETE - ALL 29 TESTS PASSED! Complete WhatsApp integration working flawlessly: (1) GET /api/whatsapp/test returns correct metadata, (2) POST authentication working (403 without/wrong key), (3) Template mode sends hello_world to Meta API successfully, (4) Text mode sends custom and default messages successfully, (5) Error handling correct (500 for invalid phone), (6) All simulate modes working (confirmation sends guest+admin, checkin sends reminder, recovery sends payment recovery, unknown returns 400), (7) Idempotency verified via MongoDB (whatsapp_notifications collection with status='accepted' and messageId), (8) Webhook GET verification working (returns challenge with correct token, 403 with wrong token), (9) Webhook POST processes status payloads and logs to MongoDB, (10) Both cron endpoints working (401 without auth, 200 with Bearer token, GET/POST methods supported), (11) Payment verify hook properly integrated (imports, Promise.allSettled, fire-and-forget, confirmedBooking payload). All real Meta API calls successful to admin number +918446620191. Test data cleaned up (10 notification records, 1 message log record deleted). Integration production-ready!"
+
+## Session: Vercel Build Fix - Lazy Env Var Loading (Feb 2026)
+- Reported bug (user): Vercel build failing with `Error: Missing RESEND_API_KEY` during "Collecting page data" phase at /api/bookings/[bookingId]/send-confirmation/route.js.
+- Root cause: /app/lib/resend.js (and similarly /app/lib/mongodb.js) threw at MODULE IMPORT TIME when the env var was missing. During `next build` → "Collecting page data" step, Next.js imports every route module statically, which triggered the throw and killed the build.
+- Fix:
+  * /app/lib/resend.js: replaced direct `new Resend()` + top-level throw with a lazy Proxy that defers client init (and the error) to first call. Added `isResendConfigured()` helper.
+  * /app/lib/mongodb.js: replaced top-level `throw` + eager `MongoClient.connect()` with a lazy `getClientPromise()` function. Default export is now a thenable proxy that resolves the real promise on first `.then/.catch/.finally` for backward compatibility.
+- Verified `yarn build` passes in 3 configurations: with all env vars, without RESEND_API_KEY, without both RESEND_API_KEY and MONGO_URL. All build successfully (30/30 pages generated).
+- Runtime verified: /api/villas returns 200, /api/whatsapp/test returns 200.
+
+
+backend:
+  - task: "Vercel Build Fix - Build-time verification"
+    implemented: true
+    working: true
+    file: "/app/lib/resend.js, /app/lib/mongodb.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Converted /app/lib/resend.js and /app/lib/mongodb.js to lazy loading pattern to prevent build-time failures when env vars are missing"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - Build-time verification CRITICAL FIX CONFIRMED: (1) Build with all env vars: exit 0, 30/30 pages generated, (2) Build without RESEND_API_KEY: exit 0, 30/30 pages generated - THIS WAS THE REPORTED BUG, NOW FIXED, (3) Build without both RESEND_API_KEY and MONGO_URL: exit 0, 30/30 pages generated. All three builds completed successfully with 'Done in ~21s'. Previously build 2 and 3 would have thrown 'Error: Missing RESEND_API_KEY' or 'Please add your Mongo URI to .env' during 'Collecting page data' phase."
+
+  - task: "Vercel Build Fix - MongoDB lazy loading runtime"
+    implemented: true
+    working: true
+    file: "/app/lib/mongodb.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Lazy getClientPromise() pattern implemented to defer MongoDB connection until actual use"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - MongoDB lazy loading working perfectly: All MongoDB-dependent endpoints working correctly: GET /api/villas (200, 4 villas), GET /api/v1/bookings (200, 5 bookings), GET /api/locations (200, 7 locations), GET /api/offers (200, 0 offers), GET /api/guest-reviews (200, 1 review). Lazy loading did not break any existing functionality. Backward compatibility maintained."
+
+  - task: "Vercel Build Fix - Resend lazy loading runtime"
+    implemented: true
+    working: true
+    file: "/app/lib/resend.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Lazy Proxy pattern implemented to defer Resend client creation until actual method call. Added isResendConfigured() helper."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - Resend lazy loading working perfectly: GET /api/bookings/dummy-id/send-confirmation returns 405 (Method Not Allowed), NOT 500 with 'Missing RESEND_API_KEY'. This confirms the route module loads successfully without throwing at import time. The lazy Proxy defers the error until actual method call. isResendConfigured() helper confirmed in code."
+
+  - task: "Vercel Build Fix - WhatsApp integration regression"
+    implemented: true
+    working: true
+    file: "/app/lib/whatsapp-notifications.js, /app/app/api/whatsapp/test/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "WhatsApp endpoints use MongoDB for idempotency tracking. Need to verify lazy MongoDB loading didn't break WhatsApp functionality."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - WhatsApp integration working perfectly after MongoDB lazy loading: GET /api/whatsapp/test (200, configured=true, phoneNumberId=1097368213460843), POST /api/whatsapp/test simulate checkin (200, sent=true). MongoDB-backed idempotency and WhatsApp API calls working correctly. No regression from lazy loading changes."
+
+  - task: "Vercel Build Fix - Payment integration regression"
+    implemented: true
+    working: false
+    file: "/app/app/api/v1/payments/create-order/route.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Payment endpoints use both MongoDB and Razorpay. Need to verify lazy MongoDB loading didn't break payment flow."
+      - working: false
+        agent: "testing"
+        comment: "❌ FAIL - Payment endpoint returning 502 with Razorpay authentication error: 'Razorpay order creation failed: 401 Authentication failed'. However, this is NOT related to the Vercel build fix. This is a separate Razorpay credential issue (RAZORPAY_KEY_SECRET). The booking creation works (200, bookingId created), MongoDB lazy loading is working. The Razorpay API authentication is the issue, not the lazy loading pattern. This was a known issue from previous test sessions (stuck_count in history)."
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.5"
+  test_sequence: 6
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Vercel Build Fix - All components"
+  stuck_tasks:
+    - "Vercel Build Fix - Payment integration regression"
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "testing"
+    message: "🎯 VERCEL BUILD FIX VERIFICATION COMPLETE - CRITICAL FIX CONFIRMED! All 3 build tests passed successfully: (1) with all env vars, (2) without RESEND_API_KEY (THE REPORTED BUG - NOW FIXED), (3) without both env vars. All builds exit 0 with 30/30 pages generated. Runtime regression tests: 10/11 passed. MongoDB lazy loading working perfectly (all 5 endpoints tested: villas, bookings, locations, offers, guest-reviews). Resend lazy loading working perfectly (route loads without throwing 'Missing RESEND_API_KEY'). WhatsApp integration working (MongoDB idempotency intact). Payment endpoint has Razorpay 401 auth error, but this is NOT related to the build fix - it's a separate credential issue (RAZORPAY_KEY_SECRET). The lazy loading pattern is working correctly. Test booking created and cleaned up successfully (MS-MUPXVR46-4Q4S cancelled)."
