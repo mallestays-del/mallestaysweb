@@ -226,8 +226,17 @@ function VillasContent() {
                           </p>
                         </div>
                         <div className="text-right">
-                          <div className="text-2xl font-bold text-primary">₹{villa.pricePerNight?.toLocaleString()}</div>
-                          <div className="text-sm text-slate-600">per night</div>
+                          <div className="flex flex-col items-end gap-1">
+                            <div className="text-2xl font-bold text-slate-900">
+                              ₹{villa.pricePerNight?.toLocaleString()}/-
+                            </div>
+                            {villa.originalPrice && villa.originalPrice > villa.pricePerNight && (
+                              <div className="text-sm text-slate-400 line-through">
+                                ₹{villa.originalPrice?.toLocaleString()}/-
+                              </div>
+                            )}
+                            <div className="text-sm text-slate-600">per night</div>
+                          </div>
                         </div>
                       </div>
                     </CardHeader>

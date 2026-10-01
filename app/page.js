@@ -429,9 +429,17 @@ export default function HomePage() {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute top-4 right-4">
-                      <Badge className="bg-yellow-600 text-white px-3 py-1">
-                        ₹{villa.pricePerNight?.toLocaleString()}/night
-                      </Badge>
+                      <div className="bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg">
+                        <div className="text-2xl font-bold text-slate-900">
+                          ₹{villa.pricePerNight?.toLocaleString()}/-
+                        </div>
+                        {villa.originalPrice && villa.originalPrice > villa.pricePerNight && (
+                          <div className="text-xs text-slate-500 line-through">
+                            ₹{villa.originalPrice?.toLocaleString()}/-
+                          </div>
+                        )}
+                        <div className="text-xs text-slate-600 text-center">per night</div>
+                      </div>
                     </div>
                   </div>
                   <CardContent className="p-6">
