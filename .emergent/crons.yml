@@ -1,0 +1,16 @@
+crons:
+  - name: wa-checkin-reminders
+    description: "Sends WhatsApp check-in reminders at 10:00 IST for guests arriving tomorrow"
+    cron: "0 10 * * *"
+    timezone: "Asia/Kolkata"
+    endpoint: "{{BASE_URL}}/api/cron/whatsapp-checkin-reminders"
+    method: POST
+    # Cron endpoints must ack 2xx immediately; enqueue/background the actual work.
+    enabled: true
+  - name: wa-abandoned-cart
+    description: "Hourly WhatsApp recovery message to guests who started checkout but didn't pay"
+    cron: "15 * * * *"
+    endpoint: "{{BASE_URL}}/api/cron/whatsapp-abandoned-cart"
+    method: POST
+    # Cron endpoints must ack 2xx immediately; enqueue/background the actual work.
+    enabled: true

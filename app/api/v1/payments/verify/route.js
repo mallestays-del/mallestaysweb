@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/mongodb';
 import { verifyPaymentSignature } from '@/lib/razorpay';
+import { sendBookingConfirmation, sendAdminAlert } from '@/lib/whatsapp-notifications';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -70,6 +71,24 @@ export async function POST(request) {
         { upsert: true }
       );
     }
+    
+    // Fire WhatsApp notifications (non-blocking - won't fail the response)
+    const confirmedBooking = {
+      ...booking,
+      amountPaid: paidAmount,
+      status: 'confirmed',
+      paymentStatus: mode === 'advance' ? 'partial' : 'paid',
+    };
+    Promise.allSettled([
+      sendBookingConfirmation(confirmedBooking),
+      sendAdminAlert(confirmedBooking),
+    ]).then((results) => {
+      results.forEach((r, i) => {
+        const label = ['guest_confirmation', 'admin_alert'][i];
+        if (r.status === 'rejected') console.error(`[whatsapp] ${label} failed:`, r.reason?.message);
+        else console.log(`[whatsapp] ${label}:`, r.value);
+      });
+    });
     
     return NextResponse.json({ 
       success: true,
