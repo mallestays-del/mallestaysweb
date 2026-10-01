@@ -172,6 +172,25 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
+          {/* Availability Management Card */}
+          <Card className="border-2 border-purple-300 bg-purple-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/admin/availability')}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3 text-purple-900 text-lg">
+                <Calendar className="h-6 w-6 text-purple-600" />
+                Availability
+              </CardTitle>
+              <CardDescription className="text-purple-800">
+                Block/unblock dates for villas
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                <Calendar className="h-4 w-4 mr-2" />
+                Manage Availability
+              </Button>
+            </CardContent>
+          </Card>
+
           {/* Pricing Manager Card */}
           <Card className="border-2 border-green-300 bg-green-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/admin/pricing')}>
             <CardHeader>

@@ -61,16 +61,19 @@ export async function POST(request) {
   try {
     const db = await getDatabase();
     const body = await request.json();
-    const { villaId, dates, action, reason } = body;
+    const { villaId, date, dates, action, reason } = body;
     
-    if (!villaId || !dates || !action) {
-      return NextResponse.json({ error: 'villaId, dates, and action are required' }, { status: 400 });
+    // Support both single date and array of dates
+    const datesToProcess = dates ? dates : (date ? [date] : null);
+    
+    if (!villaId || !datesToProcess || !action) {
+      return NextResponse.json({ error: 'villaId, date(s), and action are required' }, { status: 400 });
     }
     
     if (action === 'block') {
-      const docs = dates.map(date => ({
+      const docs = datesToProcess.map(d => ({
         villaId,
-        date,
+        date: d,
         reason: reason || 'manual_block',
         blockedAt: new Date().toISOString()
       }));
@@ -83,13 +86,13 @@ export async function POST(request) {
           { upsert: true }
         );
       }
-      return NextResponse.json({ message: `${dates.length} dates blocked` });
+      return NextResponse.json({ message: `${datesToProcess.length} date(s) blocked`, count: datesToProcess.length });
     } else if (action === 'unblock') {
-      await db.collection('availability').deleteMany({
+      const result = await db.collection('availability').deleteMany({
         villaId,
-        date: { $in: dates }
+        date: { $in: datesToProcess }
       });
-      return NextResponse.json({ message: `${dates.length} dates unblocked` });
+      return NextResponse.json({ message: `${datesToProcess.length} date(s) unblocked`, count: result.deletedCount });
     }
     
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });

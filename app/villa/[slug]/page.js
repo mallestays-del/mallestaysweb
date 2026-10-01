@@ -647,6 +647,11 @@ export default function VillaDetailsPage() {
           </div>
         </div>
 
+        {/* Availability Calendar Section */}
+        <div className="mt-12">
+          <AvailabilityCalendar villaId={villa?.id} villaName={villa?.name} />
+        </div>
+
         {/* Reviews Section */}
         <div className="mt-12">
           <Card>
