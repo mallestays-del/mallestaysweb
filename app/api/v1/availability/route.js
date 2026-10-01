@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/mongodb';
+import { requireAdmin } from '@/lib/auth-middleware';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,6 +60,9 @@ export async function GET(request) {
 // POST /api/v1/availability - Block/unblock dates (admin only)
 export async function POST(request) {
   try {
+    // Verify admin authentication
+    await requireAdmin(request);
+    
     const db = await getDatabase();
     const body = await request.json();
     const { villaId, date, dates, action, reason } = body;
@@ -98,6 +102,12 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   } catch (error) {
     console.error('Availability update error:', error);
+    
+    // Return 401 for authentication errors specifically
+    if (error.message && error.message.includes('Unauthorized')) {
+      return NextResponse.json({ error: error.message }, { status: 401 });
+    }
+    
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

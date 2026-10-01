@@ -541,7 +541,24 @@ export default function VillaDetailsPage() {
               <Card className="shadow-lg">
                 <CardContent className="pt-6">
                   <h2 className="text-2xl font-bold mb-2 text-center">Book Your Stay</h2>
-                  <p className="text-center text-slate-500 text-sm mb-6">₹{villa.pricePerNight?.toLocaleString('en-IN')} / night</p>
+                  <div className="text-center mb-6">
+                    <div className="flex items-baseline justify-center gap-2">
+                      <span className="text-3xl font-bold text-slate-900">
+                        ₹{villa.pricePerNight?.toLocaleString('en-IN')}/-
+                      </span>
+                      {villa.originalPrice && villa.originalPrice > villa.pricePerNight && (
+                        <span className="text-lg text-slate-400 line-through">
+                          ₹{villa.originalPrice?.toLocaleString('en-IN')}/-
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-slate-600 mt-1">per night</p>
+                    {villa.originalPrice && villa.originalPrice > villa.pricePerNight && (
+                      <p className="text-xs text-green-600 font-medium mt-1">
+                        Save ₹{(villa.originalPrice - villa.pricePerNight)?.toLocaleString('en-IN')}
+                      </p>
+                    )}
+                  </div>
                   
                   <form onSubmit={handleBooking} className="space-y-4">
                     {/* Check-in Date */}
