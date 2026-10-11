@@ -6,6 +6,7 @@ import ChatBot from '@/components/ChatBot';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import { Toaster } from '@/components/ui/sonner';
 import { seoConfig, generateStructuredData } from '@/lib/seo';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -96,6 +97,7 @@ export default function RootLayout({ children }) {
         <ChatBot />
         <WhatsAppButton />
         <Toaster />
+        <SpeedInsights />
       </body>
     </html>
   );
