@@ -7,6 +7,7 @@ import WhatsAppButton from '@/components/WhatsAppButton';
 import { Toaster } from '@/components/ui/sonner';
 import { seoConfig, generateStructuredData } from '@/lib/seo';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/next';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -98,6 +99,7 @@ export default function RootLayout({ children }) {
         <WhatsAppButton />
         <Toaster />
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
