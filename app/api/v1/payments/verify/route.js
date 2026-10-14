@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/mongodb';
 import { verifyPaymentSignature } from '@/lib/razorpay';
 import { sendBookingConfirmation, sendAdminAlert } from '@/lib/whatsapp-notifications';
+import { deliverWebhook } from '@/lib/webhook-signer';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -82,11 +83,12 @@ export async function POST(request) {
     Promise.allSettled([
       sendBookingConfirmation(confirmedBooking),
       sendAdminAlert(confirmedBooking),
+      deliverWebhook('booking.confirmed', confirmedBooking),
     ]).then((results) => {
       results.forEach((r, i) => {
-        const label = ['guest_confirmation', 'admin_alert'][i];
-        if (r.status === 'rejected') console.error(`[whatsapp] ${label} failed:`, r.reason?.message);
-        else console.log(`[whatsapp] ${label}:`, r.value);
+        const label = ['guest_confirmation', 'admin_alert', 'external_webhook'][i];
+        if (r.status === 'rejected') console.error(`[notify] ${label} failed:`, r.reason?.message);
+        else console.log(`[notify] ${label}:`, r.value);
       });
     });
     
