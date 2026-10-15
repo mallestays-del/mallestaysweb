@@ -1090,3 +1090,91 @@ test_plan:
 agent_communication:
   - agent: "testing"
     message: "🎯 VERCEL BUILD FIX VERIFICATION COMPLETE - CRITICAL FIX CONFIRMED! All 3 build tests passed successfully: (1) with all env vars, (2) without RESEND_API_KEY (THE REPORTED BUG - NOW FIXED), (3) without both env vars. All builds exit 0 with 30/30 pages generated. Runtime regression tests: 10/11 passed. MongoDB lazy loading working perfectly (all 5 endpoints tested: villas, bookings, locations, offers, guest-reviews). Resend lazy loading working perfectly (route loads without throwing 'Missing RESEND_API_KEY'). WhatsApp integration working (MongoDB idempotency intact). Payment endpoint has Razorpay 401 auth error, but this is NOT related to the build fix - it's a separate credential issue (RAZORPAY_KEY_SECRET). The lazy loading pattern is working correctly. Test booking created and cleaned up successfully (MS-MUPXVR46-4Q4S cancelled)."
+
+## Session: MongoDB Diagnostic Endpoint & Error Logging (Feb 2026)
+- New endpoint GET /api/health for MongoDB diagnostics (returns env config, connection status, collections WITHOUT leaking passwords)
+- Updated /app/lib/mongodb.js: lazy loading (no throw at import), safe error logging (logs user+host+code WITHOUT password), clears cached promise on error, provides hints for bad auth
+- Updated /app/app/api/health/route.js: parses MONGO_URL to extract scheme/user/host/db WITHOUT exposing password, detects special chars needing URL encoding, provides actionable hints for bad auth/AtlasError/network errors
+- All 13 backend tests passed: health endpoint (happy path, security, collections, URI parser, bad auth hints), regression tests (villas, offers, guest-reviews, locations, bookings), public API endpoints
+- Build verification: yarn build exit 0, 30/30 pages generated
+- Security verified: NO secrets leaked (no raw MONGO_URL, no password, port in mongoHost acceptable for diagnostics)
+
+backend:
+  - task: "Health Endpoint - GET /api/health"
+    implemented: true
+    working: true
+    file: "/app/app/api/health/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "New diagnostic endpoint implemented to help diagnose MongoDB connection issues (especially bad auth on Vercel). Returns env config, connection status, collections WITHOUT leaking passwords."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - Health endpoint working perfectly: Returns 200 with ok=true, connected=true, database=mallestays, 10 collections. All required fields present (env.hasMongoUrl, mongoScheme, mongoHost, mongoUser, mongoDbInUri, mongoDbEnv, passwordLikelyNeedsUrlEncoding, mongo.connected, ping, database, collectionCount, collections). Security verified: NO secrets leaked (no raw MONGO_URL, no password in response, port in mongoHost is acceptable for diagnostics). URI parser correctly extracts scheme/user/host/db without exposing password. Bad auth hints code review passed: detects bad auth/AtlasError, provides actionable hints about URL encoding and Atlas Database Access."
+
+  - task: "MongoDB lib - Lazy loading & safe error logging"
+    implemented: true
+    working: true
+    file: "/app/lib/mongodb.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Refactored mongodb.js to use lazy loading (getClientPromise) to prevent build-time failures. Added logSafeConnectError function that logs user+host+code+msg WITHOUT password. Clears cached promise on error for retry. Provides hints for bad auth."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - MongoDB lib refactor working perfectly: Code review passed (lazy loading via getClientPromise, no top-level throw, logSafeConnectError function, extracts user/host without logging password, logs error code/codeName, bad auth hint present, clears cached promise on error). All 5 regression tests passed: GET /api/villas (4 villas), GET /api/offers (0 offers), GET /api/guest-reviews (1 review), GET /api/locations (7 locations), GET /api/v1/bookings (404 for non-existent). Lazy loading did not break any existing functionality."
+
+  - task: "Build verification - yarn build"
+    implemented: true
+    working: true
+    file: "/app/lib/mongodb.js, /app/app/api/health/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Build verification to ensure lazy loading changes don't break Next.js build process"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - Build verification successful: yarn build exit 0, 30/30 pages generated, Done in 23.79s. No build-time errors from lazy loading changes."
+
+  - task: "Public API endpoints - Regression"
+    implemented: true
+    working: true
+    file: "/app/app/api/public/v1/bookings/route.js, /app/app/api/public/v1/webhook-test/route.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Regression test for public API endpoints from previous task to ensure mongodb.js refactor didn't break them"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASS - Public API endpoints still working: GET /api/public/v1/bookings with Bearer token returns 200 (count=6, hasMore=false), POST /api/public/v1/webhook-test with Bearer token returns 200 (success=true). No regression from mongodb.js changes."
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.6"
+  test_sequence: 7
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Health Endpoint - GET /api/health"
+    - "MongoDB lib - Lazy loading & safe error logging"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "testing"
+    message: "🏥 MONGODB DIAGNOSTIC ENDPOINT TESTING COMPLETE - ALL 13 TESTS PASSED! New health endpoint working perfectly: (1) GET /api/health returns 200 with ok=true, connected=true, database=mallestays, 10 collections, (2) Security verified: NO secrets leaked (no raw MONGO_URL, no password, port in mongoHost acceptable for diagnostics), (3) Expected collections present (villas, bookings, offers, locations), (4) URI parser code review passed (extracts scheme/user/host/db without exposing password, checks special chars), (5) MongoDB lib code review passed (lazy loading, safe error logging without password, clears cache on error, provides hints), (6) Bad auth hints code review passed (detects bad auth/AtlasError, provides actionable hints about URL encoding and Atlas config). Regression tests: All 5 DB endpoints working (villas=4, offers=0, guest-reviews=1, locations=7, bookings=404 for non-existent). Public API endpoints working (GET /api/public/v1/bookings count=6, POST /api/public/v1/webhook-test success=true). Build verification: yarn build exit 0, 30/30 pages. MongoDB refactor did not break any existing functionality. Health endpoint ready for production diagnostics!"
+
